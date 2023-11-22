@@ -2,7 +2,6 @@
 
 // For use by Hazel applications
 
-#include <cstdio>
 
 #include "Hazel/Application.h" 
 #include "Hazel/Log.h" 
