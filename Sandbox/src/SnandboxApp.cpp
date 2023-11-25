@@ -27,8 +27,8 @@ class Sandbox : public Hazel::Application
 public:
 	Sandbox() 
 	{
-		std::cout << "cons\n";
 		PushLayer(new ExampleLayer());
+		PushOverlay(new Hazel::ImGuiLayer());
 	}
 
 	~Sandbox() {
