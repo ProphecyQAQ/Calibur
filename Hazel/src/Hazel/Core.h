@@ -10,6 +10,10 @@
 	#error Hazel only support Windows!
 #endif
 
+#ifdef HZ_DEBUG
+	#define HZ_ENABLE_ASSERTS
+#endif
+
 #ifdef HZ_ENABLE_ASSERTS
 	#define HZ_ASSRET(x, ...) { if (!(x)) {HZ_ERROR("Assertion Failed: {)}", __VA_ARGS__); __debuebreak();} }
 	#define HZ_CORE_ASSRET(x, ...) { if (!(x)) {HZ_CORE_ERROR("Assertion Failed: {)}", __VA_ARGS__); __debuebreak();} }
