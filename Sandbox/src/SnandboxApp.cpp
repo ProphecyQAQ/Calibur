@@ -1,5 +1,6 @@
 #include <Hazel.h>
 
+
 class ExampleLayer : public Hazel::Layer 
 {
 public:
@@ -27,6 +28,10 @@ public:
 			}
 			HZ_TRACE("{0}", (char)e.GetKeyCode());
 		}
+	}
+
+	void OnImGuiRender() override
+	{
 	}
 
 };
