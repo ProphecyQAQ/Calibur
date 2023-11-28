@@ -34,8 +34,8 @@ project "Hazel"
 	files {
 		"%{prj.name}/src/**.h",
 		"%{prj.name}/src/**.cpp",
-		"%{prj.name}/vecdor/glm/glm/**.hpp",
-		"%{prj.name}/vecdor/glm/glm/**.inl",
+		"%{prj.name}/vendor/glm/glm/**.hpp",
+		"%{prj.name}/vendor/glm/glm/**.inl",
 	}
 
 	includedirs {
@@ -100,6 +100,7 @@ project "Sandbox"
 	includedirs {
 		"Hazel/vendor/spdlog/include",
 		"Hazel/src",
+		"Hazel/vender",
 		"%{IncludeDir.glm}",
 	}
 
