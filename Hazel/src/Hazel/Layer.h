@@ -3,9 +3,11 @@
 #include "Hazel/Core.h"
 #include "Hazel/Event/Event.h"
 
+#include "Hazel/Core/TimeStep.h"
+
 namespace Hazel
 {
-	class HAZEL_API Layer
+	class Layer
 	{
 	public:
 		Layer(const std::string& name = "Layer");
@@ -13,7 +15,7 @@ namespace Hazel
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(TimeStep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& e) {}
 

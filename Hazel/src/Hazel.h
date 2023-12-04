@@ -10,6 +10,8 @@
 #include "Hazel/MouseButtonCodes.h"
 #include "Hazel/KeyCodes.h"
 
+#include "Hazel/Core/TimeStep.h"
+
 #include "Hazel/ImGui/ImGuiLayer.h"
 
 // --- Renderer head file--------------------

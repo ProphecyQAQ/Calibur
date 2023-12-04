@@ -1385,6 +1385,7 @@
     </ClInclude>
     <ClInclude Include="src\Platform\OpenGL\OpenGLRendererAPI.h" />
     <ClInclude Include="src\Hazel\Renderer\OrthographicCamera.h" />
+    <ClInclude Include="src\Hazel\Core\TimeStep.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Hazel\Application.cpp">
