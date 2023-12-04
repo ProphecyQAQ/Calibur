@@ -16,7 +16,6 @@ namespace Hazel {
 
 
 	Application::Application()
-		: m_Camera(-1.6f, 1.6f, -0.9f, 0.9f )
 	{
 		HZ_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
@@ -26,83 +25,6 @@ namespace Hazel {
 		
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
-
-
-		m_VertexArray.reset(VertexArray::Create());
-
-		float vertices[3 * 7] = {
-			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-		 	 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-		};
-
-		m_VertexBuffer.reset(VertexBuffer::Create(vertices, sizeof(vertices)));
-
-		BufferLayout layout = {			
-			{ShaderDataType::Float3, "a_Position"},
-			{ShaderDataType::Float4, "a_Color"},
-		};
-
-		m_VertexBuffer->SetLayout(layout);
-		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
-		 
-		unsigned int indics[3] = { 0, 1, 2 };
-
-		m_IndexBuffer.reset(IndexBuffer::Create(indics, std::size(indics)));
-		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
-
-		m_SquareVA.reset(VertexArray::Create());
-		float squareVertices[4 * 7] = {
-			-0.75f, -0.75f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-		 	 0.75f, -0.75f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			 0.75f,  0.75f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-			-0.75f,  0.75f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-		};
-		std::shared_ptr<VertexBuffer> suqareVB(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
-
-		suqareVB->SetLayout(layout);
-		m_SquareVA->AddVertexBuffer(suqareVB);
-
-		unsigned int squareIndics[6] = { 0, 1, 2, 2, 3, 0 };
-		std::shared_ptr<IndexBuffer> squareIB(IndexBuffer::Create(squareIndics, std::size(squareIndics)));
-
-		m_SquareVA->SetIndexBuffer(squareIB);
-
-
-		std::string vertexSrc = R"(
-			#version 330 core
-				
-			layout(location = 0) in vec3 a_Position;			
-			layout(location = 1) in vec4 a_Color;			
-
-			uniform mat4 u_ViewProjection;
-
-			out vec4 fragPos;
-			out vec4 fragColor;
-
-			void main()
-			{
-				fragPos = vec4(a_Position, 1.0);
-				fragColor = a_Color;
-				gl_Position = u_ViewProjection * vec4(a_Position, 1.0);
-			}	
-		)";
-		
-		std::string fragmentSrc = R"(
-			#version 330 core
-			
-			in vec4 fragPos;
-			in vec4 fragColor;
-			layout(location = 0) out vec4 color;			
-
-			void main()
-			{
-				color = fragColor;	
-			}	
-		)";
-
-		//Init shader
-		m_Shader.reset(new Shader(vertexSrc, fragmentSrc));
 	}
 
 	Application::~Application() {
@@ -139,18 +61,6 @@ namespace Hazel {
 	void Application::Run() {
 		while (m_Running) 
 		{
-			RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-			RenderCommand::Clear();
-
-			m_Camera.SetRotation(45.f);
-
-			Renderer::BeginScene(m_Camera);
-
-			Renderer::Submit(m_Shader, m_SquareVA);
-			Renderer::Submit(m_Shader, m_VertexArray);
-
-			Renderer::EndScene();
-
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate();
 
