@@ -25,7 +25,7 @@ public:
 
 		Hazel::BufferLayout layout = {
 			{Hazel::ShaderDataType::Float3, "a_Position"},
-			{Hazel::ShaderDataType::Float4, "a_Color"},
+			{Hazel::ShaderDataType::Float2, "a_TexCoord"},
 		};
 
 		m_VertexBuffer->SetLayout(layout);
@@ -37,19 +37,19 @@ public:
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		m_SquareVA.reset(Hazel::VertexArray::Create());
-		float squareVertices[4 * 7] = {
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-		 	 0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-			-0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f,
+		float squareVertices[4 * 5] = {
+			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
+		 	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
+			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
+			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 		};
-		std::shared_ptr<Hazel::VertexBuffer> suqareVB(Hazel::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		Hazel::Ref<Hazel::VertexBuffer> suqareVB(Hazel::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
 
 		suqareVB->SetLayout(layout);
 		m_SquareVA->AddVertexBuffer(suqareVB);
 
 		unsigned int squareIndics[6] = { 0, 1, 2, 2, 3, 0 };
-		std::shared_ptr<Hazel::IndexBuffer> squareIB(Hazel::IndexBuffer::Create(squareIndics, std::size(squareIndics)));
+		Hazel::Ref<Hazel::IndexBuffer> squareIB(Hazel::IndexBuffer::Create(squareIndics, std::size(squareIndics)));
 
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -58,18 +58,15 @@ public:
 			#version 330 core
 				
 			layout(location = 0) in vec3 a_Position;			
-			layout(location = 1) in vec4 a_Color;			
 
 			uniform mat4 u_ViewProjection;
 			uniform mat4 u_Transform;
 
 			out vec4 fragPos;
-			out vec4 fragColor;
 
 			void main()
 			{
 				fragPos = vec4(a_Position, 1.0);
-				fragColor = a_Color;
 				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 			}	
 		)";
@@ -80,7 +77,6 @@ public:
 			uniform vec3 u_Color;
 
 			in vec4 fragPos;
-			in vec4 fragColor;
 			layout(location = 0) out vec4 color;		
 
 			void main()
@@ -90,7 +86,45 @@ public:
 		)";
 
 		//Init shader
-		m_Shader.reset(Hazel::Shader::Create(vertexSrc, fragmentSrc));  
+		m_Shader.reset(Hazel::Shader::Create(vertexSrc, fragmentSrc));
+
+		std::string textureVertexSrc = R"(
+			#version 330 core
+				
+			layout(location = 0) in vec3 a_Position;			
+			layout(location = 1) in vec2 a_TexCoord;			
+
+			uniform mat4 u_ViewProjection;
+			uniform mat4 u_Transform;
+
+			out vec2 v_TexCoord;
+
+			void main()
+			{
+				v_TexCoord = a_TexCoord;
+				gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+			}	
+		)";
+
+		std::string textureFragmentSrc = R"(
+			#version 330 core
+			
+			layout(location = 0) out vec4 color;		
+
+			in vec2 v_TexCoord;
+			uniform sampler2D u_Texture;
+
+			void main()
+			{
+				color = texture(u_Texture, v_TexCoord);	
+			}	
+		)";
+
+		m_TextureShader.reset(Hazel::Shader::Create(textureVertexSrc, textureFragmentSrc));
+
+		m_Texture = Hazel::Texture2D::Create("assets/textures/CheckerBoard.png");
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TextureShader)->Bind();
+		std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_TextureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
 	void OnUpdate(Hazel::TimeStep ts) override
@@ -144,7 +178,11 @@ public:
 				Hazel::Renderer::Submit(m_Shader, m_SquareVA, transform);
 			}
 		}
-		Hazel::Renderer::Submit(m_Shader, m_VertexArray);
+
+		m_Texture->Bind();
+		Hazel::Renderer::Submit(m_TextureShader, m_SquareVA);
+		//Triangle
+		//Hazel::Renderer::Submit(m_Shader, m_VertexArray);
 
 		Hazel::Renderer::EndScene();
 	}
@@ -162,12 +200,13 @@ public:
 
 private:
 
-	std::shared_ptr<Hazel::Shader> m_Shader;
-	std::shared_ptr<Hazel::VertexBuffer> m_VertexBuffer;
-	std::shared_ptr<Hazel::IndexBuffer> m_IndexBuffer;
-	std::shared_ptr<Hazel::VertexArray> m_VertexArray;
+	Hazel::Ref<Hazel::Shader> m_Shader, m_TextureShader;
+	Hazel::Ref<Hazel::Texture2D> m_Texture;
 
-	std::shared_ptr<Hazel::VertexArray> m_SquareVA;
+	Hazel::Ref<Hazel::VertexBuffer> m_VertexBuffer;
+	Hazel::Ref<Hazel::IndexBuffer> m_IndexBuffer;
+	Hazel::Ref<Hazel::VertexArray> m_VertexArray;
+	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
 
 	Hazel::OrthographicCamera m_Camera;
 
