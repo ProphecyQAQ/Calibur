@@ -9,6 +9,7 @@
 #include "Hazel/Input.h"
 #include "Hazel/MouseButtonCodes.h"
 #include "Hazel/KeyCodes.h"
+#include "Hazel/OrthographicCameraController.h"
 
 #include "Hazel/Core/TimeStep.h"
 
