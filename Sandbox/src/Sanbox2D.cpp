@@ -4,8 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Platform/OpenGL/OpenGLShader.h"
-
 Sanbox2D::Sanbox2D()
 	:Layer("Sandbox2D"), m_CameraController(1920.0f/1080.0f)
 {
@@ -32,7 +30,8 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f }, { 1.0f, 1.0f }, m_SquareColor);
+	Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 1.0f, 1.0f }, m_SquareColor);
+	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, m_SquareColor);
 
 	//glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f));
 	//std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_FlatColorShader)->Bind();
