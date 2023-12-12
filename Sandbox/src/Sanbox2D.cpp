@@ -12,7 +12,7 @@ Sanbox2D::Sanbox2D()
 
 void Sanbox2D::OnAttach()
 {
-
+	m_CheckerboardTexture = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sanbox2D::OnDetach()
@@ -31,6 +31,7 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
 	Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 1.0f, 1.0f }, m_SquareColor);
+	Hazel::Renderer2D::DrawQuad({ 0.0f, -0.0f, -0.9f}, { 0.5f, 0.5f }, m_CheckerboardTexture);
 	Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, m_SquareColor);
 
 	//glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5f));
