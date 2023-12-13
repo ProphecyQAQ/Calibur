@@ -2,8 +2,8 @@
 #include "Hazel/Renderer/OrthographicCamera.h"
 #include "Hazel/Core/TimeStep.h"
 
-#include "Hazel/Event/ApplicationEvent.h"
-#include "Hazel/Event/MouseEvent.h"
+#include "Hazel/Events/ApplicationEvent.h"
+#include "Hazel/Events/MouseEvent.h"
 
 namespace Hazel
 {

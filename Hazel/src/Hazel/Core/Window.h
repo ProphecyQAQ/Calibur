@@ -3,7 +3,7 @@
 #include "hzpch.h"
 
 #include "Hazel/Core/Core.h"
-#include "Hazel/Event/Event.h"
+#include "Hazel/Events/Event.h"
 
 namespace Hazel 
 {
@@ -24,7 +24,7 @@ namespace Hazel
 	};
 	
 	// Interface representing a desktop system based Window
-	class HAZEL_API Window 
+	class Window 
 	{
 	public:
 		using EventCallbackFn = std::function<void(Event&)>;
@@ -43,6 +43,6 @@ namespace Hazel
 
 		virtual void* GetNativeWindow() const = 0;
 
-		static Window* Create(const WindowProps& Props = WindowProps());
+		static Scope<Window> Create(const WindowProps& Props = WindowProps());
 	};
 }

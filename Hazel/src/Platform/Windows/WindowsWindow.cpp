@@ -1,9 +1,9 @@
 #include "hzpch.h"
-#include "WindowsWindow.h"
+#include "Platform/Windows/WindowsWindow.h"
 
-#include "Hazel/Event/ApplicationEvent.h"
-#include "Hazel/Event/MouseEvent.h"
-#include "Hazel/Event/KeyEvent.h"
+#include "Hazel/Events/ApplicationEvent.h"
+#include "Hazel/Events/MouseEvent.h"
+#include "Hazel/Events/KeyEvent.h"
 #include "Platform/OpenGL/OpenGLContext.h"
 
 
@@ -16,9 +16,9 @@ namespace Hazel
 		HZ_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
 	}
 
-	Window* Window::Create(const WindowProps& props)
+	Scope<Window> Window::Create(const WindowProps& props)
 	{
-		return new WindowsWindow(props);
+		return CreateScope<WindowsWindow>(props);
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props)
@@ -39,10 +39,8 @@ namespace Hazel
 
 		HZ_CORE_INFO("Creating Window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
-
 		if (s_GLFWWindowCount == 0)
 		{
-			HZ_CORE_INFO("Initializing GLFW");
 			int success = glfwInit();
 			HZ_CORE_ASSERT(success, "Coule not intialize GLFW!");
 			
@@ -53,7 +51,7 @@ namespace Hazel
 		++s_GLFWWindowCount;
 		
 		// Creat and Init Context
-		m_Context = CreateScope<OpenGLContext>(m_Window);
+		m_Context = GraphicsContext::Create(m_Window);
 		m_Context->Init();
 
 		glfwSetWindowUserPointer(m_Window, &m_Data);
@@ -164,9 +162,10 @@ namespace Hazel
 	void WindowsWindow::Shutdown()
 	{
 		glfwDestroyWindow(m_Window);
-		if (--s_GLFWWindowCount == 0)
+		--s_GLFWWindowCount;
+
+		if (s_GLFWWindowCount == 0)
 		{
-			HZ_CORE_INFO("Terminating GLFW");
 			glfwTerminate();
 		}
 	}

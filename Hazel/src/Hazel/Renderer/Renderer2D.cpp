@@ -1,9 +1,9 @@
 #include "hzpch.h"
-#include "Renderer2D.h"
+#include "Hazel/Renderer/Renderer2D.h"
 
-#include "VertexArray.h"
-#include "Shader.h"
-#include "RenderCommand.h"
+#include "Hazel/Renderer/VertexArray.h"
+#include "Hazel/Renderer/Shader.h"
+#include "Hazel/Renderer/RenderCommand.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -31,7 +31,7 @@ namespace Hazel
 			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 		};
 
-		Ref<VertexBuffer> suqareVB(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		Ref<VertexBuffer> suqareVB = VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 		BufferLayout layout = {
 			{ShaderDataType::Float3, "a_Position"},
@@ -41,7 +41,7 @@ namespace Hazel
 		s_Data->QuadVertexArray->AddVertexBuffer(suqareVB);
 
 		unsigned int squareIndics[6] = { 0, 1, 2, 2, 3, 0 };
-		Ref<IndexBuffer> squareIB(IndexBuffer::Create(squareIndics, std::size(squareIndics)));
+		Ref<IndexBuffer> squareIB = IndexBuffer::Create(squareIndics, std::size(squareIndics));
 
 		s_Data->QuadVertexArray->SetIndexBuffer(squareIB);
 

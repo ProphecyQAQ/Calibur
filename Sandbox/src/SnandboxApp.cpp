@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "imgui/imgui.h"
+#include <imgui/imgui.h>
 
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Sanbox2D.h"
@@ -23,7 +23,7 @@ public:
 			 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 		};
 
-		m_VertexBuffer.reset(Hazel::VertexBuffer::Create(vertices, sizeof(vertices)));
+		m_VertexBuffer = Hazel::VertexBuffer::Create(vertices, sizeof(vertices));
 
 		Hazel::BufferLayout layout = {
 			{Hazel::ShaderDataType::Float3, "a_Position"},
@@ -35,7 +35,7 @@ public:
 		 
 		unsigned int indics[3] = { 0, 1, 2 };
 
-		m_IndexBuffer.reset(Hazel::IndexBuffer::Create(indics, std::size(indics)));
+		m_IndexBuffer = Hazel::IndexBuffer::Create(indics, std::size(indics));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		m_SquareVA = Hazel::VertexArray::Create();
@@ -45,13 +45,13 @@ public:
 			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
 			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 		};
-		Hazel::Ref<Hazel::VertexBuffer> suqareVB(Hazel::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		Hazel::Ref<Hazel::VertexBuffer> suqareVB = Hazel::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 		suqareVB->SetLayout(layout);
 		m_SquareVA->AddVertexBuffer(suqareVB);
 
 		unsigned int squareIndics[6] = { 0, 1, 2, 2, 3, 0 };
-		Hazel::Ref<Hazel::IndexBuffer> squareIB(Hazel::IndexBuffer::Create(squareIndics, std::size(squareIndics)));
+		Hazel::Ref<Hazel::IndexBuffer> squareIB = Hazel::IndexBuffer::Create(squareIndics, std::size(squareIndics));
 
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -97,7 +97,6 @@ public:
 
 		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->Bind();
 		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
-
 	}
 
 	void OnUpdate(Hazel::TimeStep ts) override

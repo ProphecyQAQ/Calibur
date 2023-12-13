@@ -1,9 +1,9 @@
 #pragma once
 #include "Hazel/Core/Layer.h"
 
-#include "Hazel/Event/KeyEvent.h"
-#include "Hazel/Event/MouseEvent.h"
-#include "Hazel/Event/ApplicationEvent.h"
+#include "Hazel/Events/KeyEvent.h"
+#include "Hazel/Events/MouseEvent.h"
+#include "Hazel/Events/ApplicationEvent.h"
 
 namespace Hazel
 {
