@@ -14,11 +14,14 @@ Sanbox2D::Sanbox2D()
 
 void Sanbox2D::OnAttach()
 {
+	HZ_PROFILE_FUNCTION();
+
 	m_CheckerboardTexture = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
 }
 
 void Sanbox2D::OnDetach()
 {
+	HZ_PROFILE_FUNCTION();
 }
 
 void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
@@ -26,10 +29,7 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 	HZ_PROFILE_FUNCTION();
 
 	// Update
-	{
-		HZ_PROFILE_SCOPE("CameraController::OnUpdate");
-		m_CameraController.OnUpdate(ts);
-	}
+	m_CameraController.OnUpdate(ts);
 
 	// Render
 	{
