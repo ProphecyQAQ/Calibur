@@ -44,7 +44,7 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 
 		Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 1.0f, 1.0f }, m_SquareColor);
 		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, m_SquareColor);
-		Hazel::Renderer2D::DrawQuad({ 0.0f, -0.0f, -0.1f }, { 10.0f, 10.0f } ,m_CheckerboardTexture, 10.0f, glm::vec4(1.0f, 0.9f, 0.9f, 1.0f));
+		//Hazel::Renderer2D::DrawQuad({ 0.0f, -0.0f, -0.1f }, { 10.0f, 10.0f } ,m_CheckerboardTexture, 10.0f, glm::vec4(1.0f, 0.9f, 0.9f, 1.0f));
 		Hazel::Renderer2D::EndScene();
 	}
 
