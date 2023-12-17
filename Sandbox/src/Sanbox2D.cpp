@@ -17,6 +17,9 @@ void Sanbox2D::OnAttach()
 	HZ_PROFILE_FUNCTION();
 
 	m_CheckerboardTexture = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
+	m_SpriteSheet = Hazel::Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+
+	m_TextureStairs = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, {2, 1}, {128, 128}, {1,2});
 
 	// Init here
 	m_Particle.ColorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
@@ -48,6 +51,7 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 		Hazel::RenderCommand::Clear();
 	}
 
+	#if 0
 	{
 		static float rotation = 0.0f;
 		rotation += ts * 50.0f;
@@ -57,12 +61,12 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 
 		Hazel::Renderer2D::DrawRotateQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
 		Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-		Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor );
-		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f } ,m_CheckerboardTexture, 10.0f);
+		Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
+		Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
 		Hazel::Renderer2D::DrawRotateQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, m_CheckerboardTexture, 20.0f);
-		//Hazel::Renderer2D::EndScene();
+		Hazel::Renderer2D::EndScene();
 
-		//Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
 		for (float y = -5.0f; y < 5.0f; y += 0.5f)
 		{
 			for (float x = -5.0f; x < 5.0f; x += 0.5f)
@@ -72,29 +76,32 @@ void Sanbox2D::OnUpdate(Hazel::TimeStep ts)
 			}
 		}
 		Hazel::Renderer2D::EndScene();
+	}
+	#endif
 
-
-		if (Hazel::Input::IsMouseButtonPressed(HZ_MOUSE_BUTTON_LEFT))
-		{
-			auto [x, y] = Hazel::Input::GetMousePosition();
-			auto width = Hazel::Application::Get().GetWindow().GetWidth();
-			auto height = Hazel::Application::Get().GetWindow().GetHeight();
+	if (Hazel::Input::IsMouseButtonPressed(HZ_MOUSE_BUTTON_LEFT))
+	{
+		auto [x, y] = Hazel::Input::GetMousePosition();
+		auto width = Hazel::Application::Get().GetWindow().GetWidth();
+		auto height = Hazel::Application::Get().GetWindow().GetHeight();
 			
-			auto bounds = m_CameraController.GetBounds();
-			auto pos = m_CameraController.GetCamera().GetPosition();
-			x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
-			y = bounds.GetHeight() * 0.5f - (y / height) * bounds.GetHeight();
+		auto bounds = m_CameraController.GetBounds();
+		auto pos = m_CameraController.GetCamera().GetPosition();
+		x = (x / width) * bounds.GetWidth() - bounds.GetWidth() * 0.5f;
+		y = bounds.GetHeight() * 0.5f - (y / height) * bounds.GetHeight();
 
-			m_Particle.Position = { x + pos.x, y + pos.y };
-			for (int i = 0; i < 5; i++)
-				m_ParticleSystem.Emit(m_Particle);
+		m_Particle.Position = { x + pos.x, y + pos.y };
+		for (int i = 0; i < 5; i++)
+			m_ParticleSystem.Emit(m_Particle);
 
-		}
-
-		m_ParticleSystem.OnUpdate(ts);
-		m_ParticleSystem.OnRender(m_CameraController.GetCamera());
 	}
 
+	m_ParticleSystem.OnUpdate(ts);
+	m_ParticleSystem.OnRender(m_CameraController.GetCamera());
+
+	Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, 0.3f }, { 1.0f, 2.0f } , m_TextureStairs);
+	Hazel::Renderer2D::EndScene();
 }
 
 void Sanbox2D::OnImGuiRender()

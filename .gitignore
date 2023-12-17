@@ -3,6 +3,8 @@
 **/bin-int/
 Intermediates/
 
+**/game
+
 # Hazel files
 *.log
 *.json
