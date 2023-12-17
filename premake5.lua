@@ -2,7 +2,10 @@ workspace "Hazel"
 	architecture "x86_x64"
 	startproject "Sandbox"
 	configurations { "Debug", "Release", "Dist" }
-	startproject "Sandbox"
+	flags
+	{
+		"MultiProcessorCompile"
+	}
 
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
@@ -45,6 +48,12 @@ project "Hazel"
 		"%{prj.name}/vendor/glm/glm/**.inl",
 	}
 
+	defines
+	{
+		"_CRT_SECURE_NO_WARNINGS",
+		"GLFW_INCLUDE_NONE"
+	}
+
 	includedirs {
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
@@ -66,8 +75,6 @@ project "Hazel"
 		systemversion "latest"
 
 		defines {
-			"HZ_BUILD_DLL",
-			"GLFW_INCLUDE_NONE"
 		}
 
 	filter "configurations:Debug"
