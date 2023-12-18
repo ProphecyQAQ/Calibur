@@ -70,7 +70,12 @@ namespace Hazel {
 		}
 	}
 
-	void Application::Run() 
+	void Application::Close()
+	{
+		m_Running = false;
+	}
+
+	void Application::Run()
 	{
 		HZ_PROFILE_FUNCTION();
 

@@ -29,7 +29,8 @@ namespace Hazel {
 		
 		static Application& Get() { return *s_Instance; }
 		Window& GetWindow() { return *m_Window; }
-	
+
+		void Close();
 	private:
 		void Run();
 		bool OnWindowClosed(WindowCloseEvent& e);
