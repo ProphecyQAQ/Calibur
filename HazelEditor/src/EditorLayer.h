@@ -33,5 +33,8 @@ namespace Hazel
 
 		uint32_t m_MapWidth, m_MapHeight;
 		std::unordered_map<char, Ref<SubTexture2D>> m_TextureMap;
+
+		bool m_ViewportFocused = false;
+		bool m_ViewportHovered = false;
 	};
 }
