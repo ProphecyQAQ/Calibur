@@ -19,10 +19,11 @@ namespace Hazel
 	private:
 		OrthographicCameraController m_CameraController;
 
-
 		Ref<Shader> m_FlatColorShader;
 		Ref<VertexArray> m_SquareVA;
 		Ref<Framebuffer> m_Framebuffer;
+
+		glm::vec2 m_ViewportSize = { 0.f, 0.f };
 
 		Ref<Texture2D> m_CheckerboardTexture;
 		Ref<Texture2D> m_SpriteSheet;
