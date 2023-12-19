@@ -25,7 +25,7 @@ namespace Hazel
 		virtual uint32_t GetColorAttachmentRendererID() const = 0;
 
 		//virtual FramebufferSpecification& GetSpecificaiton() = 0;
-		virtual const FramebufferSpecification& GetSpecificaiton() const = 0;
+		virtual const FramebufferSpecification& GetSpecificaition() const = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
 	};
