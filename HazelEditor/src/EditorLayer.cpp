@@ -17,21 +17,27 @@ namespace Hazel
 	{
 		HZ_PROFILE_FUNCTION();
 
-		m_CheckerboardTexture = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
-		m_SpriteSheet = Hazel::Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
+		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
+		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
 
-		//m_TextureB = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, {1, 11}, {128, 128}, {1, 1});
-		//m_TextureStairs = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, {7, 6}, {128, 128}, {1, 1});
+		//m_TextureB = SubTexture2D::CreateFromCoords(m_SpriteSheet, {1, 11}, {128, 128}, {1, 1});
+		//m_TextureStairs = SubTexture2D::CreateFromCoords(m_SpriteSheet, {7, 6}, {128, 128}, {1, 1});
 
-		m_TextureMap['D'] = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
-		m_TextureMap['W'] = Hazel::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
+		m_TextureMap['D'] = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
+		m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
-		Hazel::FramebufferSpecification fbSpec;
+		FramebufferSpecification fbSpec;
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
-		m_Framebuffer = Hazel::Framebuffer::Create(fbSpec);
+		m_Framebuffer = Framebuffer::Create(fbSpec);
 
 		m_CameraController.SetZoomLevel(4.f);
+
+		m_ActiveScene = CreateRef<Scene>();
+
+		m_Square = m_ActiveScene->CreateEntity();
+		m_ActiveScene->Reg().emplace<TransformComponent>(m_Square);
+		m_ActiveScene->Reg().emplace<SpriteRendererComponenet>(m_Square, glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
 	}
 
 	void EditorLayer::OnDetach()
@@ -39,12 +45,12 @@ namespace Hazel
 		HZ_PROFILE_FUNCTION();
 	}
 
-	void EditorLayer::OnUpdate(Hazel::TimeStep ts)
+	void EditorLayer::OnUpdate(TimeStep ts)
 	{
 		HZ_PROFILE_FUNCTION();
 
 		//Resize
-		if (Hazel::FramebufferSpecification spec = m_Framebuffer->GetSpecificaition();
+		if (FramebufferSpecification spec = m_Framebuffer->GetSpecificaition();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f && // zero sized framebuffer is invalid
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y))
 		{
@@ -56,56 +62,22 @@ namespace Hazel
 		if (m_ViewportFocused)
 			m_CameraController.OnUpdate(ts);
 
+
 		// Render
-		Hazel::Renderer2D::ResetStats();
-		{
-			HZ_PROFILE_SCOPE("Render Prep");
-			m_Framebuffer->Bind();
+		Renderer2D::ResetStats();
+		m_Framebuffer->Bind();
 
-			Hazel::RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-			Hazel::RenderCommand::Clear();
-		}
+		RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		RenderCommand::Clear();
 
-		{
-			static float rotation = 0.0f;
-			rotation += ts * 50.0f;
+		Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-			HZ_PROFILE_SCOPE("Render Draw");
-			Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
+		//Update scene
+		m_ActiveScene->OnUpdate(ts);
 
-			Hazel::Renderer2D::DrawRotateQuad({ 1.0f, 0.0f }, { 0.8f, 0.8f }, -45.0f, { 0.8f, 0.2f, 0.3f, 1.0f });
-			Hazel::Renderer2D::DrawQuad({ -1.0f, 0.0f }, { 0.8f, 0.8f }, { 0.8f, 0.2f, 0.3f, 1.0f });
-			Hazel::Renderer2D::DrawQuad({ 0.5f, -0.5f }, { 0.5f, 0.75f }, m_SquareColor);
-			Hazel::Renderer2D::DrawQuad({ 0.0f, 0.0f, -0.1f }, { 20.0f, 20.0f }, m_CheckerboardTexture, 10.0f);
-			Hazel::Renderer2D::DrawRotateQuad({ -2.0f, 0.0f, 0.0f }, { 1.0f, 1.0f }, rotation, m_CheckerboardTexture, 20.0f);
-			Hazel::Renderer2D::EndScene();
-
-			Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-			for (float y = -5.0f; y < 5.0f; y += 0.5f)
-			{
-				for (float x = -5.0f; x < 5.0f; x += 0.5f)
-				{
-					glm::vec4 color = { (x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 0.7f };
-					Hazel::Renderer2D::DrawQuad({ x, y }, { 0.45f, 0.45f }, color);
-				}
-			}
-			Hazel::Renderer2D::EndScene();
-		}
+		Renderer2D::EndScene();
 
 		m_Framebuffer->Unbind();
-
-		/*Hazel::Renderer2D::BeginScene(m_CameraController.GetCamera());
-		for (size_t x = 0; x < m_MapHeight; x++)
-		{
-			for (size_t y = 0; y < m_MapWidth; y++)
-			{
-				char tileType = s_MapTiles[x * m_MapWidth + y];
-				const Hazel::Ref<Hazel::Texture2D>& texture = m_TextureMap[tileType]->GetTexture();
-
-				Hazel::Renderer2D::DrawQuad({y - m_MapWidth/2.f, m_MapHeight/2.f - x}, { 1.f, 1.f }, m_TextureMap[tileType]);
-			}
-		}
-		Hazel::Renderer2D::EndScene();*/
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -164,7 +136,7 @@ namespace Hazel
 				// which we can't undo at the moment without finer window depth/z control.
 				//ImGui::MenuItem("Fullscreen", NULL, &opt_fullscreen_persistant);
 
-				if (ImGui::MenuItem("Exit")) Hazel::Application::Get().Close();
+				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
 
@@ -173,14 +145,14 @@ namespace Hazel
 
 		ImGui::Begin("Settings");
 
-		auto stats = Hazel::Renderer2D::GetStats();
+		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
 
-		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_ActiveScene->Reg().get<SpriteRendererComponenet>(m_Square).Color));
 
 		ImGui::End();
 			
@@ -204,7 +176,7 @@ namespace Hazel
 
 	}
 
-	void EditorLayer::OnEvent(Hazel::Event& e)
+	void EditorLayer::OnEvent(Event& e)
 	{
 		m_CameraController.OnEvent(e);
 	}
