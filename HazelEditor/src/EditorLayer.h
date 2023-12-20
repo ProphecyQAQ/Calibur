@@ -24,7 +24,7 @@ namespace Hazel
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
-		entt::entity m_Square;
+		Entity m_Square;
 
 		glm::vec2 m_ViewportSize = { 0.f, 0.f };
 
