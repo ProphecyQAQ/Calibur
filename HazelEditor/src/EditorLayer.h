@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Hazel.h"
+#include "Hazel/Core/Base.h"
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace Hazel
 {
@@ -43,5 +45,8 @@ namespace Hazel
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
+
+		//Panels;
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 }

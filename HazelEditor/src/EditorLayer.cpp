@@ -85,6 +85,8 @@ namespace Hazel
 
 		m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnDetach()
@@ -126,6 +128,7 @@ namespace Hazel
 	void EditorLayer::OnImGuiRender()
 	{
 		HZ_PROFILE_FUNCTION();
+
 		// Note: Switch this to true to enable dockspace
 		static bool dockspaceOpen = true;
 		static bool opt_fullscreen_persistant = true;
@@ -241,7 +244,7 @@ namespace Hazel
 
 		ImGui::End();
 		
-
+		m_SceneHierarchyPanel.OnImGuiRender();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
