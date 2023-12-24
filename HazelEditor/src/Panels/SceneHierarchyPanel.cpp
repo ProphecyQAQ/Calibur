@@ -4,6 +4,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 namespace Hazel
 {
@@ -69,6 +70,47 @@ namespace Hazel
 		}
 	}
 
+	static void DrawVec3Control(const std::string& label, glm::vec3& values, float resetValue = 0.0f, float columuWidth = 100.0f)
+	{
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, columuWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{0, 0});
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+		const char* xyz[] = { "X", "Y", "Z", "##X", "##Y", "##Z" };
+		const ImVec4 button[3] = { ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f },ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f },ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f } };
+		const ImVec4 buttonHovered[3] = { ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f },ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f },ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f } };
+		const ImVec4 buttonActive[3] = { ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f },ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f },ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f } };
+
+		for (int i = 0; i < 3; i++)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Button, button[i]);
+			ImGui::PushStyleColor(ImGuiCol_ButtonHovered, buttonHovered[i]);
+			ImGui::PushStyleColor(ImGuiCol_ButtonActive, buttonActive[i]);
+
+			if (ImGui::Button(xyz[i], buttonSize))
+				values[i] = resetValue;
+		
+			ImGui::SameLine();
+			ImGui::DragFloat(xyz[i+3], &values[i], 0.1f, 0.0f, 0.0f, "%.2f");
+			ImGui::PopItemWidth();
+			ImGui::PopStyleColor(3);
+			if (i != 2 ) ImGui::SameLine();
+		}
+		ImGui::PopStyleVar();
+		ImGui::Columns(1);
+
+		ImGui::PopID();
+	}
+
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -88,12 +130,14 @@ namespace Hazel
 		{
 			if (ImGui::TreeNodeEx((void*)typeid(TransformComponent).hash_code(), ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
 			{
-				auto& transform =  entity.GetComponent<TransformComponent>().Transform;
-
-				if (ImGui::DragFloat3("Position", glm::value_ptr(transform[3]), 0.1f))
-				{
-
-				}
+				auto& tc =  entity.GetComponent<TransformComponent>();
+				
+				DrawVec3Control("Translation", tc.Translation);
+				glm::vec3 rotation = glm::degrees(tc.Rotation);
+				DrawVec3Control("Rotation", rotation);
+				tc.Rotation = glm::radians(rotation);
+				DrawVec3Control("Scale", tc.Scale, 1.0f);
+				
 				ImGui::TreePop();
 			}
 		}
