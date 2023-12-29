@@ -2,6 +2,7 @@
 
 #include "entt.hpp"
 #include "Hazel/Core/TimeStep.h"
+#include "Hazel/Renderer/EditorCamera.h"
 
 namespace Hazel
 {
@@ -18,7 +19,8 @@ namespace Hazel
 
 		entt::registry& Reg() { return m_Registry; }
 
-		void OnUpdate(TimeStep ts);
+		void OnUpdateEditor(TimeStep ts, EditorCamera& camera);
+		void OnUpdateRuntime(TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 		
 		Entity GetPrimaryCameraEntity();

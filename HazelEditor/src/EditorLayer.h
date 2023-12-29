@@ -4,6 +4,8 @@
 #include "Hazel/Core/Base.h"
 #include "Panels/SceneHierarchyPanel.h"
 
+#include "Hazel/Renderer/EditorCamera.h"
+
 namespace Hazel
 {
 	class EditorLayer : public Layer
@@ -39,6 +41,7 @@ namespace Hazel
 		bool m_PrimaryCamera = false;
 
 		glm::vec2 m_ViewportSize = { 0.f, 0.f };
+		EditorCamera m_EditorCamera;
 
 		Ref<Texture2D> m_CheckerboardTexture;
 		Ref<Texture2D> m_SpriteSheet;
