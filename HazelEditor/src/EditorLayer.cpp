@@ -33,6 +33,7 @@ namespace Hazel
 		m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
 
 		FramebufferSpecification fbSpec;
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::Depth};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
@@ -128,7 +129,6 @@ namespace Hazel
 			m_CameraController.OnUpdate(ts);
 			m_EditorCamera.OnUpdate(ts);
 		}
-
 
 		// Render
 		Renderer2D::ResetStats();
@@ -246,7 +246,7 @@ namespace Hazel
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
-		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID();
+		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
 		ImGui::Image((void*)textureID, viewportPanelSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		
 		//Gizoms
