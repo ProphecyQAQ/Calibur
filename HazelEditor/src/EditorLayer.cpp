@@ -135,6 +135,9 @@ namespace Hazel
 		m_Framebuffer->Bind();
 		RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 		RenderCommand::Clear();
+
+		// Clear entity id to -1
+		m_Framebuffer->ClaerAttachment(1, -1);
 			
 		//Update scene
 		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
