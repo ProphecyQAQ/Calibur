@@ -49,9 +49,6 @@ namespace Hazel
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
 		SpriteRendererComponent(const glm::vec4& color)
 			: Color(color) {}
-
-		operator glm::vec4& () { return Color; }
-		operator const glm::vec4& () const { return Color; }
 	};
 
 	struct CameraComponent

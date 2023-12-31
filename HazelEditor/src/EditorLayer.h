@@ -43,6 +43,7 @@ namespace Hazel
 		glm::vec2 m_ViewportSize = { 0.f, 0.f };
 		glm::vec2 m_ViewportBounds[2]; //global viewport bounds
 		EditorCamera m_EditorCamera;
+		Entity m_HoveredEntity;
 
 		Ref<Texture2D> m_CheckerboardTexture;
 		Ref<Texture2D> m_SpriteSheet;
