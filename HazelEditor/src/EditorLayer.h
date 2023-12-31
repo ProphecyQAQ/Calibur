@@ -22,6 +22,7 @@ namespace Hazel
 		virtual void OnEvent(Event& e) override;
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
+		bool OnMouseButtonPressed(MouseButtonPressedEvent& e);
 		
 		void NewScene();
 		void OpenScene();
