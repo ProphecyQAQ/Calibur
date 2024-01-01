@@ -10,7 +10,7 @@
 
 #include "Hazel/Core/Application.h"
 
-#include "ImGuizmo.h"
+#include "vendor/ImGuizmo/ImGuizmo.h"
 
 namespace Hazel 
 {

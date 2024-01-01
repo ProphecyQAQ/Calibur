@@ -23,7 +23,7 @@ namespace Hazel
 
 	};
 
-	Application* CreateApplication() {
+	Application* CreateApplication(ApplicationCommandLineArgs args) {
 		return new HazelEditor();
 	}
 }
