@@ -331,6 +331,7 @@ namespace Hazel
 		ImGui::End();
 		
 		m_SceneHierarchyPanel.OnImGuiRender();
+		m_ContextBrowserPanel.OnImguiRender();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
