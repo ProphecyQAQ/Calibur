@@ -41,7 +41,8 @@ project "Hazel"
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.yaml_cpp}",
 		"%{IncludeDir.ImGuizom}",
-		"%{IncludeDir.VulkanSDK}"
+		"%{IncludeDir.VulkanSDK}",
+		"%{IncludeDir.Assimp}",
 	}
 
 	links
@@ -63,6 +64,7 @@ project "Hazel"
 		{
 		}
 
+
 	filter "configurations:Debug"
 		defines "HZ_DEBUG"
 		runtime "Debug"
@@ -72,9 +74,10 @@ project "Hazel"
 		{
 			"%{Library.ShaderC_Debug}",
 			"%{Library.SPIRV_Cross_Debug}",
-			"%{Library.SPIRV_Cross_GLSL_Debug}"
+			"%{Library.SPIRV_Cross_GLSL_Debug}",
+			"%{Library.Assimp_Debug}"
 		}
-
+		
 	filter "configurations:Release"
 		defines "HZ_RELEASE"
 		runtime "Release"
@@ -84,7 +87,13 @@ project "Hazel"
 		{
 			"%{Library.ShaderC_Release}",
 			"%{Library.SPIRV_Cross_Release}",
-			"%{Library.SPIRV_Cross_GLSL_Release}"
+			"%{Library.SPIRV_Cross_GLSL_Release}",
+			"%{Library.Assimp_Release}"
+		}
+
+		postbuildcommands
+		{
+			'{COPY} "%{Binaries.Assimp_Release}" "%{cfg.targetdir}"',
 		}
 
 	filter "configurations:Dist"
@@ -96,6 +105,7 @@ project "Hazel"
 		{
 			"%{Library.ShaderC_Release}",
 			"%{Library.SPIRV_Cross_Release}",
-			"%{Library.SPIRV_Cross_GLSL_Release}"
+			"%{Library.SPIRV_Cross_GLSL_Release}",
+			"%{Library.Assimp_Release}"
 		}
 

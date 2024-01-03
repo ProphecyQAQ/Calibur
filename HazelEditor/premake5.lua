@@ -20,7 +20,8 @@ project "HazelEditor"
 		"%{wks.location}/Hazel/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}",
-		"%{IncludeDir.ImGuizmo}"
+		"%{IncludeDir.ImGuizmo}",
+		"%{IncludeDir.Assimp}"
 	}
 	
 	defines
@@ -30,7 +31,7 @@ project "HazelEditor"
 
 	links
 	{
-		"Hazel"
+		"Hazel",
 	}
 
 	filter "system:windows"
@@ -41,10 +42,21 @@ project "HazelEditor"
 		runtime "Debug"
 		symbols "on"
 
+		postbuildcommands
+		{
+			'{COPY} "%{Binaries.Assimp_Debug}" "%{cfg.targetdir}"',
+		}
+
 	filter "configurations:Release"
 		defines "HZ_RELEASE"
 		runtime "Release"
 		optimize "on"
+
+		postbuildcommands
+		{
+			'{COPY} "%{Binaries.Assimp_Release}" "%{cfg.targetdir}"',
+		}
+
 
 	filter "configurations:Dist"
 		defines "HZ_DIST"

@@ -10,13 +10,18 @@
 #include "Hazel/Utils/PlatformUtils.h"
 #include "ImGuizmo.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 namespace Hazel
 {
 
 	EditorLayer::EditorLayer()
 		:Layer("EditorLayer"), m_CameraController(1920.0f / 1080.0f)
 	{
-
+		Assimp::Importer importer;
+		const aiScene *scene = importer.ReadFile("Resources/Model/nanosuit/nanosuit.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
 	}
 
 	void EditorLayer::OnAttach()
@@ -286,14 +291,6 @@ namespace Hazel
 			float windowWidth  = (float)ImGui::GetWindowWidth();
 			float windowHeight = (float)ImGui::GetWindowHeight();
 			ImGuizmo::SetRect(m_ViewportBounds[0].x, m_ViewportBounds[0].y, m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y);
-			
-			//Camera
-			
-			// Camera from entity
-			//auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			//const auto& camrea = cameraEntity.GetComponent<CameraComponent>().Camera;
-			//const glm::mat4& cameraProjeciton = camrea.GetProjection();
-			//glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
 			
 			//Editor Camera
 			const glm::mat4& cameraProjeciton = m_EditorCamera.GetProjection();
