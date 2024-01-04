@@ -1,23 +1,23 @@
 
--- Hazel Dependencies
+-- Calibur Dependencies
 
 VULKAN_SDK = os.getenv("VULKAN_SDK")
 
 IncludeDir = {}
-IncludeDir["stb_image"] = "%{wks.location}/Hazel/vendor/stb_image"
-IncludeDir["yaml_cpp"] = "%{wks.location}/Hazel/vendor/yaml-cpp/include"
-IncludeDir["Box2D"] = "%{wks.location}/Hazel/vendor/Box2D/include"
-IncludeDir["filewatch"] = "%{wks.location}/Hazel/vendor/filewatch"
-IncludeDir["GLFW"] = "%{wks.location}/Hazel/vendor/GLFW/include"
-IncludeDir["Glad"] = "%{wks.location}/Hazel/vendor/Glad/include"
-IncludeDir["ImGui"] = "%{wks.location}/Hazel/vendor/ImGui"
-IncludeDir["ImGuizmo"] = "%{wks.location}/Hazel/vendor/ImGuizmo"
-IncludeDir["glm"] = "%{wks.location}/Hazel/vendor/glm"
-IncludeDir["entt"] = "%{wks.location}/Hazel/vendor/entt/include"
-IncludeDir["mono"] = "%{wks.location}/Hazel/vendor/mono/include"
-IncludeDir["shaderc"] = "%{wks.location}/Hazel/vendor/shaderc/include"
-IncludeDir["SPIRV_Cross"] = "%{wks.location}/Hazel/vendor/SPIRV-Cross"
-IncludeDir["Assimp"] = "%{wks.location}/Hazel/vendor/assimp/include"
+IncludeDir["stb_image"] = "%{wks.location}/Calibur/vendor/stb_image"
+IncludeDir["yaml_cpp"] = "%{wks.location}/Calibur/vendor/yaml-cpp/include"
+IncludeDir["Box2D"] = "%{wks.location}/Calibur/vendor/Box2D/include"
+IncludeDir["filewatch"] = "%{wks.location}/Calibur/vendor/filewatch"
+IncludeDir["GLFW"] = "%{wks.location}/Calibur/vendor/GLFW/include"
+IncludeDir["Glad"] = "%{wks.location}/Calibur/vendor/Glad/include"
+IncludeDir["ImGui"] = "%{wks.location}/Calibur/vendor/ImGui"
+IncludeDir["ImGuizmo"] = "%{wks.location}/Calibur/vendor/ImGuizmo"
+IncludeDir["glm"] = "%{wks.location}/Calibur/vendor/glm"
+IncludeDir["entt"] = "%{wks.location}/Calibur/vendor/entt/include"
+IncludeDir["mono"] = "%{wks.location}/Calibur/vendor/mono/include"
+IncludeDir["shaderc"] = "%{wks.location}/Calibur/vendor/shaderc/include"
+IncludeDir["SPIRV_Cross"] = "%{wks.location}/Calibur/vendor/SPIRV-Cross"
+IncludeDir["Assimp"] = "%{wks.location}/Calibur/vendor/assimp/include"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
 
 LibraryDir = {}
@@ -26,8 +26,8 @@ LibraryDir["VulkanSDK"] = "%{VULKAN_SDK}/Lib"
 
 Library = {}
 
-Library["Assimp_Debug"] = "%{wks.location}/Hazel/vendor/assimp/bin/Debug/assimp-vc142-mtd.lib"
-Library["Assimp_Release"] = "%{wks.location}/Hazel/vendor/assimp/bin/Release/assimp-vc142-mt.lib"
+Library["Assimp_Debug"] = "%{wks.location}/Calibur/vendor/assimp/bin/Debug/assimp-vc142-mtd.lib"
+Library["Assimp_Release"] = "%{wks.location}/Calibur/vendor/assimp/bin/Release/assimp-vc142-mt.lib"
 
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"
@@ -43,5 +43,5 @@ Library["SPIRV_Cross_GLSL_Release"] = "%{LibraryDir.VulkanSDK}/spirv-cross-glsl.
 
 Binaries = {}
 
-Binaries['Assimp_Debug'] = "%{wks.location}/Hazel/vendor/assimp/bin/Debug/assimp-vc142-mtd.dll"
-Binaries['Assimp_Release'] = "%{wks.location}/Hazel/vendor/assimp/bin/Release/assimp-vc142-mt.dll"
+Binaries['Assimp_Debug'] = "%{wks.location}/Calibur/vendor/assimp/bin/Debug/assimp-vc142-mtd.dll"
+Binaries['Assimp_Release'] = "%{wks.location}/Calibur/vendor/assimp/bin/Release/assimp-vc142-mt.dll"

@@ -5,7 +5,7 @@ Intermediates/
 
 **/game
 
-# Hazel files
+# Calibur files
 *.log
 *.json
 
@@ -18,6 +18,6 @@ Intermediates/
 **.csproj
 
 # Directories
-Hazel/vendor/VulkanSDK
-Hazelnut/assets/cache
+Calibur/vendor/VulkanSDK
+CaliburEditor/assets/cache
 scripts/__pycache__

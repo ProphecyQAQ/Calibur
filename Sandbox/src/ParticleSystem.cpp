@@ -11,7 +11,7 @@ ParticleSystem::ParticleSystem(uint32_t MaxParticles)
 	m_ParticlePool.resize(MaxParticles);
 }
 
-void ParticleSystem::OnUpdate(Hazel::TimeStep ts)
+void ParticleSystem::OnUpdate(Calibur::TimeStep ts)
 {
 	for (auto& particle : m_ParticlePool)
 	{
@@ -31,9 +31,9 @@ void ParticleSystem::OnUpdate(Hazel::TimeStep ts)
 
 }
 
-void ParticleSystem::OnRender(Hazel::OrthographicCamera& camera)
+void ParticleSystem::OnRender(Calibur::OrthographicCamera& camera)
 {
-	Hazel::Renderer2D::BeginScene(camera);
+	Calibur::Renderer2D::BeginScene(camera);
 	for (auto& particle : m_ParticlePool)
 	{
 		if (particle.Active == false)
@@ -45,9 +45,9 @@ void ParticleSystem::OnRender(Hazel::OrthographicCamera& camera)
 		float size = glm::lerp(particle.SizeBegin, particle.SizeEnd, life);
 		
 		glm::vec3 position = { particle.Position.x, particle.Position.y, 0.2f };
-		Hazel::Renderer2D::DrawRotateQuad(position, { size, size }, particle.Rotation, color);
+		Calibur::Renderer2D::DrawRotateQuad(position, { size, size }, particle.Rotation, color);
 	}
-	Hazel::Renderer2D::EndScene();
+	Calibur::Renderer2D::EndScene();
 }
 
 void ParticleSystem::Emit(const ParticleProps& particleProps)

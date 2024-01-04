@@ -1,9 +1,9 @@
 include "./vendor/premake/premake_customization/solution_items.lua"
 include "Dependencies.lua"
 
-workspace "Hazel"
+workspace "Calibur"
 	architecture "x86_64"
-	startproject "HazelEditor"
+	startproject "CaliburEditor"
 
 	configurations
 	{
@@ -26,12 +26,12 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 group "Dependencies"
 	include "vendor/premake"
-	include "Hazel/vendor/GLFW"
-	include "Hazel/vendor/Glad"
-	include "Hazel/vendor/imgui"
-	include "Hazel/vendor/yaml-cpp"
+	include "Calibur/vendor/GLFW"
+	include "Calibur/vendor/Glad"
+	include "Calibur/vendor/imgui"
+	include "Calibur/vendor/yaml-cpp"
 group ""
 
-include "Hazel"
+include "Calibur"
 include "Sandbox"
-include "HazelEditor"
+include "CaliburEditor"

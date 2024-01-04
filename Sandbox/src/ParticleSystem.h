@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Hazel.h>
+#include <Calibur.h>
 
 struct ParticleProps
 {
@@ -16,8 +16,8 @@ class ParticleSystem
 public:
 	ParticleSystem(uint32_t MaxParticles = 1000);
 
-	void OnUpdate(Hazel::TimeStep ts);
-	void OnRender(Hazel::OrthographicCamera& camera);
+	void OnUpdate(Calibur::TimeStep ts);
+	void OnRender(Calibur::OrthographicCamera& camera);
 
 	void Emit(const ParticleProps& particleProps);
 private:

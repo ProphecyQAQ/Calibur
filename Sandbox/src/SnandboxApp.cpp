@@ -1,5 +1,5 @@
-#include <Hazel.h>
-#include "Hazel/Core/EntryPoint.h"
+#include <Calibur.h>
+#include "Calibur/Core/EntryPoint.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,13 +9,13 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 #include "Sanbox2D.h"
 
-class ExampleLayer : public Hazel::Layer 
+class ExampleLayer : public Calibur::Layer 
 {
 public:
 	ExampleLayer() 
 		: Layer("Example"), m_CameraController(1920.f/1080.f, true)
 	{
-		m_VertexArray = Hazel::VertexArray::Create();
+		m_VertexArray = Calibur::VertexArray::Create();
 
 		float vertices[3 * 7] = {
 			-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
@@ -23,11 +23,11 @@ public:
 			 0.0f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 		};
 
-		m_VertexBuffer = Hazel::VertexBuffer::Create(vertices, sizeof(vertices));
+		m_VertexBuffer = Calibur::VertexBuffer::Create(vertices, sizeof(vertices));
 
-		Hazel::BufferLayout layout = {
-			{Hazel::ShaderDataType::Float3, "a_Position"},
-			{Hazel::ShaderDataType::Float2, "a_TexCoord"},
+		Calibur::BufferLayout layout = {
+			{Calibur::ShaderDataType::Float3, "a_Position"},
+			{Calibur::ShaderDataType::Float2, "a_TexCoord"},
 		};
 
 		m_VertexBuffer->SetLayout(layout);
@@ -35,23 +35,23 @@ public:
 		 
 		unsigned int indics[3] = { 0, 1, 2 };
 
-		m_IndexBuffer = Hazel::IndexBuffer::Create(indics, std::size(indics));
+		m_IndexBuffer = Calibur::IndexBuffer::Create(indics, std::size(indics));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
-		m_SquareVA = Hazel::VertexArray::Create();
+		m_SquareVA = Calibur::VertexArray::Create();
 		float squareVertices[4 * 5] = {
 			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
 		 	 0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
 			 0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
 			-0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
 		};
-		Hazel::Ref<Hazel::VertexBuffer> suqareVB = Hazel::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
+		Calibur::Ref<Calibur::VertexBuffer> suqareVB = Calibur::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 		suqareVB->SetLayout(layout);
 		m_SquareVA->AddVertexBuffer(suqareVB);
 
 		unsigned int squareIndics[6] = { 0, 1, 2, 2, 3, 0 };
-		Hazel::Ref<Hazel::IndexBuffer> squareIB = Hazel::IndexBuffer::Create(squareIndics, std::size(squareIndics));
+		Calibur::Ref<Calibur::IndexBuffer> squareIB = Calibur::IndexBuffer::Create(squareIndics, std::size(squareIndics));
 
 		m_SquareVA->SetIndexBuffer(squareIB);
 
@@ -88,27 +88,27 @@ public:
 		)";
 
 		//Init shader
-		m_Shader = Hazel::Shader::Create("flatColorShader", vertexSrc, fragmentSrc);
+		m_Shader = Calibur::Shader::Create("flatColorShader", vertexSrc, fragmentSrc);
 
 		auto textureShader = m_ShaderLibrary.Load("assets/shaders/Texture.glsl");
 
-		m_Texture = Hazel::Texture2D::Create("assets/textures/Checkerboard.png");
-		m_ChernoTexture = Hazel::Texture2D::Create("assets/textures/ChernoLogo.png");
+		m_Texture = Calibur::Texture2D::Create("assets/textures/Checkerboard.png");
+		m_ChernoTexture = Calibur::Texture2D::Create("assets/textures/ChernoLogo.png");
 
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->Bind();
-		std::dynamic_pointer_cast<Hazel::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
+		std::dynamic_pointer_cast<Calibur::OpenGLShader>(textureShader)->Bind();
+		std::dynamic_pointer_cast<Calibur::OpenGLShader>(textureShader)->UploadUniformInt("u_Texture", 0);
 	}
 
-	void OnUpdate(Hazel::TimeStep ts) override
+	void OnUpdate(Calibur::TimeStep ts) override
 	{
 		// Update
 		m_CameraController.OnUpdate(ts);  
 
 		//Render
-		Hazel::RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-		Hazel::RenderCommand::Clear();
+		Calibur::RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		Calibur::RenderCommand::Clear();
 
-		Hazel::Renderer::BeginScene(m_CameraController.GetCamera());
+		Calibur::Renderer::BeginScene(m_CameraController.GetCamera());
 		
 		glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -121,22 +121,22 @@ public:
 				glm::vec3 position(x * 0.11f, y * 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f), position) * scale;
 
-				std::dynamic_pointer_cast<Hazel::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_SquareColor);
+				std::dynamic_pointer_cast<Calibur::OpenGLShader>(m_Shader)->UploadUniformFloat3("u_Color", m_SquareColor);
 
-				Hazel::Renderer::Submit(m_Shader, m_SquareVA, transform);
+				Calibur::Renderer::Submit(m_Shader, m_SquareVA, transform);
 			}
 		}
 		
 		auto textureShader = m_ShaderLibrary.Get("Texture");
 
 		m_Texture->Bind();
-		Hazel::Renderer::Submit(textureShader, m_SquareVA);
+		Calibur::Renderer::Submit(textureShader, m_SquareVA);
 		m_ChernoTexture->Bind();
-		Hazel::Renderer::Submit(textureShader, m_SquareVA);
+		Calibur::Renderer::Submit(textureShader, m_SquareVA);
 		//Triangle
-		//Hazel::Renderer::Submit(m_Shader, m_VertexArray);
+		//Calibur::Renderer::Submit(m_Shader, m_VertexArray);
 
-		Hazel::Renderer::EndScene();
+		Calibur::Renderer::EndScene();
 	}
 
 	void OnImGuiRender() override
@@ -146,27 +146,27 @@ public:
 		ImGui::End();
 	}
 
-	void OnEvent(Hazel::Event& e) override
+	void OnEvent(Calibur::Event& e) override
 	{
 		m_CameraController.OnEvent(e);
 	}
 
 private:
-	Hazel::ShaderLibrary m_ShaderLibrary;
-	Hazel::Ref<Hazel::Shader> m_Shader;
-	Hazel::Ref<Hazel::Texture2D> m_Texture, m_ChernoTexture;
+	Calibur::ShaderLibrary m_ShaderLibrary;
+	Calibur::Ref<Calibur::Shader> m_Shader;
+	Calibur::Ref<Calibur::Texture2D> m_Texture, m_ChernoTexture;
 
-	Hazel::Ref<Hazel::VertexBuffer> m_VertexBuffer;
-	Hazel::Ref<Hazel::IndexBuffer> m_IndexBuffer;
-	Hazel::Ref<Hazel::VertexArray> m_VertexArray;
-	Hazel::Ref<Hazel::VertexArray> m_SquareVA;
+	Calibur::Ref<Calibur::VertexBuffer> m_VertexBuffer;
+	Calibur::Ref<Calibur::IndexBuffer> m_IndexBuffer;
+	Calibur::Ref<Calibur::VertexArray> m_VertexArray;
+	Calibur::Ref<Calibur::VertexArray> m_SquareVA;
 
-	Hazel::OrthographicCameraController m_CameraController;
+	Calibur::OrthographicCameraController m_CameraController;
 
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f};
 };
 
-class Sandbox : public Hazel::Application 
+class Sandbox : public Calibur::Application 
 {
 public:
 	Sandbox() 
@@ -182,7 +182,7 @@ public:
 
 };
 
-Hazel::Application* Hazel::CreateApplication(Hazel::ApplicationCommandLineArgs args)
+Calibur::Application* Calibur::CreateApplication(Calibur::ApplicationCommandLineArgs args)
 {
 	return new Sandbox();
 }

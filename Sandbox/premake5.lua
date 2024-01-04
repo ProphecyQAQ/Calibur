@@ -15,16 +15,16 @@ project "Sandbox"
 
 	includedirs
 	{
-		"%{wks.location}/Hazel/vendor/spdlog/include",
-		"%{wks.location}/Hazel/src",
-		"%{wks.location}/Hazel/vendor",
+		"%{wks.location}/Calibur/vendor/spdlog/include",
+		"%{wks.location}/Calibur/src",
+		"%{wks.location}/Calibur/vendor",
 		"%{IncludeDir.glm}",
 		"%{IncludeDir.entt}"
 	}
 
 	links
 	{
-		"Hazel"
+		"Calibur"
 	}
 
 	filter "system:windows"
