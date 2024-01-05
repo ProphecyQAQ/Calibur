@@ -77,7 +77,7 @@ namespace Calibur
 				{
 					aiFace& face = mesh->mFaces[i];
 					HZ_CORE_ASSERT(face.mNumIndices == 3, "Calibur only supports triangles for now!");
-					Index index = { face.mIndices[0] + m_SubMeshes[idx].BaseIndex, face.mIndices[1] + m_SubMeshes[idx].BaseIndex, face.mIndices[2]+ m_SubMeshes[idx].BaseIndex };
+					Index index = { face.mIndices[0], face.mIndices[1], face.mIndices[2] };
 					m_Indices.push_back(index);
 				}
 			}

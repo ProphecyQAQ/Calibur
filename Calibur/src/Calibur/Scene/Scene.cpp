@@ -62,12 +62,21 @@ namespace Calibur
 		Renderer::BeginScene(camera);
 		
 		auto view = m_Registry.view<TransformComponent, MeshComponent>();
+		m_MeshShader->Bind();
 		for (auto entity : view)
 		{
 			auto& transform = view.get<TransformComponent>(entity);
+			//m_MeshShader->SetMat4("u_Transform", transform.GetTransform());
+			Ref<UniformBuffer> ubf = UniformBuffer::Create(sizeof(glm::mat4), 1);
+			ubf->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			auto& mesh = view.get<MeshComponent>(entity);
-			Renderer::Submit(m_MeshShader, mesh.mesh->GetVertexArray(), transform.GetTransform());
+			auto& submeshs = mesh.mesh->GetSubMeshes();
+			for (size_t id = 0; id < submeshs.size(); id++)
+			{
+				Renderer::RenderMesh(mesh.mesh, id);
+			}
 		}
+		m_MeshShader->Unbind();
 
 		Renderer::EndScene();
 	}

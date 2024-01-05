@@ -14,6 +14,11 @@ layout(std140, binding = 0) uniform Camera
 	mat4 u_ViewProjection;
 };
 
+layout(std140, binding = 1) uniform Transform
+{
+	mat4 u_Transform;
+};
+
 struct VertexOutput
 {
 	vec3 worldPosition;
@@ -27,8 +32,7 @@ layout (location = 0) out VertexOutput Output;
 
 void main()
 {
-	mat4 u_Transform = mat4(1.0);
-	Output.worldPosition = vec3(u_Transform * vec4(a_Position, 1.0));
+	Output.worldPosition = mat3(u_Transform) * a_Position;
 	Output.worldNormal = transpose(inverse(mat3(u_Transform))) * a_Normal;
 	Output.texCoord = a_TexCoord;
 	Output.tangent = a_Tangent;

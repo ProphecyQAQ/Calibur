@@ -27,6 +27,8 @@ namespace Calibur
 			const Ref<VertexArray>& vertexArray,
 			const glm::mat4& transform = glm::mat4(1.0f));
 
+		static void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex);
+
 		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
 	private:
 		struct SceneData

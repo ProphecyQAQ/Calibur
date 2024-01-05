@@ -58,6 +58,13 @@ namespace Calibur
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
+	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
+	{
+		auto& submesh = mesh->GetSubMeshes()[submeshIndex];
+		glDrawRangeElementsBaseVertex(GL_TRIANGLES, submesh.BaseIndex, submesh.BaseIndex + submesh.IndexCount, submesh.IndexCount, GL_UNSIGNED_INT, nullptr, submesh.BaseVertex);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	void OpenGLRenderer::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();

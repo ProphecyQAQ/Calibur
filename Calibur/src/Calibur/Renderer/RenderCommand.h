@@ -32,6 +32,11 @@ namespace Calibur
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 
+		static void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
+		{
+			s_RendererAPI->RenderMesh(mesh, submeshIndex);
+		}
+
 	private:
 		static Scope<RendererAPI> s_RendererAPI;
 	};
