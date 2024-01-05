@@ -327,5 +327,10 @@ namespace Calibur
 			{
 				ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 			});
+		
+		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
+			{
+				ImGui::Text("Mesh");
+			});
 	}
 }

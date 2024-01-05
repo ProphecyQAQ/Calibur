@@ -1,23 +1,23 @@
 #include "hzpch.h"
 
 #include "Calibur/Renderer/Renderer.h"
-#include "Calibur/Renderer/Renderer2D.h"
 
 namespace Calibur
 {
 	Scope<Renderer::SceneData> Renderer::m_SceneData = CreateScope<Renderer::SceneData>();
+	static Ref<UniformBuffer> m_CameraUniformBuffer;
 
 	void Renderer::Init()
 	{
 		HZ_PROFILE_FUNCTION();
 
 		RenderCommand::Init();
-		Renderer2D::Init();
+
+		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
 	}
 
 	void Renderer::Shutdown()
 	{
-		Renderer2D::Shutdown();
 	}
 
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
@@ -28,6 +28,12 @@ namespace Calibur
 	void Renderer::BeginScene(OrthographicCamera& camera)
 	{
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+	}
+
+	void Renderer::BeginScene(EditorCamera& camera)
+	{
+		m_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
+		m_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
 	}
 
 	void Renderer::EndScene()

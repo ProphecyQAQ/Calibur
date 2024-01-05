@@ -3,6 +3,7 @@
 #include "Calibur/Scene/Entity.h"
 #include "Calibur/Scene/Components.h"
 #include "Calibur/Renderer/Renderer2D.h"
+#include "Calibur/Renderer/Renderer.h"
 
 #include <glm/glm.hpp>
 
@@ -20,6 +21,8 @@ namespace Calibur
 		
 		auto view = m_Registry.view<TransformComponent>();
 		#endif
+
+		m_MeshShader = Shader::Create("assets/shaders/Texture3D.glsl");
 	}
 
 	Scene::~Scene()
@@ -43,16 +46,30 @@ namespace Calibur
 
 	void Scene::OnUpdateEditor(TimeStep ts, EditorCamera& camera)
 	{
+		// Render 2D
 		Renderer2D::BeginScene(camera);
-
+		
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto entity : group)
 		{
 			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 		}
-
+		
 		Renderer2D::EndScene();
+		
+		// Render 3D
+		Renderer::BeginScene(camera);
+		
+		auto view = m_Registry.view<TransformComponent, MeshComponent>();
+		for (auto entity : view)
+		{
+			auto& transform = view.get<TransformComponent>(entity);
+			auto& mesh = view.get<MeshComponent>(entity);
+			Renderer::Submit(m_MeshShader, mesh.mesh->GetVertexArray(), transform.GetTransform());
+		}
+
+		Renderer::EndScene();
 	}
 
 	void Scene::OnUpdateRuntime(TimeStep ts)
@@ -90,7 +107,7 @@ namespace Calibur
 				}
 			}
 		}
-
+		
 		if (mainCamera)
 		{
 			Renderer2D::BeginScene(*mainCamera, cameraTransform);
@@ -153,6 +170,11 @@ namespace Calibur
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<MeshComponent>(Entity entity, MeshComponent& component)
 	{
 	}
 

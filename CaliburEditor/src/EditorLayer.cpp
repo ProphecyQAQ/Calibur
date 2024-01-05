@@ -105,6 +105,8 @@ namespace Calibur
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 		#endif
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		m_ActiveScene->CreateEntity("Nano").AddComponent<MeshComponent>("./Resources/Model/nanosuit/nanosuit.obj");
 	}
 
 	void EditorLayer::OnDetach()

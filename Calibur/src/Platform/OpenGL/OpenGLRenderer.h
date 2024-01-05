@@ -4,7 +4,7 @@
 
 namespace Calibur
 {
-	class OpenGLRendererAPI : public RendererAPI
+	class OpenGLRenderer: public RendererAPI
 	{
 	public:
 		virtual void Init() override;

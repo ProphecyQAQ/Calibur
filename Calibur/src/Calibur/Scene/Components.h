@@ -7,6 +7,7 @@
 
 #include "Calibur/Scene/SceneCamera.h"
 #include "Calibur/Scene/ScriptableEntity.h"
+#include "Calibur/Renderer/Mesh.h"
 
 namespace Calibur
 {
@@ -74,5 +75,17 @@ namespace Calibur
 			InstantiateScript = []() { return static_cast<ScriptableEntity*>(new T()); };
 			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
 		}
+	};
+
+	struct MeshComponent
+	{
+		Ref<Mesh> mesh;
+
+		MeshComponent() = default;
+		MeshComponent(const MeshComponent&) = default;
+		MeshComponent(const std::string& filepath)
+			: mesh(std::make_shared<Mesh>(filepath)) {}
+		MeshComponent(const Ref<Mesh>& mesh)
+			: mesh(mesh) {}
 	};
 }

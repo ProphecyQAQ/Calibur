@@ -2,8 +2,10 @@
 
 #include "Shader.h"
 #include "Calibur/Renderer/RenderCommand.h"
+#include "Calibur/Renderer/UniformBuffer.h"
 
 #include "Calibur/Renderer/OrthographicCamera.h"
+#include "Calibur/Renderer/EditorCamera.h"
 #include "Calibur/Renderer/Shader.h"
 
 namespace Calibur
@@ -17,6 +19,7 @@ namespace Calibur
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
 		static void BeginScene(OrthographicCamera& camera);
+		static void BeginScene(EditorCamera& camera);
 		static void EndScene();
 
 		static void Submit(

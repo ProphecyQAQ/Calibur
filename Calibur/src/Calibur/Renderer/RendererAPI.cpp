@@ -1,7 +1,7 @@
 #include "hzpch.h"
 #include "Calibur/Renderer/RendererAPI.h"
 
-#include "Platform/OpenGL/OpenGLRendererAPI.h"
+#include "Platform/OpenGL/OpenGLRenderer.h"
 
 namespace Calibur
 {
@@ -12,7 +12,7 @@ namespace Calibur
 		switch (s_API)
 		{
 		case RendererAPI::API::None:    HZ_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLRendererAPI>();
+		case RendererAPI::API::OpenGL:  return CreateScope<OpenGLRenderer>();
 		}
 
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");

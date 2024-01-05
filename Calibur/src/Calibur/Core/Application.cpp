@@ -4,6 +4,7 @@
 #include "Calibur/Core/Log.h"
 
 #include "Calibur/Renderer/Renderer.h"
+#include "Calibur/Renderer/Renderer2D.h"
 
 #include "Calibur/Core/Input.h"
 
@@ -25,6 +26,7 @@ namespace Calibur {
 		m_Window->SetEventCallback(HZ_BIND_EVENT_FN(Application::OnEvent));
 
 		Renderer::Init();
+		Renderer2D::Init();
 		
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -34,6 +36,7 @@ namespace Calibur {
 	{
 		HZ_PROFILE_FUNCTION();
 
+		Renderer2D::Shutdown();
 		Renderer::Shutdown();
 	}
 	

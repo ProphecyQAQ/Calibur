@@ -3,6 +3,7 @@
 #include "entt.hpp"
 #include "Calibur/Core/TimeStep.h"
 #include "Calibur/Renderer/EditorCamera.h"
+#include "Calibur/Renderer/Shader.h"
 
 namespace Calibur
 {
@@ -30,6 +31,9 @@ namespace Calibur
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth, m_ViewportHeight;
+
+		// !TODO: Remove shader
+		Ref<Shader> m_MeshShader;
 
 		friend class Entity;
 		friend class SceneSerializer;

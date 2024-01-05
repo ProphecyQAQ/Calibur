@@ -96,6 +96,8 @@ namespace Calibur {
 	{
 		HZ_PROFILE_FUNCTION();
 
+		m_FilePath = filepath;
+
 		Utils::CreateCacheDirectoryIfNeeded();
 
 		std::string source = ReadFile(filepath);
@@ -256,7 +258,7 @@ namespace Calibur {
 		for (auto&& [stage, spirv] : m_VulkanSPIRV)
 		{
 			std::filesystem::path shaderFilePath = m_FilePath;
-			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string(), Utils::GLShaderStageCachedOpenGLFileExtension(stage));
+			std::filesystem::path cachedPath = cacheDirectory / (shaderFilePath.filename().string() +  Utils::GLShaderStageCachedOpenGLFileExtension(stage));
 			std::ifstream in(cachedPath, std::ios::in | std::ios::binary);
 			if (in.is_open())
 			{
