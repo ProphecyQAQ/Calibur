@@ -22,7 +22,7 @@ namespace Calibur
 		auto view = m_Registry.view<TransformComponent>();
 		#endif
 
-		m_MeshShader = Shader::Create("assets/shaders/Texture3D.glsl");
+		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
 	}
 
 	Scene::~Scene()
@@ -62,21 +62,21 @@ namespace Calibur
 		Renderer::BeginScene(camera);
 		
 		auto view = m_Registry.view<TransformComponent, MeshComponent>();
-		m_MeshShader->Bind();
 		for (auto entity : view)
 		{
 			auto& transform = view.get<TransformComponent>(entity);
-			//m_MeshShader->SetMat4("u_Transform", transform.GetTransform());
-			Ref<UniformBuffer> ubf = UniformBuffer::Create(sizeof(glm::mat4), 1);
-			ubf->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+
 			auto& mesh = view.get<MeshComponent>(entity);
+			mesh.material->GetShader()->Bind();
+
+			m_TransformBuffer->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			auto& submeshs = mesh.mesh->GetSubMeshes();
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				Renderer::RenderMesh(mesh.mesh, id);
 			}
+			mesh.material->GetShader()->Unbind();
 		}
-		m_MeshShader->Unbind();
 
 		Renderer::EndScene();
 	}

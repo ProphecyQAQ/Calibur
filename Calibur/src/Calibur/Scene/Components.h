@@ -8,6 +8,7 @@
 #include "Calibur/Scene/SceneCamera.h"
 #include "Calibur/Scene/ScriptableEntity.h"
 #include "Calibur/Renderer/Mesh.h"
+#include "Calibur/Renderer/Material.h"
 
 namespace Calibur
 {
@@ -80,6 +81,7 @@ namespace Calibur
 	struct MeshComponent
 	{
 		Ref<Mesh> mesh;
+		Ref<Material> material;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;

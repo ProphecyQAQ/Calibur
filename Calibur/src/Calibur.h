@@ -29,6 +29,8 @@
 #include "Calibur/Renderer/VertexArray.h"
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/Framebuffer.h"
+#include "Calibur/Renderer/Mesh.h"
+#include "Calibur/Renderer/Material.h"
 #include "Calibur/Renderer/Texture.h"
 #include "Calibur/Renderer/SubTexture2D.h"
 
