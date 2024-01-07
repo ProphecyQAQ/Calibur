@@ -7,6 +7,12 @@ namespace Calibur
 	Scope<Renderer::SceneData> Renderer::m_SceneData = CreateScope<Renderer::SceneData>();
 	static Ref<UniformBuffer> m_CameraUniformBuffer;
 
+	static struct RenderData
+	{
+		Ref<ShaderLibrary> s_ShaderLibrary;
+		Ref<Texture2D> s_WhiteTexture;
+	}*s_RenderData;
+
 	void Renderer::Init()
 	{
 		HZ_PROFILE_FUNCTION();
@@ -14,6 +20,12 @@ namespace Calibur
 		RenderCommand::Init();
 
 		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
+		
+		s_RenderData = new RenderData();
+		s_RenderData->s_WhiteTexture = Texture2D::Create(1, 1);
+		s_RenderData->s_ShaderLibrary = ShaderLibrary::Create();
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/Texture3D.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/textureToScreen.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -57,5 +69,15 @@ namespace Calibur
 	{
 		mesh->GetVertexArray()->Bind();
 		RenderCommand::RenderMesh(mesh, submeshIndex);
+	}
+	
+	Ref<ShaderLibrary> Renderer::GetShaderLibrary()
+	{
+		return s_RenderData->s_ShaderLibrary;
+	}
+
+	Ref<Texture2D> Renderer::GetWhiteTexture()
+	{
+		return s_RenderData->s_WhiteTexture;
 	}
 }

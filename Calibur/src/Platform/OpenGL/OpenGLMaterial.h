@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Calibur/Renderer/Texture.h"
 #include "Calibur/Renderer/Material.h"
 
 namespace Calibur
@@ -17,10 +18,25 @@ namespace Calibur
 		virtual void SetFloat4(const std::string& name, const glm::vec4& value);
 		virtual void SetMat4(const std::string& name, const glm::mat4& value);
 
-		virtual Ref<Shader> GetShader() { return m_Shader; };
-		virtual const std::string& GetName() { return m_Name; };
+		virtual Ref<Shader> GetShader() override { return m_Shader; };
+		virtual const std::string& GetName() override { return m_Name; };
+		virtual MaterialUniforms& GetMaterialUniforms() override { return m_MaterialUniforms; };
+
+		virtual void SetAlbedoMap(const Ref<Texture2D>& texture) override { m_AlbedoMap = texture; };
+		virtual void SetNormalMap(const Ref<Texture2D>& texture) override { m_NormalMap = texture; };
+		virtual void SetSpecMap(const Ref<Texture2D>& texture) override { m_SpecMap = texture; };
+		virtual void SetRoughnessMap(const Ref<Texture2D>& texture) override { m_RoughnessMap = texture; };
+
+		virtual Ref<Texture2D> GetAlbedoMap() override { return m_AlbedoMap; };
+		virtual Ref<Texture2D> GetNormalMap() override { return m_NormalMap; };
+		virtual Ref<Texture2D> GetSpecMap() override { return m_SpecMap; };
+		virtual Ref<Texture2D> GetRoughnessMap() override { return m_RoughnessMap; };
 	private:
-		Ref<Shader> m_Shader;
 		std::string m_Name;
+
+		Ref<Shader> m_Shader;
+		MaterialUniforms m_MaterialUniforms;
+
+		Ref<Texture2D> m_AlbedoMap, m_NormalMap, m_SpecMap, m_RoughnessMap;
 	};
 }

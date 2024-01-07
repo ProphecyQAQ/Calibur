@@ -5,6 +5,15 @@
 
 namespace Calibur
 {
+	struct MaterialUniforms
+	{
+		glm::vec3 Albedo  = glm::vec3(0.8f);
+		float Metallic    = 0.0f;
+		float Roughness   = 0.8f;
+		float Emission    = 0.0;;
+		bool useNormalMap = false;
+	};
+
 	class Material
 	{
 	public:
@@ -19,5 +28,16 @@ namespace Calibur
 
 		virtual Ref<Shader> GetShader() = 0;
 		virtual const std::string& GetName() = 0;
+		virtual MaterialUniforms& GetMaterialUniforms() = 0;
+
+		virtual void SetAlbedoMap(const Ref<Texture2D>& texture) = 0;
+		virtual void SetNormalMap(const Ref<Texture2D>& texture) = 0;
+		virtual void SetSpecMap(const Ref<Texture2D>& texture) = 0;
+		virtual void SetRoughnessMap(const Ref<Texture2D>& texture) = 0;
+
+		virtual Ref<Texture2D> GetAlbedoMap()  = 0;
+		virtual Ref<Texture2D> GetNormalMap() = 0;
+		virtual Ref<Texture2D> GetSpecMap() = 0;
+		virtual Ref<Texture2D> GetRoughnessMap() = 0;
 	};
 }

@@ -32,6 +32,9 @@ namespace Calibur
 	class ShaderLibrary 
 	{
 	public:
+		ShaderLibrary() = default;
+		~ShaderLibrary() = default;
+
 		void Add(const std::string& name, const Ref<Shader>& shader);
 		void Add(const Ref<Shader>& shader);
 		Ref<Shader> Load(const std::string& filepath);
@@ -40,6 +43,8 @@ namespace Calibur
 		Ref<Shader> Get(const std::string& name);
 
 		bool Exists(const std::string& name) const;
+
+		static Ref<ShaderLibrary> Create();
 	private:
 		std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 	};

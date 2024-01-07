@@ -1,16 +1,12 @@
 #include "hzpch.h"
 #include "Calibur/Renderer/Mesh.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
+#include "Calibur/Renderer/Renderer.h"
 
 namespace Calibur
 {
 	static const uint32_t s_MeshImportFlags =
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_Triangulate |             // Make sure we're triangles
-		aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_GenNormals |              // Make sure we have legit normals
 		aiProcess_GenUVCoords |             // Convert UVs if required 
 		//aiProcess_OptimizeGraph |          
@@ -46,9 +42,10 @@ namespace Calibur
 				m_SubMeshes[idx].MaterialIndex = mesh->mMaterialIndex;
 				m_SubMeshes[idx].VertexCount = mesh->mNumVertices;
 				m_SubMeshes[idx].IndexCount = mesh->mNumFaces * 3;
+				m_SubMeshes[idx].MeshName = mesh->mName.C_Str();
 
 				vertexCount += mesh->mNumVertices;
-				indexCount += mesh->mNumFaces * 3;
+				indexCount  += mesh->mNumFaces * 3;
 
 				// Vertices
 				for (size_t i = 0; i < mesh->mNumVertices; i++)
@@ -82,6 +79,8 @@ namespace Calibur
 				}
 			}
 		}
+
+		LoadMaterials(scene);
 			
 		m_VertexBuffer = VertexBuffer::Create((float*)m_Vertices.data(), (uint32_t)(m_Vertices.size() * sizeof(Vertex)));
 		m_IndexBuffer = IndexBuffer::Create((uint32_t*)m_Indices.data(), (uint32_t)(m_Indices.size() * sizeof(Index)));
@@ -98,5 +97,94 @@ namespace Calibur
 		m_VertexArray = VertexArray::Create();
 		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+	}
+	
+
+	void Mesh::LoadMaterials(const aiScene* scene)
+	{
+		if (scene->HasMaterials())
+		{
+			m_Materials.resize(scene->mNumMaterials);
+
+			for (size_t i = 0; i < scene->mNumMaterials; i++)
+			{
+				auto aiMaterial = scene->mMaterials[i];
+				auto aiMateriaName = aiMaterial->GetName();
+
+				Ref<Material> material = Material::Create(Renderer::GetShaderLibrary()->Get("Texture3D"), aiMateriaName.C_Str());
+				m_Materials[i] = material;
+				
+				///////////// Material Properties //////////////
+				aiColor3D aiColor;
+				if (aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor) == AI_SUCCESS)
+				{
+					material->GetMaterialUniforms().Albedo = {aiColor.r, aiColor.g, aiColor.b};
+				}
+
+				if (aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiColor) == AI_SUCCESS)
+				{
+					material->GetMaterialUniforms().Emission = aiColor.r;
+				}
+				
+				float metallic, roughness;
+				if (aiMaterial->Get(AI_MATKEY_REFLECTIVITY, metallic) == AI_SUCCESS)
+				{
+					material->GetMaterialUniforms().Metallic = metallic;
+				}
+				if (aiMaterial->Get(AI_MATKEY_ROUGHNESS_FACTOR, roughness) == AI_SUCCESS)
+				{
+					material->GetMaterialUniforms().Roughness = roughness;
+				}
+				///////////////////////////////////////////////
+
+				///////////// Material Textures  //////////////
+				// Now one material only can load one texture for each textures. 
+				if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
+				{
+					aiString path;
+					aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &path);
+
+					size_t lastSlash = m_FilePath.find_last_of('/');
+					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
+					material->SetAlbedoMap(Texture2D::Create(texturePath));
+				}
+				else material->SetAlbedoMap(Renderer::GetWhiteTexture());
+
+				if (aiMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0)
+				{
+					aiString path;
+					aiMaterial->GetTexture(aiTextureType_HEIGHT, 0, &path);
+
+					size_t lastSlash = m_FilePath.find_last_of('/');
+					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
+					material->SetNormalMap(Texture2D::Create(texturePath));
+				}
+				else material->SetNormalMap(Renderer::GetWhiteTexture());
+
+				if (aiMaterial->GetTextureCount(aiTextureType_SHININESS) > 0)
+				{
+					aiString path;
+					aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &path);
+
+					size_t lastSlash = m_FilePath.find_last_of('/');
+					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
+					material->SetRoughnessMap(Texture2D::Create(texturePath));
+				}
+				else material->SetRoughnessMap(Renderer::GetWhiteTexture());
+
+				if (aiMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0)
+				{
+					aiString path;
+					aiMaterial->GetTexture(aiTextureType_SPECULAR, 0, &path);
+
+					size_t lastSlash = m_FilePath.find_last_of('/');
+					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
+					material->SetSpecMap(Texture2D::Create(texturePath));
+				}
+				else material->SetSpecMap(Renderer::GetWhiteTexture());
+
+				///////////////////////////////////////////////
+			}
+		}
 	}
 }

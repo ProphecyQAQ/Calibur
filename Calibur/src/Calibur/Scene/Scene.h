@@ -34,6 +34,7 @@ namespace Calibur
 		uint32_t m_ViewportWidth, m_ViewportHeight;
 
 		Ref<UniformBuffer> m_TransformBuffer;
+		Ref<UniformBuffer> m_MaterialUniform;
 
 		friend class Entity;
 		friend class SceneSerializer;

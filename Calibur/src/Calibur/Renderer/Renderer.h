@@ -30,6 +30,9 @@ namespace Calibur
 		static void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex);
 
 		static RendererAPI::API GetAPI() { return RendererAPI::GetAPI(); }
+
+		static Ref<ShaderLibrary> GetShaderLibrary();
+		static Ref<Texture2D> GetWhiteTexture();
 	private:
 		struct SceneData
 		{

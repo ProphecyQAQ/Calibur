@@ -109,7 +109,7 @@ namespace Calibur
 		// Nanosuit
 		auto& entity = m_ActiveScene->CreateEntity("Nano");
 		entity.AddComponent<MeshComponent>("./Resources/Model/nanosuit/nanosuit.obj");
-		entity.GetComponent<MeshComponent>().material = Material::Create(Shader::Create("assets/shaders/Texture3D.glsl"));
+		entity.GetComponent<MeshComponent>().material = Material::Create(Renderer::GetShaderLibrary()->Get("Texture3D"));
 	}
 
 	void EditorLayer::OnDetach()
@@ -143,7 +143,7 @@ namespace Calibur
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		RenderCommand::SetClearColor(glm::vec4(0.9f, 0.9f, 0.9f, 1.0f));
 		RenderCommand::Clear();
 
 		// Clear entity id to -1

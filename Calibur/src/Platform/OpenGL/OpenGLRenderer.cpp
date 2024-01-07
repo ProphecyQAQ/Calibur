@@ -37,10 +37,12 @@ namespace Calibur
 			glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
 		#endif
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
+
+		//glPolygonMode(GL_FRONT, GL_LINE);
 	}
 
 	void OpenGLRenderer::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
@@ -61,7 +63,7 @@ namespace Calibur
 	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 	{
 		auto& submesh = mesh->GetSubMeshes()[submeshIndex];
-		glDrawRangeElementsBaseVertex(GL_TRIANGLES, submesh.BaseIndex, submesh.BaseIndex + submesh.IndexCount, submesh.IndexCount, GL_UNSIGNED_INT, nullptr, submesh.BaseVertex);
+		glDrawElementsBaseVertex(GL_TRIANGLES,  submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32_t)), submesh.BaseVertex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
