@@ -74,7 +74,8 @@ layout(set = 0, binding = 3) uniform sampler2D u_RoughnessTexture;
 
 void main()
 {
-	color = texture(u_DiffuseTexture, Input.texCoord) + texture(u_SpecTexture, Input.texCoord);
+	//color = vec4(texture(u_DiffuseTexture, Input.texCoord).rgb, 1.0);
+	color = texture(u_DiffuseTexture, Input.texCoord);
 	//color = vec4(0.1, 0.1, 0.1, 1.0);
 
 	color2 = -1;

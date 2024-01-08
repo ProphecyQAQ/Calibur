@@ -85,8 +85,8 @@ namespace Calibur
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
-		MeshComponent(const std::string& filepath)
-			: mesh(std::make_shared<Mesh>(filepath)) {}
+		MeshComponent(const std::string& filepath, bool isVerticalFlip)
+			: mesh(std::make_shared<Mesh>(filepath, isVerticalFlip)) {}
 		MeshComponent(const Ref<Mesh>& mesh)
 			: mesh(mesh) {}
 	};

@@ -67,7 +67,6 @@ namespace Calibur
 
 	void Renderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 	{
-		mesh->GetVertexArray()->Bind();
 		RenderCommand::RenderMesh(mesh, submeshIndex);
 	}
 	

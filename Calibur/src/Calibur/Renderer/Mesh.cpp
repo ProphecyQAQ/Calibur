@@ -15,8 +15,8 @@ namespace Calibur
 		aiProcess_ValidateDataStructure;    // Validation
 
 
-	Mesh::Mesh(std::string filepath)
-		: m_FilePath(filepath)
+	Mesh::Mesh(std::string filepath, bool isVerticalFlip)
+		: m_FilePath(filepath), m_IsVerticalFlip(isVerticalFlip)
 	{	
 		Assimp::Importer importer;
 		const aiScene *scene = importer.ReadFile(filepath,  s_MeshImportFlags);
@@ -74,6 +74,7 @@ namespace Calibur
 				{
 					aiFace& face = mesh->mFaces[i];
 					HZ_CORE_ASSERT(face.mNumIndices == 3, "Calibur only supports triangles for now!");
+					//Index index = { face.mIndices[0] + m_SubMeshes[idx].IndexCount, face.mIndices[1] + m_SubMeshes[idx].IndexCount, face.mIndices[2] + m_SubMeshes[idx].IndexCount };
 					Index index = { face.mIndices[0], face.mIndices[1], face.mIndices[2] };
 					m_Indices.push_back(index);
 				}
@@ -146,9 +147,9 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetAlbedoMap(Texture2D::Create(texturePath));
+					material->SetDiffuseMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
 				}
-				else material->SetAlbedoMap(Renderer::GetWhiteTexture());
+				else material->SetDiffuseMap(Renderer::GetWhiteTexture());
 
 				if (aiMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0)
 				{
@@ -157,7 +158,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetNormalMap(Texture2D::Create(texturePath));
+					material->SetNormalMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
 				}
 				else material->SetNormalMap(Renderer::GetWhiteTexture());
 
@@ -168,7 +169,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetRoughnessMap(Texture2D::Create(texturePath));
+					material->SetRoughnessMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
 				}
 				else material->SetRoughnessMap(Renderer::GetWhiteTexture());
 
@@ -179,7 +180,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetSpecMap(Texture2D::Create(texturePath));
+					material->SetSpecMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
 				}
 				else material->SetSpecMap(Renderer::GetWhiteTexture());
 

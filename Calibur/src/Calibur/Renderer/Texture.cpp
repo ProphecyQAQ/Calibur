@@ -24,7 +24,7 @@ namespace Calibur
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(const std::string path)
+	Ref<Texture2D> Texture2D::Create(const std::string path, bool isVerticalFlip)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -33,7 +33,7 @@ namespace Calibur
 			return nullptr;
 		
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTexture2D>(path);
+			return CreateRef<OpenGLTexture2D>(path, isVerticalFlip);
 		}
 		
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");

@@ -63,7 +63,7 @@ namespace Calibur
 	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 	{
 		auto& submesh = mesh->GetSubMeshes()[submeshIndex];
-		glDrawElementsBaseVertex(GL_TRIANGLES,  submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32_t)), submesh.BaseVertex);
+		glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32_t)), submesh.BaseVertex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 

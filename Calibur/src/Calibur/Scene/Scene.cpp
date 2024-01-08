@@ -69,50 +69,27 @@ namespace Calibur
 			auto& transform = view.get<TransformComponent>(entity);
 
 			auto& mesh = view.get<MeshComponent>(entity);
+			auto& submeshs = mesh.mesh->GetSubMeshes();
+			mesh.mesh->GetVertexArray()->Bind();
 
 			m_TransformBuffer->SetData(&transform.GetTransform(), sizeof(glm::mat4));
-			auto& submeshs = mesh.mesh->GetSubMeshes();
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
 
 				material->GetShader()->Bind();
-				
-				//Ref<Shader> shader = Renderer::GetShaderLibrary()->Get("textureToScreen");
-				//shader->Bind();
-				material->GetAlbedoMap()->Bind(0);
-				material->GetNormalMap()->Bind(1);
-				//material->GetMetallicMap()->Bind(2);
-				material->GetRoughnessMap()->Bind(3);
-				float vertices[] = {
-					// Î»ÖÃ            // ÎÆÀí×ø±ê
-					-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-					 1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-					 1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-					-1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-				};
-				uint32_t indices[] = { 0, 1, 2, 2, 3, 0 };
-
-				Ref<VertexArray> vao = VertexArray::Create();
-				BufferLayout layout = {
-					{ ShaderDataType::Float3, "a_Position" },
-					{ ShaderDataType::Float2, "a_TexCoord" }
-				};
-				Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices, sizeof(vertices));
-				vbo->SetLayout(layout);
-				vao->AddVertexBuffer(vbo);
-				Ref<IndexBuffer> ibo = IndexBuffer::Create(indices, sizeof(indices));
-				vao->SetIndexBuffer(ibo);
-				//Renderer::Submit(shader, vao);
-
+				material->GetDiffuseMap()->Bind(0);
+				//material->GetNormalMap()->Bind(1);
+				//material->GetSpecMap()->Bind(2);
+				//material->GetRoughnessMap()->Bind(3);
 
 				Renderer::RenderMesh(mesh.mesh, id);
 
 				material->GetShader()->Unbind();
-
-				//break;
 			}
-			//Renderer::Submit(Renderer::GetShaderLibrary()->Get("Texture3D"), mesh.mesh->GetVertexArray());
+			//Ref<Texture2D> tex = Texture2D::Create("Resources/Model/backpack/diffuse.jpg");
+			//tex->Bind(0);
+ 			//Renderer::Submit(Renderer::GetShaderLibrary()->Get("Texture3D"), mesh.mesh->GetVertexArray());
 		}
 
 		Renderer::EndScene();

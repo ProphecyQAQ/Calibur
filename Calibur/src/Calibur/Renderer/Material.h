@@ -30,12 +30,12 @@ namespace Calibur
 		virtual const std::string& GetName() = 0;
 		virtual MaterialUniforms& GetMaterialUniforms() = 0;
 
-		virtual void SetAlbedoMap(const Ref<Texture2D>& texture) = 0;
+		virtual void SetDiffuseMap(const Ref<Texture2D>& texture) = 0;
 		virtual void SetNormalMap(const Ref<Texture2D>& texture) = 0;
 		virtual void SetSpecMap(const Ref<Texture2D>& texture) = 0;
 		virtual void SetRoughnessMap(const Ref<Texture2D>& texture) = 0;
 
-		virtual Ref<Texture2D> GetAlbedoMap()  = 0;
+		virtual Ref<Texture2D> GetDiffuseMap()  = 0;
 		virtual Ref<Texture2D> GetNormalMap() = 0;
 		virtual Ref<Texture2D> GetSpecMap() = 0;
 		virtual Ref<Texture2D> GetRoughnessMap() = 0;

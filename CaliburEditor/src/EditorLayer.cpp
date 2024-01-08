@@ -20,8 +20,6 @@ namespace Calibur
 	EditorLayer::EditorLayer()
 		:Layer("EditorLayer"), m_CameraController(1920.0f / 1080.0f)
 	{
-		Assimp::Importer importer;
-		const aiScene *scene = importer.ReadFile("Resources/Model/nanosuit/nanosuit.obj", aiProcess_Triangulate | aiProcess_FlipUVs);
 	}
 
 	void EditorLayer::OnAttach()
@@ -108,7 +106,7 @@ namespace Calibur
 		
 		// Nanosuit
 		auto& entity = m_ActiveScene->CreateEntity("Nano");
-		entity.AddComponent<MeshComponent>("./Resources/Model/nanosuit/nanosuit.obj");
+		entity.AddComponent<MeshComponent>("./Resources/Model/nanosuit/nanosuit.obj", true);
 		entity.GetComponent<MeshComponent>().material = Material::Create(Renderer::GetShaderLibrary()->Get("Texture3D"));
 	}
 

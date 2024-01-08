@@ -42,7 +42,7 @@ namespace Calibur
 	class Mesh
 	{
 	public:
-		Mesh(std::string filepath);
+		Mesh(std::string filepath, bool isVerticalFlip);
 		~Mesh() = default;
 
 		// TODO: Remove
@@ -66,6 +66,7 @@ namespace Calibur
 		std::vector<Index> m_Indices;
 
 		std::vector<Ref<Material>> m_Materials;
+		bool m_IsVerticalFlip = false;
 
 		std::string m_FilePath;
 	};

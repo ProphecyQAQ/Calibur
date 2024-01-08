@@ -22,12 +22,12 @@ namespace Calibur
 		virtual const std::string& GetName() override { return m_Name; };
 		virtual MaterialUniforms& GetMaterialUniforms() override { return m_MaterialUniforms; };
 
-		virtual void SetAlbedoMap(const Ref<Texture2D>& texture) override { m_AlbedoMap = texture; };
+		virtual void SetDiffuseMap(const Ref<Texture2D>& texture) override { m_DiffuseMap = texture; };
 		virtual void SetNormalMap(const Ref<Texture2D>& texture) override { m_NormalMap = texture; };
 		virtual void SetSpecMap(const Ref<Texture2D>& texture) override { m_SpecMap = texture; };
 		virtual void SetRoughnessMap(const Ref<Texture2D>& texture) override { m_RoughnessMap = texture; };
 
-		virtual Ref<Texture2D> GetAlbedoMap() override { return m_AlbedoMap; };
+		virtual Ref<Texture2D> GetDiffuseMap() override { return m_DiffuseMap; };
 		virtual Ref<Texture2D> GetNormalMap() override { return m_NormalMap; };
 		virtual Ref<Texture2D> GetSpecMap() override { return m_SpecMap; };
 		virtual Ref<Texture2D> GetRoughnessMap() override { return m_RoughnessMap; };
@@ -37,6 +37,6 @@ namespace Calibur
 		Ref<Shader> m_Shader;
 		MaterialUniforms m_MaterialUniforms;
 
-		Ref<Texture2D> m_AlbedoMap, m_NormalMap, m_SpecMap, m_RoughnessMap;
+		Ref<Texture2D> m_DiffuseMap, m_NormalMap, m_SpecMap, m_RoughnessMap;
 	};
 }
