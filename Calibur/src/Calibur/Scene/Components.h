@@ -8,6 +8,7 @@
 #include "Calibur/Scene/SceneCamera.h"
 #include "Calibur/Scene/ScriptableEntity.h"
 #include "Calibur/Renderer/Mesh.h"
+#include "Calibur/Renderer/Texture.h"
 #include "Calibur/Renderer/Material.h"
 
 namespace Calibur
@@ -46,6 +47,8 @@ namespace Calibur
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
+		Ref<Texture2D> Texture;
+		float TilingFactor = 1.0f;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
