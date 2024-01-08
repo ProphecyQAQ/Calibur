@@ -93,4 +93,8 @@ namespace Calibur
 
 		glBindTextureUnit(slot, m_RendererID);
 	}
+
+	void OpenGLTexture2D::Unbind() const
+	{
+	}
 }

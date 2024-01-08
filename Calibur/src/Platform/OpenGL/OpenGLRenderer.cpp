@@ -63,6 +63,7 @@ namespace Calibur
 	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 	{
 		auto& submesh = mesh->GetSubMeshes()[submeshIndex];
+		mesh->GetVertexArray()->Bind();
 		glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32_t)), submesh.BaseVertex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -70,6 +71,7 @@ namespace Calibur
 	void OpenGLRenderer::DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount)
 	{
 		uint32_t count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
+		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

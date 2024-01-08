@@ -9,6 +9,8 @@
 
 namespace Calibur
 {
+	extern const std::filesystem::path g_AssetPath;
+
 	class EditorLayer : public Layer
 	{
 	public:
@@ -27,6 +29,7 @@ namespace Calibur
 		
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
 	private:
 		OrthographicCameraController m_CameraController;

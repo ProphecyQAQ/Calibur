@@ -70,7 +70,6 @@ namespace Calibur
 
 			auto& mesh = view.get<MeshComponent>(entity);
 			auto& submeshs = mesh.mesh->GetSubMeshes();
-			mesh.mesh->GetVertexArray()->Bind();
 
 			m_TransformBuffer->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			for (size_t id = 0; id < submeshs.size(); id++)

@@ -106,8 +106,7 @@ namespace Calibur
 		
 		// Nanosuit
 		auto& entity = m_ActiveScene->CreateEntity("Nano");
-		entity.AddComponent<MeshComponent>("./Resources/Model/nanosuit/nanosuit.obj", true);
-		entity.GetComponent<MeshComponent>().material = Material::Create(Renderer::GetShaderLibrary()->Get("Texture3D"));
+		entity.AddComponent<MeshComponent>("./Resources/Model/backpack/backpack.obj", true);
 	}
 
 	void EditorLayer::OnDetach()
@@ -282,7 +281,17 @@ namespace Calibur
 		m_ViewportSize = { viewportPanelSize.x, viewportPanelSize.y };
 
 		uint32_t textureID = m_Framebuffer->GetColorAttachmentRendererID(0);
-		ImGui::Image((void*)textureID, viewportPanelSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		ImGui::Image(reinterpret_cast<void*>(textureID), viewportPanelSize, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+			{
+				const wchar_t* path = (const wchar_t*)payload->Data;
+				OpenScene(std::filesystem::path(g_AssetPath) / path);
+			}
+			ImGui::EndDragDropTarget(); 
+		}
 
 		//Gizoms
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
@@ -425,27 +434,30 @@ namespace Calibur
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Deserialize(path.string());
+	}
+
 	void EditorLayer::OpenScene()
 	{
-		std::optional<std::string> filepath = FileDialogs::OpenFile("Calibur Scene (*.yaml)\0*.yaml\0");
-		if (filepath)
-		{
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(*filepath);
-		}
+		std::string filepath = FileDialogs::OpenFile("Calibur Scene (*.yaml)\0*.yaml\0");
+		if (!filepath.empty())
+			OpenScene(filepath);
 	}
 
 	void EditorLayer::SaveSceneAs()
 	{
-		std::optional<std::string> filepath = FileDialogs::SaveFile("Calibur Scene (*.yaml)\0*.yaml\0");
-		if (filepath)
+		std::string filepath = FileDialogs::SaveFile("Calibur Scene (*.yaml)\0*.yaml\0");
+		if (!filepath.empty())
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(*filepath);
+			serializer.Serialize(filepath);
 		}
 	}
 }

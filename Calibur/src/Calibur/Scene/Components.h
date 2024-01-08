@@ -81,7 +81,7 @@ namespace Calibur
 	struct MeshComponent
 	{
 		Ref<Mesh> mesh;
-		Ref<Material> material;
+		//Ref<Material> material;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
