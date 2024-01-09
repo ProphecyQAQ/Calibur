@@ -215,7 +215,7 @@ namespace Calibur
 		return pixelData;
 	}
 
-	void OpenGLFramebuffer::ClaerAttachment(uint32_t attachmentIndex, int value)
+	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)
 	{
 		HZ_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
 

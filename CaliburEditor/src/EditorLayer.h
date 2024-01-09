@@ -31,6 +31,11 @@ namespace Calibur
 		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveSceneAs();
+
+		void OnScenePlay();
+		void OnSceneStop();
+
+		void UI_ToolBar();
 	private:
 		OrthographicCameraController m_CameraController;
 
@@ -51,13 +56,8 @@ namespace Calibur
 		Entity m_HoveredEntity;
 
 		Ref<Texture2D> m_CheckerboardTexture;
-		Ref<Texture2D> m_SpriteSheet;
-		Ref<SubTexture2D> m_TextureStairs;
 
 		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
-
-		uint32_t m_MapWidth, m_MapHeight;
-		std::unordered_map<char, Ref<SubTexture2D>> m_TextureMap;
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
@@ -67,5 +67,12 @@ namespace Calibur
 		//Panels;
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContextBrowserPanel;
+
+		Ref<Texture2D> m_IconPlay, m_IconStop;
+		enum class SceneState
+		{
+			Edit, Play
+		};
+		SceneState m_SceneState = SceneState::Edit;
 	};
 }

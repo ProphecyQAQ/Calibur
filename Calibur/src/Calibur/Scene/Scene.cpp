@@ -78,17 +78,14 @@ namespace Calibur
 
 				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);
-				//material->GetNormalMap()->Bind(1);
-				//material->GetSpecMap()->Bind(2);
-				//material->GetRoughnessMap()->Bind(3);
+				material->GetNormalMap()->Bind(1);
+				material->GetSpecMap()->Bind(2);
+				material->GetRoughnessMap()->Bind(3);
 
 				Renderer::RenderMesh(mesh.mesh, id);
 
 				material->GetShader()->Unbind();
 			}
-			//Ref<Texture2D> tex = Texture2D::Create("Resources/Model/backpack/diffuse.jpg");
-			//tex->Bind(0);
- 			//Renderer::Submit(Renderer::GetShaderLibrary()->Get("Texture3D"), mesh.mesh->GetVertexArray());
 		}
 
 		Renderer::EndScene();
@@ -112,7 +109,6 @@ namespace Calibur
 
 		}
 
-		//Render 2D sprites
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
 		{
@@ -142,6 +138,36 @@ namespace Calibur
 			}
 
 			Renderer2D::EndScene();
+
+
+			Renderer::BeginScene(*mainCamera, cameraTransform);
+			
+			auto view = m_Registry.view<TransformComponent, MeshComponent>();
+			for (auto entity : view)
+			{
+				auto& transform = view.get<TransformComponent>(entity);
+
+				auto& mesh = view.get<MeshComponent>(entity);
+				auto& submeshs = mesh.mesh->GetSubMeshes();
+
+				m_TransformBuffer->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+				for (size_t id = 0; id < submeshs.size(); id++)
+				{
+					auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
+
+					material->GetShader()->Bind();
+					material->GetDiffuseMap()->Bind(0);
+					material->GetNormalMap()->Bind(1);
+					material->GetSpecMap()->Bind(2);
+					material->GetRoughnessMap()->Bind(3);
+
+					Renderer::RenderMesh(mesh.mesh, id);
+
+					material->GetShader()->Unbind();
+				}
+			}
+
+			Renderer::EndScene();
 		}
 	}
 

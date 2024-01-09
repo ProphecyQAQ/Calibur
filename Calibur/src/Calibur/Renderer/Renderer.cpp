@@ -42,6 +42,12 @@ namespace Calibur
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}
 
+	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
+	{
+		m_SceneData->ViewProjectionMatrix = camera.GetProjection() * glm::inverse(transform);
+		m_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
+	}
+
 	void Renderer::BeginScene(EditorCamera& camera)
 	{
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjection();

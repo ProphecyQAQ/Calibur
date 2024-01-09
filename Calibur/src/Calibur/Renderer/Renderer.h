@@ -8,6 +8,8 @@
 #include "Calibur/Renderer/EditorCamera.h"
 #include "Calibur/Renderer/Shader.h"
 
+#include <glm/glm.hpp>
+
 namespace Calibur
 {
 	class Renderer
@@ -19,6 +21,7 @@ namespace Calibur
 		static void OnWindowResize(uint32_t width, uint32_t height);
 
 		static void BeginScene(OrthographicCamera& camera);
+		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void BeginScene(EditorCamera& camera);
 		static void EndScene();
 

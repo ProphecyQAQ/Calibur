@@ -27,13 +27,8 @@ namespace Calibur
 		HZ_PROFILE_FUNCTION();
 
 		m_CheckerboardTexture = Texture2D::Create("assets/textures/Checkerboard.png");
-		m_SpriteSheet = Texture2D::Create("assets/game/textures/RPGpack_sheet_2X.png");
-
-		//m_TextureB = SubTexture2D::CreateFromCoords(m_SpriteSheet, {1, 11}, {128, 128}, {1, 1});
-		//m_TextureStairs = SubTexture2D::CreateFromCoords(m_SpriteSheet, {7, 6}, {128, 128}, {1, 1});
-
-		m_TextureMap['D'] = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6, 11 }, { 128, 128 }, { 1, 1 });
-		m_TextureMap['W'] = SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11, 11 }, { 128, 128 }, { 1, 1 });
+		m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
+		m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
@@ -106,7 +101,7 @@ namespace Calibur
 		
 		// Nanosuit
 		auto& entity = m_ActiveScene->CreateEntity("Nano");
-		entity.AddComponent<MeshComponent>("./Resources/Model/backpack/backpack.obj", true);
+		entity.AddComponent<MeshComponent>("Resources/Model/nanosuit/nanosuit.obj", false);
 	}
 
 	void EditorLayer::OnDetach()
@@ -130,13 +125,6 @@ namespace Calibur
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 		}
 
-		// Update
-		if (m_ViewportFocused)
-		{
-			m_CameraController.OnUpdate(ts);
-			m_EditorCamera.OnUpdate(ts);
-		}
-
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
@@ -144,10 +132,28 @@ namespace Calibur
 		RenderCommand::Clear();
 
 		// Clear entity id to -1
-		m_Framebuffer->ClaerAttachment(1, -1);
-			
-		//Update scene
-		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+		m_Framebuffer->ClearAttachment(1, -1);
+		
+		switch (m_SceneState)
+		{
+			case SceneState::Edit:
+			{
+				// Update
+				if (m_ViewportFocused)
+				{
+					m_CameraController.OnUpdate(ts);
+				}
+				m_EditorCamera.OnUpdate(ts);
+
+				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); 
+				break;
+			}
+			case SceneState::Play:
+			{
+				m_ActiveScene->OnUpdateRuntime(ts);
+				break;
+			}
+		}
 
 		auto [mx, my] = ImGui::GetMousePos();
 		mx -= m_ViewportBounds[0].x;
@@ -337,10 +343,45 @@ namespace Calibur
 		ImGui::End();
 		ImGui::PopStyleVar();
 
+		UI_ToolBar();
+
 		ImGui::End();
 		
 		m_SceneHierarchyPanel.OnImGuiRender();
 		m_ContextBrowserPanel.OnImguiRender();
+	}
+
+	void EditorLayer::UI_ToolBar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 0));
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		auto& colors = ImGui::GetStyle().Colors;
+		const auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		const auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+
+		float size = ImGui::GetWindowHeight() - 4.0f;
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+
+		ImGui::SetCursorPos(ImVec2(ImGui::GetContentRegionMax().x * 0.5f - size * 0.5f, ImGui::GetContentRegionMax().y * 0.5f - size * 0.5f));
+		if (ImGui::ImageButton((ImTextureID)icon->GetRendererID(), ImVec2(size, size)))
+		{
+			if (m_SceneState == SceneState::Edit)
+			{
+				OnScenePlay();
+			}
+			else if (m_SceneState == SceneState::Play)
+			{
+				OnSceneStop();
+			}
+		}
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
+		ImGui::End();
 	}
 
 	void EditorLayer::OnEvent(Event& e)
@@ -459,5 +500,15 @@ namespace Calibur
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(filepath);
 		}
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
 	}
 }
