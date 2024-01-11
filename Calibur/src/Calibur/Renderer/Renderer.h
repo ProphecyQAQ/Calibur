@@ -12,6 +12,8 @@
 
 namespace Calibur
 {
+	struct SceneLightData;
+
 	class Renderer
 	{
 	public:
@@ -24,6 +26,9 @@ namespace Calibur
 		static void BeginScene(const Camera& camera, const glm::mat4& transform);
 		static void BeginScene(EditorCamera& camera);
 		static void EndScene();
+
+		// Light
+		static void SubmitLight(SceneLightData& light);
 
 		static void Submit(
 			const Ref<Shader>& shader, 

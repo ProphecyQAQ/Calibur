@@ -3,16 +3,13 @@
 #type vertex
 #version 450 core
 
+#include "Buffer.glsl"
+
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
 layout(location = 2) in vec2 a_TexCoord;
 layout(location = 3) in vec3 a_Tangent;
 layout(location = 4) in vec3 a_Bitangent;
-
-layout(std140, binding = 0) uniform Camera
-{
-	mat4 u_ViewProjection;
-};
 
 layout(std140, binding = 1) uniform Transform
 {
@@ -43,6 +40,8 @@ void main()
 
 #type fragment
 #version 450 core
+
+#include "Buffer.glsl"
 
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
@@ -75,7 +74,8 @@ layout(set = 0, binding = 3) uniform sampler2D u_RoughnessTexture;
 void main()
 {
 	//color = vec4(texture(u_DiffuseTexture, Input.texCoord).rgb, 1.0);
-	color = texture(u_DiffuseTexture, Input.texCoord);
+	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb * u_DirectionalLight.Radiance;
+	color = vec4(diffuseColor, 1.0);
 	//color = vec4(0.1, 0.1, 0.1, 1.0);
 
 	color2 = -1;

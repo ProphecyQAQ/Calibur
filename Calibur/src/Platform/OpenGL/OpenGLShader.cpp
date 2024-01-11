@@ -193,6 +193,10 @@ namespace Calibur {
 		const bool optimize = true;
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+		
+		// Head file
+		shaderc_util::FileFinder fileFinder;
+		options.SetIncluder(std::make_unique<glslc::FileIncluder>(&fileFinder));
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 
@@ -250,6 +254,9 @@ namespace Calibur {
 		const bool optimize = true;
 		if (optimize)
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
+
+		shaderc_util::FileFinder fileFinder;
+		options.SetIncluder(std::make_unique<glslc::FileIncluder>(&fileFinder));
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
 

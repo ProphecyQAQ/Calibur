@@ -19,7 +19,7 @@ project "Calibur"
 		"vendor/glm/glm/**.hpp",
 		"vendor/glm/glm/**.inl",
 		"vendor/ImGuizmo/ImGuizmo.h",
-		"vendor/ImGuizmo/ImGuizmo.cpp"
+		"vendor/ImGuizmo/ImGuizmo.cpp",
 	}
 
 	defines
@@ -43,6 +43,8 @@ project "Calibur"
 		"%{IncludeDir.ImGuizom}",
 		"%{IncludeDir.VulkanSDK}",
 		"%{IncludeDir.Assimp}",
+		"%{IncludeDir.Shaderc_file}",
+		"vendor/shaderc_file/libshaderc_util/include",
 	}
 
 	links
@@ -51,7 +53,8 @@ project "Calibur"
 		"Glad",
 		"ImGui",
 		"yaml-cpp",
-		"opengl32.lib"
+		"opengl32.lib",
+		"Shaderc_file"
 	}
 
 	filter "files:vendor/ImGuizmo/**.cpp"

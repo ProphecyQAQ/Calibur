@@ -1,11 +1,13 @@
 #include "hzpch.h"
 
 #include "Calibur/Renderer/Renderer.h"
+#include "Calibur/Scene/Scene.h"
 
 namespace Calibur
 {
 	Scope<Renderer::SceneData> Renderer::m_SceneData = CreateScope<Renderer::SceneData>();
-	static Ref<UniformBuffer> m_CameraUniformBuffer;
+	static Ref<UniformBuffer> s_CameraUniformBuffer;
+	static Ref<UniformBuffer> s_DirectionalLightUniformBuffer;
 
 	static struct RenderData
 	{
@@ -19,7 +21,8 @@ namespace Calibur
 
 		RenderCommand::Init();
 
-		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
+		s_CameraUniformBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
+		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(SceneLightData), 3);
 		
 		s_RenderData = new RenderData();
 		s_RenderData->s_WhiteTexture = Texture2D::Create(1, 1);
@@ -45,17 +48,22 @@ namespace Calibur
 	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
 		m_SceneData->ViewProjectionMatrix = camera.GetProjection() * glm::inverse(transform);
-		m_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
+		s_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
 	}
 
 	void Renderer::BeginScene(EditorCamera& camera)
 	{
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
-		m_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
+		s_CameraUniformBuffer->SetData(&m_SceneData->ViewProjectionMatrix, sizeof(SceneData));
 	}
 
 	void Renderer::EndScene()
 	{
+	}
+
+	void Renderer::SubmitLight(SceneLightData& light)
+	{
+		s_DirectionalLightUniformBuffer->SetData(&light.DirectionalLights, sizeof(SceneLightData));
 	}
 
 	void Renderer::Submit(

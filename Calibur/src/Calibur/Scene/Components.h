@@ -93,4 +93,15 @@ namespace Calibur
 		MeshComponent(const Ref<Mesh>& mesh)
 			: mesh(mesh) {}
 	};
+
+	enum class LightType
+	{
+		None = 0, Directional, Point, Spot
+	};
+
+	struct DirectionalLightComponent
+	{
+		glm::vec3 Radiance{1.0f};
+		float Intensity = 1.0f;
+	};
 }

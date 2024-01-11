@@ -30,6 +30,7 @@ group "Dependencies"
 	include "Calibur/vendor/Glad"
 	include "Calibur/vendor/imgui"
 	include "Calibur/vendor/yaml-cpp"
+	include "Calibur/vendor/shaderc_file"
 group ""
 
 include "Calibur"

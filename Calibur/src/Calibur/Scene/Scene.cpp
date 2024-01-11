@@ -48,6 +48,27 @@ namespace Calibur
 
 	void Scene::OnUpdateEditor(TimeStep ts, EditorCamera& camera)
 	{
+		// Light
+		SceneLightData lightData;
+		{
+			//Directional Light 
+			// Now only one dir light
+			auto view = m_Registry.view<DirectionalLightComponent, TransformComponent>();
+			for (auto entity : view)
+			{
+				auto& light = view.get<DirectionalLightComponent>(entity);
+				auto& transform = view.get<TransformComponent>(entity);
+				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
+				lightData.DirectionalLights =
+				{
+					light.Radiance,
+					direction,
+					light.Intensity
+				};
+			}
+		}
+		Renderer::SubmitLight(lightData);
+
 		// Render 2D
 		Renderer2D::BeginScene(camera);
 		
@@ -233,6 +254,11 @@ namespace Calibur
 
 	template<>
 	void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
 	{
 	}
 }

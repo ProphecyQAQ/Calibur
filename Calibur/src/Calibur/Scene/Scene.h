@@ -6,9 +6,24 @@
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 
+#include <glm/glm.hpp>
+
 namespace Calibur
 {
 	class Entity;
+
+	struct DirectionalLight
+	{
+		glm::vec3 Radiance{ 0.0f, 0.0f, 0.0f };
+		glm::vec3 Direction{ 0.0f, 0.0f, 0.0f };
+		float Intensity = 0.0f;
+	};
+
+	struct SceneLightData
+	{
+		DirectionalLight DirectionalLights;
+		//int DirectionalLightIndex = 0;
+	};
 
 	class Scene
 	{

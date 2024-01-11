@@ -15,7 +15,7 @@ IncludeDir["ImGuizmo"] = "%{wks.location}/Calibur/vendor/ImGuizmo"
 IncludeDir["glm"] = "%{wks.location}/Calibur/vendor/glm"
 IncludeDir["entt"] = "%{wks.location}/Calibur/vendor/entt/include"
 IncludeDir["mono"] = "%{wks.location}/Calibur/vendor/mono/include"
-IncludeDir["shaderc"] = "%{wks.location}/Calibur/vendor/shaderc/include"
+IncludeDir["Shaderc_file"] = "%{wks.location}/Calibur/vendor/shaderc_file"
 IncludeDir["SPIRV_Cross"] = "%{wks.location}/Calibur/vendor/SPIRV-Cross"
 IncludeDir["Assimp"] = "%{wks.location}/Calibur/vendor/assimp/include"
 IncludeDir["VulkanSDK"] = "%{VULKAN_SDK}/Include"
@@ -28,6 +28,8 @@ Library = {}
 
 Library["Assimp_Debug"] = "%{wks.location}/Calibur/vendor/assimp/bin/Debug/assimp-vc142-mtd.lib"
 Library["Assimp_Release"] = "%{wks.location}/Calibur/vendor/assimp/bin/Release/assimp-vc142-mt.lib"
+
+Library["Shaderc_file"] = "%{wks.location}/Calibur/vendor/shaderc_file/libshaderc_util.lib"
 
 Library["Vulkan"] = "%{LibraryDir.VulkanSDK}/vulkan-1.lib"
 Library["VulkanUtils"] = "%{LibraryDir.VulkanSDK}/VkLayer_utils.lib"

@@ -237,6 +237,15 @@ namespace Calibur
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Directional Light"))
+			{
+				if (!m_SelectionContext.HasComponent<DirectionalLightComponent>())
+					m_SelectionContext.AddComponent<DirectionalLightComponent>();
+				else
+					HZ_CORE_WARN("This entity already has the Driectional Light Component!");
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -349,6 +358,12 @@ namespace Calibur
 		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
 				ImGui::Text("Mesh");
+			});
+
+		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
+			{
+				ImGui::ColorEdit3("Radiance", glm::value_ptr(component.Radiance));
+				ImGui::DragFloat("Intensity", &component.Intensity, 0.2f, 0.001f, 1000.f);
 			});
 	}
 }

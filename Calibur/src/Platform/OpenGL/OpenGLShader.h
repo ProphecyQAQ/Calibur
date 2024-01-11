@@ -2,6 +2,9 @@
 #include "Calibur/Renderer/Shader.h"
 #include <glm/glm.hpp>
 
+#include <glslc/file_includer.h>
+#include <libshaderc_util/include/libshaderc_util/file_finder.h>
+
 using GLenum = unsigned int;
 
 namespace Calibur
