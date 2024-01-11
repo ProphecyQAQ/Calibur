@@ -128,7 +128,7 @@ namespace Calibur
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor(glm::vec4(0.9f, 0.9f, 0.9f, 1.0f));
+		RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 		RenderCommand::Clear();
 
 		// Clear entity id to -1

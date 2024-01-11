@@ -73,10 +73,21 @@ layout(set = 0, binding = 3) uniform sampler2D u_RoughnessTexture;
 
 void main()
 {
-	//color = vec4(texture(u_DiffuseTexture, Input.texCoord).rgb, 1.0);
-	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb * u_DirectionalLight.Radiance;
-	color = vec4(diffuseColor, 1.0);
-	//color = vec4(0.1, 0.1, 0.1, 1.0);
+	vec3 normal = normalize(Input.worldNormal);
+	vec3 lightDir = normalize(u_DirectionalLight.Direction);
+	vec3 viewDir = normalize(u_CameraPosition - Input.worldPosition);
+
+	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
+	//ambient
+	vec3 ambient = 0.05 * diffuseColor;
+
+	vec3 diffuse = Albedo * u_DirectionalLight.Radiance * max(dot(normal, lightDir), 0.0);
+	diffuse = diffuse * diffuseColor;
+	
+	vec3 halfDir = normalize(lightDir + viewDir);
+	vec3 spec = pow(max(dot(normal, halfDir), 0.0), 32.0) * u_DirectionalLight.Radiance;
+	
+	color = vec4(ambient + diffuse + spec, 1.0);
 
 	color2 = -1;
 }

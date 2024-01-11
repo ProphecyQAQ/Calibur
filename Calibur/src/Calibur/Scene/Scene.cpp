@@ -96,6 +96,7 @@ namespace Calibur
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
+				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
 
 				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);
