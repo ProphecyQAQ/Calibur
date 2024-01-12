@@ -22,6 +22,11 @@ namespace Calibur
 			s_RendererAPI->SetClearColor(color); 
 		};
 
+		static void SetDepthTest(bool flag)
+		{
+			s_RendererAPI->SetDepthTest(flag);
+		}
+
 		static void Clear()
 		{ 
 			s_RendererAPI->Clear(); 

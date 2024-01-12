@@ -7,6 +7,10 @@
 namespace Calibur
 {
 
+	////////////////////////////////
+	////////Texture 2D////////////
+	////////////////////////////////
+
 	OpenGLTexture2D::OpenGLTexture2D(uint32_t width, uint32_t height)
 		: m_Width(width), m_Height(height)
 	{
@@ -93,6 +97,71 @@ namespace Calibur
 	}
 
 	void OpenGLTexture2D::Bind(uint32_t slot) const
+	{
+		HZ_PROFILE_FUNCTION();
+
+		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	////////////////////////////////
+	////////Texture Cube////////////
+	////////////////////////////////
+	
+	static const char* direction[] = { "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg" };
+
+	OpenGLTextureCube::OpenGLTextureCube(const std::string& directoryPath, bool isVerticalFlip)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		for (size_t i = 0; i < 6; i++)
+		{
+			std::string path = directoryPath + "/" + direction[i];
+
+			int width, height, channels;
+			stbi_set_flip_vertically_on_load(isVerticalFlip);
+			stbi_uc* data = nullptr;
+
+			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+
+			if (data == nullptr) continue;
+
+			m_Width = width;
+			m_Height = height;
+
+			GLenum internalFormat = 0, dataFormat = 0;
+			if (channels == 4)
+			{
+				internalFormat = GL_RGBA8;
+				dataFormat = GL_RGBA;
+			}
+			else if (channels == 3)
+			{
+				internalFormat = GL_RGB8;
+				dataFormat = GL_RGB;
+			}
+			
+			if (i == 0) {
+				glGenTextures(1, &m_RendererID);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+			}
+
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+
+			stbi_image_free(data);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	}
+
+	OpenGLTextureCube::~OpenGLTextureCube()
+	{
+		glDeleteTextures(1, &m_RendererID);
+	}
+
+	void OpenGLTextureCube::Bind(uint32_t slot) const
 	{
 		HZ_PROFILE_FUNCTION();
 

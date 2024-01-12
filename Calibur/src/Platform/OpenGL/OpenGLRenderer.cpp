@@ -60,6 +60,14 @@ namespace Calibur
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
+	void OpenGLRenderer::SetDepthTest(bool flag)
+	{
+		if (flag == true)
+			glEnable(GL_DEPTH_TEST);
+		else
+			glDisable(GL_DEPTH_TEST);
+	}
+
 	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 	{
 		auto& submesh = mesh->GetSubMeshes()[submeshIndex];

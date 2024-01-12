@@ -10,21 +10,64 @@
 
 namespace Calibur
 {
+	static struct SkyboxData
+	{
+		Ref<VertexArray> vao;
+		Ref<VertexBuffer> vbo;
+		Ref<IndexBuffer> ibo;
+		Ref<TextureCube> texture;
+		Ref<Shader> shader;
+	}s_Skybox;
+
+
+	static float skyboxVertices[24] =
+	{
+		+1, +1, +1,
+		-1, +1, +1,
+		-1, -1, +1,
+		+1, -1, +1,
+		+1, +1, -1,
+		-1, +1, -1,
+		-1, -1, -1,
+		+1, -1, -1,
+	};
+
+	static uint32_t skyboxIndices[6 * 6] =  // in fact, uint8_t is enough
+	{
+		1,5,2, 2,5,6,  // left
+		3,7,0, 0,7,4,  // right
+		2,6,3, 3,6,7,  // back
+		0,4,1, 1,4,5,  // front
+		6,5,7, 7,5,4,  // bottom
+		1,2,0, 0,2,3,  // top
+	};
+
 	Scene::Scene()
 	{
 		#if 0
-		entt::entity entity =  m_Registry.create(); // return a uint32_t 
+		entt::entity entity = m_Registry.create(); // return a uint32_t 
 
 		m_Registry.emplace<TransformComponent>(entity);
 
 		if (m_Registry.try_get<TransformComponent>(entity))
 			TransformComponent& transform = m_Registry.get<TransformComponent>(entity);
-		
+
 		auto view = m_Registry.view<TransformComponent>();
 		#endif
 
 		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
 		m_MaterialUniform = UniformBuffer::Create(sizeof(MaterialUniforms), 2);
+
+		s_Skybox.texture = TextureCube::Create("Resources/CubeMap/skybox");
+		s_Skybox.vbo = VertexBuffer::Create(skyboxVertices, sizeof(skyboxVertices));
+		s_Skybox.ibo = IndexBuffer::Create(skyboxIndices, sizeof(skyboxIndices));
+		BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }};
+		s_Skybox.vbo->SetLayout(layout);
+
+		s_Skybox.vao = VertexArray::Create();
+		s_Skybox.vao->SetIndexBuffer(s_Skybox.ibo);
+		s_Skybox.vao->AddVertexBuffer(s_Skybox.vbo);
+		s_Skybox.shader = Renderer::GetShaderLibrary()->Get("Skybox");
 	}
 
 	Scene::~Scene()
@@ -48,6 +91,16 @@ namespace Calibur
 
 	void Scene::OnUpdateEditor(TimeStep ts, EditorCamera& camera)
 	{
+		// Skybox
+		{
+			RenderCommand::SetDepthTest(false);
+			s_Skybox.shader->Bind();
+			s_Skybox.texture->Bind(1);
+			RenderCommand::DrawIndexed(s_Skybox.vao);
+			s_Skybox.shader->Unbind();
+			RenderCommand::SetDepthTest(true);
+		}
+
 		// Light
 		SceneLightData lightData;
 		{

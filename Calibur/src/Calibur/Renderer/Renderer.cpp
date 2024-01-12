@@ -27,8 +27,10 @@ namespace Calibur
 		s_RenderData = new RenderData();
 		s_RenderData->s_WhiteTexture = Texture2D::Create(1, 1);
 		s_RenderData->s_ShaderLibrary = ShaderLibrary::Create();
+
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Texture3D.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/textureToScreen.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/Skybox.glsl");
 	}
 
 	void Renderer::Shutdown()

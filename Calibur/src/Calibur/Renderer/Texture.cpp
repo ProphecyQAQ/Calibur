@@ -24,7 +24,7 @@ namespace Calibur
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(const std::string path, bool isVerticalFlip)
+	Ref<Texture2D> Texture2D::Create(const std::string& path, bool isVerticalFlip)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -34,6 +34,23 @@ namespace Calibur
 		
 		case RendererAPI::API::OpenGL:
 			return CreateRef<OpenGLTexture2D>(path, isVerticalFlip);
+		}
+		
+		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
+		
+		return nullptr;
+	}
+
+	Ref<TextureCube> TextureCube::Create(const std::string& directoryPath, bool isVerticalFlip)
+	{
+		switch (Renderer::GetAPI()){
+		
+		case RendererAPI::API::None:
+			HZ_CORE_ASSERT(false, "RendererAPI::None is not supported!");
+			return nullptr;
+		
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLTextureCube>(directoryPath, isVerticalFlip);
 		}
 		
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
