@@ -19,7 +19,6 @@ namespace Calibur
 		Ref<Shader> shader;
 	}s_Skybox;
 
-
 	static float skyboxVertices[24] =
 	{
 		+1, +1, +1,

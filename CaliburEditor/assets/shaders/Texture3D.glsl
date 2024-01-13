@@ -23,6 +23,7 @@ struct VertexOutput
 	vec2 texCoord;
 	vec3 tangent;
 	vec3 bitangent;
+	mat3 tbn;
 };
 
 layout (location = 0) out VertexOutput Output;
@@ -34,6 +35,11 @@ void main()
 	Output.texCoord = a_TexCoord;
 	Output.tangent = a_Tangent;
 	Output.bitangent = a_Bitangent;
+
+	vec3 T = normalize(vec3(u_Transform * vec4(a_Tangent,   0.0)));
+	vec3 B = normalize(vec3(u_Transform * vec4(a_Bitangent, 0.0)));
+	vec3 N = normalize(vec3(u_Transform * vec4(a_Normal,    0.0)));
+	Output.tbn = mat3(T, B, N);
 
 	gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
 }
@@ -62,6 +68,7 @@ struct VertexOutput
 	vec2 texCoord;
 	vec3 tangent;
 	vec3 bitangent;
+	mat3 tbn;
 };
 
 layout (location = 0) in VertexOutput Input;
@@ -73,7 +80,11 @@ layout(set = 0, binding = 3) uniform sampler2D u_RoughnessTexture;
 
 void main()
 {
-	vec3 normal = normalize(Input.worldNormal);
+	//Normal map
+	vec3 normal = texture(u_NormalTexture, Input.texCoord).rgb;
+	normal = normalize(normal * 2.0 - 1.0);
+	normal = normalize(Input.tbn * normal);
+
 	vec3 lightDir = normalize(u_DirectionalLight.Direction);
 	vec3 viewDir = normalize(u_CameraPosition - Input.worldPosition);
 

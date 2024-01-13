@@ -31,6 +31,7 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Texture3D.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/textureToScreen.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Skybox.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr.glsl");
 	}
 
 	void Renderer::Shutdown()

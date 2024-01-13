@@ -102,6 +102,7 @@ namespace Calibur
 		// Nanosuit
 		auto& entity = m_ActiveScene->CreateEntity("Nano");
 		entity.AddComponent<MeshComponent>("Resources/Model/backpack/backpack.obj", false);
+		//entity.AddComponent<MeshComponent>("Resources/Model/nanosuit/nanosuit.obj", true);
 	}
 
 	void EditorLayer::OnDetach()
