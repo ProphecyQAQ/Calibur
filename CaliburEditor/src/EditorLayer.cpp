@@ -30,15 +30,15 @@ namespace Calibur
 		m_IconPlay = Texture2D::Create("Resources/Icons/PlayButton.png");
 		m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
+		m_ActiveScene = CreateRef<Scene>();
+
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
-
+		
 		m_CameraController.SetZoomLevel(4.f);
-
-		m_ActiveScene = CreateRef<Scene>();
 
 		m_EditorCamera = EditorCamera(30.f, 16.f / 9.f, 0.001f, 1000.f);
 		#if 0
@@ -113,6 +113,7 @@ namespace Calibur
 	void EditorLayer::OnUpdate(TimeStep ts)
 	{
 		HZ_PROFILE_FUNCTION();
+		//m_ActiveScene->m_SceneEnv->DrawEquirectangularToCubemap(m_ActiveScene->m_SceneEnv->GetEquirectangularMap());
 
 		//Resize
 		if (FramebufferSpecification spec = m_Framebuffer->GetSpecificaition();

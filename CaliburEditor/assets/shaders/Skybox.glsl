@@ -28,7 +28,7 @@ layout(location = 0) in vec3 v_Position;
 layout(location = 0) out vec4 color;
 layout(location = 1) out int color2;
 
-layout(binding = 0) uniform samplerCube u_TextureCube;
+layout(binding = 1) uniform samplerCube u_TextureCube;
 
 void main()
 {

@@ -196,6 +196,7 @@ namespace Calibur {
 		
 		// Head file
 		shaderc_util::FileFinder fileFinder;
+		fileFinder.search_path().push_back("assets/shaders/Include");
 		options.SetIncluder(std::make_unique<glslc::FileIncluder>(&fileFinder));
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();
@@ -256,6 +257,7 @@ namespace Calibur {
 			options.SetOptimizationLevel(shaderc_optimization_level_performance);
 
 		shaderc_util::FileFinder fileFinder;
+		fileFinder.search_path().push_back("assets/shaders/Include");
 		options.SetIncluder(std::make_unique<glslc::FileIncluder>(&fileFinder));
 
 		std::filesystem::path cacheDirectory = Utils::GetCacheDirectory();

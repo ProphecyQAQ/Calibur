@@ -81,6 +81,7 @@ namespace Calibur
 			switch (format)
 			{
 			case FramebufferTextureFormat::RGBA8: return GL_RGBA8;
+			case FramebufferTextureFormat::RGB16F: return GL_RGB16F;
 			case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
 			}
 			
@@ -140,7 +141,11 @@ namespace Calibur
 				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
 				{
 					case FramebufferTextureFormat::RGBA8:
-						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);
+						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGBA8, GL_RGBA, m_Specification.Width, m_Specification.Height, i);  
+						break;
+						
+					case FramebufferTextureFormat::RGB16F:
+						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGB16F, GL_RGB, m_Specification.Width, m_Specification.Height, i);  
 						break;
 
 					case FramebufferTextureFormat::RED_INTEGER:
@@ -213,6 +218,17 @@ namespace Calibur
 		glReadPixels(x, y, 1, 1, GL_RED_INTEGER, GL_INT, &pixelData);
 
 		return pixelData;
+	}
+
+	void OpenGLFramebuffer::SetRenderTargetToCubeMap(uint32_t renderID, uint32_t index)
+	{
+		HZ_CORE_ASSERT(index < 6);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, renderID, 0);
+		GLenum buffers[1] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, buffers);
+
+		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
 	}
 
 	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, int value)

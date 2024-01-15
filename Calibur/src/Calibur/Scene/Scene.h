@@ -5,6 +5,7 @@
 #include "Calibur/Renderer/EditorCamera.h"
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
+#include "Calibur/Renderer/SceneEnvironment.h"
 
 #include <glm/glm.hpp>
 
@@ -41,6 +42,8 @@ namespace Calibur
 		void OnViewportResize(uint32_t width, uint32_t height);
 		
 		Entity GetPrimaryCameraEntity();
+
+		Ref<SceneEnvironment> m_SceneEnv;
 	private:
 		template<typename T>
 		void OnComponentAdded(Entity entity, T& component);
@@ -50,6 +53,7 @@ namespace Calibur
 
 		Ref<UniformBuffer> m_TransformBuffer;
 		Ref<UniformBuffer> m_MaterialUniform;
+
 
 		friend class Entity;
 		friend class SceneSerializer;

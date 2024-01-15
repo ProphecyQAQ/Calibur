@@ -67,6 +67,8 @@ namespace Calibur
 		s_Skybox.vao->SetIndexBuffer(s_Skybox.ibo);
 		s_Skybox.vao->AddVertexBuffer(s_Skybox.vbo);
 		s_Skybox.shader = Renderer::GetShaderLibrary()->Get("Skybox");
+
+		m_SceneEnv = CreateRef<SceneEnvironment>("Resources/sIbl/hallstatt4_hd.hdr", true);
 	}
 
 	Scene::~Scene()
@@ -94,7 +96,8 @@ namespace Calibur
 		{
 			RenderCommand::SetDepthTest(false);
 			s_Skybox.shader->Bind();
-			s_Skybox.texture->Bind(1);
+			//s_Skybox.texture->Bind(1);
+			m_SceneEnv->GetSkybox()->Bind(1);
 			RenderCommand::DrawIndexed(s_Skybox.vao);
 			s_Skybox.shader->Unbind();
 			RenderCommand::SetDepthTest(true);

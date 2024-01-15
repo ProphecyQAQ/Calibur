@@ -32,12 +32,16 @@ namespace Calibur
 	{	
 		HZ_PROFILE_FUNCTION();
 
-		int width, height, channels;
+		int width, height, channels, type;
 		stbi_set_flip_vertically_on_load(isVerticalFlip);
-		stbi_uc* data = nullptr;
+		void* data = nullptr;
 		{
 			HZ_PROFILE_SCOPE("stbi_load - OpenGLTexture2D::OpenGLTexture2D(const std::string&)");
-			data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+
+			if (stbi_is_hdr(path.c_str()))
+				data = stbi_loadf(path.c_str(), &width, &height, &channels, 0);
+			else
+				data = stbi_load(path.c_str(), &width, &height, &channels, 0);
 		}
 		if (data)
 		{
@@ -51,11 +55,20 @@ namespace Calibur
 			{
 				internalFormat = GL_RGBA8;
 				dataFormat = GL_RGBA;
+				type = GL_UNSIGNED_BYTE;
 			}
 			else if (channels == 3)
 			{
 				internalFormat = GL_RGB8;
 				dataFormat = GL_RGB;
+				type = GL_UNSIGNED_BYTE;
+			}
+
+			if (stbi_is_hdr(path.c_str()))
+			{
+				internalFormat = GL_RGB16F;
+				dataFormat = GL_RGB;
+				type = GL_FLOAT;
 			}
 
 			m_InternalFormat = internalFormat;
@@ -69,11 +82,11 @@ namespace Calibur
 			glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_REPEAT);
-			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-			glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, GL_UNSIGNED_BYTE, data);
-
+			glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, type, data);
+			
 			stbi_image_free(data);
 		}
 	}
@@ -107,6 +120,26 @@ namespace Calibur
 	
 	static const char* direction[] = { "right.jpg", "left.jpg", "top.jpg", "bottom.jpg", "front.jpg", "back.jpg" };
 
+	OpenGLTextureCube::OpenGLTextureCube(uint32_t width, uint32_t height)
+		: m_Width(width), m_Height(height)
+	{
+		glGenTextures(1, &m_RendererID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+		for (unsigned int i = 0; i < 6; ++i)
+		{
+			// note that we store each face with 16 bit floating point values
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB16F, 
+						 512, 512, 0, GL_RGB, GL_FLOAT, nullptr);
+		}
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+	}
+
 	OpenGLTextureCube::OpenGLTextureCube(const std::string& directoryPath, bool isVerticalFlip)
 	{
 		HZ_PROFILE_FUNCTION();
@@ -139,11 +172,11 @@ namespace Calibur
 			}
 			
 			if (i == 0) {
-				glGenTextures(1, &m_RendererID);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
+				glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_RendererID);
+				glTextureStorage2D(m_RendererID, 1, internalFormat, width, height);
 			}
-
-			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, dataFormat, GL_UNSIGNED_BYTE, data);
+			
+			glTextureSubImage3D(m_RendererID, 0, 0, 0, i, width, height, 1, dataFormat, GL_UNSIGNED_BYTE, data);
 
 			stbi_image_free(data);
 		}

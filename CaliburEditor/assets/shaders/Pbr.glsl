@@ -73,11 +73,7 @@ struct VertexOutput
 
 layout (location = 0) in VertexOutput Input;
 
-layout(set = 0, binding = 0) uniform sampler2D u_DiffuseTexture;
-layout(set = 0, binding = 1) uniform sampler2D u_NormalTexture;
-layout(set = 0, binding = 2) uniform sampler2D u_SpecTexture;
-layout(set = 0, binding = 3) uniform sampler2D u_RoughnessTexture;
-layout(set = 0, binding = 4) uniform sampler2D u_AoTexture;
+#include "PbrCommon.glsl"
 
 const float PI = 3.14159265359;
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
@@ -135,7 +131,8 @@ void main()
 	vec3 viewDir = normalize(u_CameraPosition - Input.worldPosition);
 	vec3 halfDir = normalize(lightDir + viewDir);
 
-	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
+	vec3 diffuseColor = pow(texture(u_DiffuseTexture, Input.texCoord).rgb, vec3(2.2));
+	vec3 specColor = texture(u_SpecTexture, Input.texCoord).rgb;
 
 	vec3 F0 = vec3(0.04);
 	F0 = myMix(F0, diffuseColor, Metallic);
@@ -156,10 +153,10 @@ void main()
 
 	float NdotL = max(dot(normal, lightDir), 0.0);
 
-	vec3 Lo = (kD * diffuseColor / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
+	vec3 Lo = (kD * diffuseColor / PI + specular * specColor) * u_DirectionalLight.Radiance * NdotL; 
 
 	//ambient
-	vec3 ambient = vec3(0.05) * diffuseColor;
+	vec3 ambient = vec3(0.03) * diffuseColor;
 
 	Lo += ambient;
 	// HDR tonemapping

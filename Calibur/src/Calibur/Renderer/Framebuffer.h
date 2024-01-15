@@ -10,6 +10,7 @@ namespace Calibur
 		
 		//Color
 		RGBA8,
+		RGB16F,
 		RED_INTEGER,
 
 		//Depth/stencil
@@ -55,6 +56,8 @@ namespace Calibur
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 		virtual int ReadPixel(uint32_t attachmentIndex, int i, int j) = 0;
+
+		virtual void SetRenderTargetToCubeMap(uint32_t renderID, uint32_t index) = 0;
 		
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
 

@@ -13,6 +13,7 @@ namespace Calibur
 	{
 		Ref<ShaderLibrary> s_ShaderLibrary;
 		Ref<Texture2D> s_WhiteTexture;
+
 	}*s_RenderData;
 
 	void Renderer::Init()
@@ -32,6 +33,7 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/textureToScreen.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/EquirectangularToCube.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -79,8 +81,8 @@ namespace Calibur
 		const glm::mat4& transform)
 	{
 		shader->Bind();
-		shader->SetMat4("u_ViewProjection", m_SceneData->ViewProjectionMatrix);
-		shader->SetMat4("u_Transform", transform);
+		//shader->SetMat4("u_ViewProjection", m_SceneData->ViewProjectionMatrix);
+		//shader->SetMat4("u_Transform", transform);
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);

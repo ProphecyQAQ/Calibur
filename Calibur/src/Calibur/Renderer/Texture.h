@@ -32,6 +32,7 @@ namespace Calibur
 	class TextureCube : public Texture
 	{
 	public:
+		static Ref<TextureCube> Create(uint32_t width, uint32_t height);
 		static Ref<TextureCube> Create(const std::string& directoryPath, bool isVerticalFlip = false);
 	};
 }

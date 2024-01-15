@@ -36,6 +36,7 @@ namespace Calibur
 	class OpenGLTextureCube : public TextureCube
 	{
 	public:
+		OpenGLTextureCube(uint32_t width, uint32_t height);
 		OpenGLTextureCube(const std::string& directoryPath, bool isVerticalFlip);
 		virtual ~OpenGLTextureCube();
 

@@ -6,7 +6,7 @@
 
 #include <glm/glm.hpp>
 
-#include <assimp/Importer.hpp>
+#include "assimp/Importer.hpp"
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
@@ -54,6 +54,7 @@ namespace Calibur
 
 		std::vector<SubMesh>& GetSubMeshes() { return m_SubMeshes; }
 		std::vector<Ref<Material>>& GetMaterials() { return m_Materials; }
+		std::string& GetFilePath() { return m_FilePath; }
 
 	private:
 		Ref<VertexBuffer> m_VertexBuffer;

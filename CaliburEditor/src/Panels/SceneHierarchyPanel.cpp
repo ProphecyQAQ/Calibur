@@ -357,7 +357,11 @@ namespace Calibur
 		
 		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
-				ImGui::Text("Mesh");
+				ImGui::Text("Mesh Name: %s", component.mesh->GetFilePath().c_str());
+				for (size_t i = 0; i < component.mesh->GetSubMeshes().size(); i++)
+				{
+					ImGui::Text("SubMesh %s", component.mesh->GetSubMeshes()[i].MeshName.c_str());
+				}
 			});
 
 		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](auto& component)
