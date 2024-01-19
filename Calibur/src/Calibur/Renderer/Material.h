@@ -8,7 +8,7 @@ namespace Calibur
 	struct MaterialUniforms
 	{
 		glm::vec3 Albedo  = glm::vec3(0.8f);
-		float Metallic    = 0.0f;
+		float Metallic    = 0.5f;
 		float Roughness   = 0.8f;
 		float Emission    = 0.0;;
 		bool useNormalMap = false;

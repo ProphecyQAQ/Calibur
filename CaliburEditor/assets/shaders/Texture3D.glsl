@@ -86,7 +86,7 @@ void main()
 	normal = normalize(Input.tbn * normal);
 
 	vec3 lightDir = normalize(u_DirectionalLight.Direction);
-	vec3 viewDir = normalize(u_CameraPosition - Input.worldPosition);
+	vec3 viewDir = normalize(u_CameraPosition.xyz - Input.worldPosition);
 
 	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
 	//ambient

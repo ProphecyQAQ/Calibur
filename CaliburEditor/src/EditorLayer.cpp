@@ -31,6 +31,7 @@ namespace Calibur
 		m_IconStop = Texture2D::Create("Resources/Icons/StopButton.png");
 
 		m_ActiveScene = CreateRef<Scene>();
+		m_SceneRenderer = CreateRef<SceneRenderer>(m_ActiveScene);
 
 		FramebufferSpecification fbSpec;
 		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
@@ -100,9 +101,12 @@ namespace Calibur
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		
 		// Nanosuit
-		auto& entity = m_ActiveScene->CreateEntity("Nano");
-		entity.AddComponent<MeshComponent>("Resources/Model/backpack/backpack.obj", false);
-		//entity.AddComponent<MeshComponent>("Resources/Model/nanosuit/nanosuit.obj", true);
+		//auto& entity = m_ActiveScene->CreateEntity("Nano");
+		//entity.AddComponent<MeshComponent>("Resources/Model/backpack/backpack.obj", false);
+
+		// Sphere
+		auto& entity = m_ActiveScene->CreateEntity("Sphere");
+		entity.AddComponent<MeshComponent>("Resources/Model/sphere/wooden_sphere.obj", true);
 	}
 
 	void EditorLayer::OnDetach()
@@ -113,7 +117,6 @@ namespace Calibur
 	void EditorLayer::OnUpdate(TimeStep ts)
 	{
 		HZ_PROFILE_FUNCTION();
-		//m_ActiveScene->m_SceneEnv->DrawEquirectangularToCubemap(m_ActiveScene->m_SceneEnv->GetEquirectangularMap());
 
 		//Resize
 		if (FramebufferSpecification spec = m_Framebuffer->GetSpecificaition();
@@ -147,12 +150,12 @@ namespace Calibur
 				}
 				m_EditorCamera.OnUpdate(ts);
 
-				m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera); 
+				m_ActiveScene->OnUpdateEditor(m_SceneRenderer, ts, m_EditorCamera); 
 				break;
 			}
 			case SceneState::Play:
 			{
-				m_ActiveScene->OnUpdateRuntime(ts);
+				m_ActiveScene->OnUpdateRuntime(m_SceneRenderer, ts);
 				break;
 			}
 		}
@@ -264,7 +267,7 @@ namespace Calibur
 			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
 		ImGui::Text("Hovered Entity: %s", name.c_str());
 
-		auto stats = Renderer2D::GetStats();
+		auto& stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);

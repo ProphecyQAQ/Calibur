@@ -14,7 +14,10 @@ namespace Calibur
 		~SceneEnvironment() = default;
 
 		void DrawEquirectangularToCubemap(Ref<Texture2D> equirectangularMap);
+		void DrawIrradianceMap();
 		Ref<Texture2D> GetEquirectangularMap() { return m_EquirectangularMap; }
+		Ref<TextureCube> GetRadianceMap() { return m_RadianceMap; }
+		Ref<TextureCube> GetIrradianceMap() { return m_IrradianceMap; }
 		Ref<TextureCube> GetSkybox() { return m_Skybox; }
 
 	private:

@@ -33,7 +33,9 @@
 #include "Calibur/Renderer/Material.h"
 #include "Calibur/Renderer/Texture.h"
 #include "Calibur/Renderer/SubTexture2D.h"
+#include "Calibur/Renderer/SceneRenderer.h"
 
+#include "Calibur/Renderer/EditorCamera.h"
 #include "Calibur/Renderer/OrthographicCamera.h"
 #include "Calibur/Renderer/OrthographicCameraController.h"
 // -------------------------------------------

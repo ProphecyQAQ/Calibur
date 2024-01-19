@@ -48,6 +48,7 @@ void main()
 #version 450 core
 
 #include "Buffer.glsl"
+#include "PbrCommon.glsl"
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out int ID;
@@ -72,8 +73,6 @@ struct VertexOutput
 };
 
 layout (location = 0) in VertexOutput Input;
-
-#include "PbrCommon.glsl"
 
 const float PI = 3.14159265359;
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
@@ -123,16 +122,25 @@ vec3 myMix(vec3 x, vec3 y, float a) {
 void main()
 {
 	//Normal map
-	vec3 normal = texture(u_NormalTexture, Input.texCoord).rgb;
-	normal = normalize(normal * 2.0 - 1.0);
-	normal = normalize(Input.tbn * normal);
+	vec3 normal = vec3(0.0);
+	if (useNormalMap)
+	{
+		normal = texture(u_NormalTexture, Input.texCoord).rgb;
+		normal = normalize(normal * 2.0 - 1.0);
+		normal = normalize(Input.tbn * normal);
+	}
+	else normal = normalize(Input.worldNormal);
+
+	vec3 camPos = u_CameraPosition.xyz;
 
 	vec3 lightDir = normalize(u_DirectionalLight.Direction);
-	vec3 viewDir = normalize(u_CameraPosition - Input.worldPosition);
+	vec3 viewDir = normalize(camPos - Input.worldPosition);
 	vec3 halfDir = normalize(lightDir + viewDir);
 
-	vec3 diffuseColor = pow(texture(u_DiffuseTexture, Input.texCoord).rgb, vec3(2.2));
+	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
 	vec3 specColor = texture(u_SpecTexture, Input.texCoord).rgb;
+
+	vec3 irradiance = texture(u_EnvIrradianceTex, normal).rgb;
 
 	vec3 F0 = vec3(0.04);
 	F0 = myMix(F0, diffuseColor, Metallic);
@@ -153,12 +161,12 @@ void main()
 
 	float NdotL = max(dot(normal, lightDir), 0.0);
 
-	vec3 Lo = (kD * diffuseColor / PI + specular * specColor) * u_DirectionalLight.Radiance * NdotL; 
+	vec3 Lo = (kD * diffuseColor / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
 
 	//ambient
-	vec3 ambient = vec3(0.03) * diffuseColor;
+	vec3 ambient = irradiance * diffuseColor * kD;
 
-	Lo += ambient;
+	Lo = Lo + ambient;
 	// HDR tonemapping
     Lo = Lo / (Lo+ vec3(1.0));
     // gamma correct

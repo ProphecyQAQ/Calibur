@@ -1,11 +1,8 @@
 #pragma once
 
 #include "Calibur.h"
-#include "Calibur/Core/Base.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
-
-#include "Calibur/Renderer/EditorCamera.h"
 
 namespace Calibur
 {
@@ -44,6 +41,7 @@ namespace Calibur
 		Ref<Framebuffer> m_Framebuffer;
 
 		Ref<Scene> m_ActiveScene;
+		Ref<SceneRenderer> m_SceneRenderer;
 		Entity m_Square;
 		Entity m_CameraEntity;
 		Entity m_SecondCamera;

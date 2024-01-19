@@ -41,13 +41,5 @@ namespace Calibur
 
 		static Ref<ShaderLibrary> GetShaderLibrary();
 		static Ref<Texture2D> GetWhiteTexture();
-	private:
-		struct SceneData
-		{
-			glm::mat4 ViewProjectionMatrix;
-			glm::vec3 CameraPosition;
-		};
-
-		static Scope<SceneData> m_SceneData;
 	};
 }

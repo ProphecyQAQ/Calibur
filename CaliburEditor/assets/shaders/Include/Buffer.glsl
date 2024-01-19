@@ -1,9 +1,10 @@
 
 // Camera
-layout(std140, binding = 0) uniform Camera
+
+layout(std140, binding = 0) uniform SceneData 
 {
 	mat4 u_ViewProjection;
-	vec3 u_CameraPosition;
+	vec4 u_CameraPosition;
 };
 
 

@@ -15,8 +15,8 @@ namespace Calibur
 		Ref<VertexArray> vao;
 		Ref<VertexBuffer> vbo;
 		Ref<IndexBuffer> ibo;
-		Ref<TextureCube> texture;
 		Ref<Shader> shader;
+		Ref<TextureCube> texture;
 	}s_Skybox;
 
 	static float skyboxVertices[24] =
@@ -43,30 +43,19 @@ namespace Calibur
 
 	Scene::Scene()
 	{
-		#if 0
-		entt::entity entity = m_Registry.create(); // return a uint32_t 
-
-		m_Registry.emplace<TransformComponent>(entity);
-
-		if (m_Registry.try_get<TransformComponent>(entity))
-			TransformComponent& transform = m_Registry.get<TransformComponent>(entity);
-
-		auto view = m_Registry.view<TransformComponent>();
-		#endif
+		s_Skybox.shader = Renderer::GetShaderLibrary()->Get("Skybox");
+		s_Skybox.vao = VertexArray::Create();
+		Ref<VertexBuffer> vbo = VertexBuffer::Create(skyboxVertices, sizeof(skyboxVertices));
+		vbo->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" }
+			});
+		s_Skybox.vao->AddVertexBuffer(vbo);
+		Ref<IndexBuffer> ibo = IndexBuffer::Create(skyboxIndices, sizeof(skyboxIndices));
+		s_Skybox.vao->SetIndexBuffer(ibo);
+		//s_Skybox.texture = TextureCube::Create("Resources/sIbl/hallstatt4_hd.hdr");
 
 		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
 		m_MaterialUniform = UniformBuffer::Create(sizeof(MaterialUniforms), 2);
-
-		s_Skybox.texture = TextureCube::Create("Resources/CubeMap/skybox");
-		s_Skybox.vbo = VertexBuffer::Create(skyboxVertices, sizeof(skyboxVertices));
-		s_Skybox.ibo = IndexBuffer::Create(skyboxIndices, sizeof(skyboxIndices));
-		BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }};
-		s_Skybox.vbo->SetLayout(layout);
-
-		s_Skybox.vao = VertexArray::Create();
-		s_Skybox.vao->SetIndexBuffer(s_Skybox.ibo);
-		s_Skybox.vao->AddVertexBuffer(s_Skybox.vbo);
-		s_Skybox.shader = Renderer::GetShaderLibrary()->Get("Skybox");
 
 		m_SceneEnv = CreateRef<SceneEnvironment>("Resources/sIbl/hallstatt4_hd.hdr", true);
 	}
@@ -90,19 +79,8 @@ namespace Calibur
 		m_Registry.destroy(entity);
 	}
 
-	void Scene::OnUpdateEditor(TimeStep ts, EditorCamera& camera)
+	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera)
 	{
-		// Skybox
-		{
-			RenderCommand::SetDepthTest(false);
-			s_Skybox.shader->Bind();
-			//s_Skybox.texture->Bind(1);
-			m_SceneEnv->GetSkybox()->Bind(1);
-			RenderCommand::DrawIndexed(s_Skybox.vao);
-			s_Skybox.shader->Unbind();
-			RenderCommand::SetDepthTest(true);
-		}
-
 		// Light
 		SceneLightData lightData;
 		{
@@ -123,6 +101,21 @@ namespace Calibur
 			}
 		}
 		Renderer::SubmitLight(lightData);
+
+		//renderer->SetScene(this);
+		renderer->BeginScene({camera.GetProjection(), camera.GetViewMatrix(), camera.GetPosition()});
+		// Skybox
+		Renderer::BeginScene(camera);
+		{
+			RenderCommand::SetDepthTest(false);
+			s_Skybox.shader->Bind();
+			//s_Skybox.texture->Bind(1);
+			m_SceneEnv->GetSkybox()->Bind(1);
+			RenderCommand::DrawIndexed(s_Skybox.vao);
+			s_Skybox.shader->Unbind();
+			RenderCommand::SetDepthTest(true);
+		}
+		Renderer::EndScene();
 
 		// Render 2D
 		Renderer2D::BeginScene(camera);
@@ -153,6 +146,9 @@ namespace Calibur
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
 				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
 
+				//Set Environment
+				m_SceneEnv->GetIrradianceMap()->Bind(6);
+
 				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);
 				material->GetNormalMap()->Bind(1);
@@ -166,9 +162,11 @@ namespace Calibur
 		}
 
 		Renderer::EndScene();
+
+		renderer->EndScene();
 	}
 
-	void Scene::OnUpdateRuntime(TimeStep ts)
+	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts)
 	{
 		// Update scripts
 		{

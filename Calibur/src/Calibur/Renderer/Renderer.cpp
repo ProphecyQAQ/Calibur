@@ -5,7 +5,6 @@
 
 namespace Calibur
 {
-	Scope<Renderer::SceneData> Renderer::m_SceneData = CreateScope<Renderer::SceneData>();
 	static Ref<UniformBuffer> s_CameraUniformBuffer;
 	static Ref<UniformBuffer> s_DirectionalLightUniformBuffer;
 
@@ -22,7 +21,6 @@ namespace Calibur
 
 		RenderCommand::Init();
 
-		s_CameraUniformBuffer = UniformBuffer::Create(sizeof(SceneData), 0);
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(SceneLightData), 3);
 		
 		s_RenderData = new RenderData();
@@ -34,6 +32,7 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Skybox.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/EquirectangularToCube.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/irradianceConvolution.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -47,23 +46,14 @@ namespace Calibur
 
 	void Renderer::BeginScene(OrthographicCamera& camera)
 	{
-		m_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 	}
 
 	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
 	{
-		m_SceneData->ViewProjectionMatrix = camera.GetProjection() * glm::inverse(transform);
-		m_SceneData->CameraPosition = glm::vec3(transform[0][3], transform[1][3], transform[2][3]);
-
-		s_CameraUniformBuffer->SetData(&m_SceneData, sizeof(SceneData));
 	}
 
 	void Renderer::BeginScene(EditorCamera& camera)
 	{
-		m_SceneData->ViewProjectionMatrix = camera.GetViewProjection();
-		m_SceneData->CameraPosition = camera.GetPosition();
-
-		s_CameraUniformBuffer->SetData(&m_SceneData, sizeof(SceneData));
 	}
 
 	void Renderer::EndScene()
@@ -81,8 +71,6 @@ namespace Calibur
 		const glm::mat4& transform)
 	{
 		shader->Bind();
-		//shader->SetMat4("u_ViewProjection", m_SceneData->ViewProjectionMatrix);
-		//shader->SetMat4("u_Transform", transform);
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);

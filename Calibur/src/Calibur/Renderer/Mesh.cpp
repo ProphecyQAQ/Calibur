@@ -74,7 +74,6 @@ namespace Calibur
 				{
 					aiFace& face = mesh->mFaces[i];
 					HZ_CORE_ASSERT(face.mNumIndices == 3, "Calibur only supports triangles for now!");
-					//Index index = { face.mIndices[0] + m_SubMeshes[idx].IndexCount, face.mIndices[1] + m_SubMeshes[idx].IndexCount, face.mIndices[2] + m_SubMeshes[idx].IndexCount };
 					Index index = { face.mIndices[0], face.mIndices[1], face.mIndices[2] };
 					m_Indices.push_back(index);
 				}
@@ -159,6 +158,8 @@ namespace Calibur
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
 					material->SetNormalMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
+
+					material->GetMaterialUniforms().useNormalMap = true;
 				}
 				else material->SetNormalMap(Renderer::GetWhiteTexture());
 

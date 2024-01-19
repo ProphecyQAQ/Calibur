@@ -6,6 +6,7 @@
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 #include "Calibur/Renderer/SceneEnvironment.h"
+#include "Calibur/Renderer/SceneRenderer.h"
 
 #include <glm/glm.hpp>
 
@@ -37,8 +38,8 @@ namespace Calibur
 
 		entt::registry& Reg() { return m_Registry; }
 
-		void OnUpdateEditor(TimeStep ts, EditorCamera& camera);
-		void OnUpdateRuntime(TimeStep ts);
+		void OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera);
+		void OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 		
 		Entity GetPrimaryCameraEntity();
@@ -50,10 +51,9 @@ namespace Calibur
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth, m_ViewportHeight;
-
+		
 		Ref<UniformBuffer> m_TransformBuffer;
 		Ref<UniformBuffer> m_MaterialUniform;
-
 
 		friend class Entity;
 		friend class SceneSerializer;
