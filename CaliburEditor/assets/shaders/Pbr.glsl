@@ -55,11 +55,11 @@ layout(location = 1) out int ID;
 
 layout(std140, binding = 2) uniform MaterialUniform
 {
-	vec3 Albedo;
+	vec4 Albedo;
 	float Metallic;
 	float Roughness;
 	float Emission;
-	bool useNormalMap;
+	uint useNormalMap;
 };
 
 struct VertexOutput
@@ -122,14 +122,13 @@ vec3 myMix(vec3 x, vec3 y, float a) {
 void main()
 {
 	//Normal map
-	vec3 normal = vec3(0.0);
-	if (useNormalMap)
+	vec3 normal = normalize(Input.worldNormal);
+	if (useNormalMap == 1)
 	{
 		normal = texture(u_NormalTexture, Input.texCoord).rgb;
 		normal = normalize(normal * 2.0 - 1.0);
 		normal = normalize(Input.tbn * normal);
 	}
-	else normal = normalize(Input.worldNormal);
 
 	vec3 camPos = u_CameraPosition.xyz;
 
@@ -161,16 +160,16 @@ void main()
 
 	float NdotL = max(dot(normal, lightDir), 0.0);
 
-	vec3 Lo = (kD * diffuseColor / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
+	vec3 Lo = (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
 
 	//ambient
-	vec3 ambient = irradiance * diffuseColor * kD;
+	vec3 ambient = irradiance * Albedo.rgb * kD;
 
 	Lo = Lo + ambient;
 	// HDR tonemapping
-    Lo = Lo / (Lo+ vec3(1.0));
+    Lo = Lo / (Lo + vec3(1.0));
     // gamma correct
-    Lo = pow(Lo, vec3(1.0/2.2)); 
+    Lo = pow(Lo, vec3(1.0/2.2));
 	
 	FragColor = vec4(Lo, 1.0);
 	ID = -1;

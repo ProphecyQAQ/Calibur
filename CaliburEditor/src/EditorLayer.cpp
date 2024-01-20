@@ -106,7 +106,7 @@ namespace Calibur
 
 		// Sphere
 		auto& entity = m_ActiveScene->CreateEntity("Sphere");
-		entity.AddComponent<MeshComponent>("Resources/Model/sphere/wooden_sphere.obj", true);
+		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", true);
 	}
 
 	void EditorLayer::OnDetach()

@@ -5,10 +5,7 @@
 
 layout(location = 0) in vec3 a_Position;
 
-layout(std140, binding = 0) uniform Camera
-{
-	mat4 u_ViewProjection;
-};
+#include "Buffer.glsl"
 
 layout(location = 0) out vec3 v_Position;
 
@@ -33,7 +30,6 @@ layout(binding = 1) uniform samplerCube u_TextureCube;
 void main()
 {
 	color = texture(u_TextureCube, v_Position);
-	//color = vec4(texCoord, 1.0);
 
 	color2 = -1;
 }

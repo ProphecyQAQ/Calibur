@@ -7,11 +7,11 @@ namespace Calibur
 {
 	struct MaterialUniforms
 	{
-		glm::vec3 Albedo  = glm::vec3(0.8f);
-		float Metallic    = 0.5f;
-		float Roughness   = 0.8f;
-		float Emission    = 0.0;;
-		bool useNormalMap = false;
+		glm::vec4 Albedo  = glm::vec4(0.6f, 0.6f, 0.6f, 1.0f);
+		float Metallic    = 0.0f;
+		float Roughness   = 0.0f;
+		float Emission    = 0.0;
+		uint32_t useNormalMap = 0;
 	};
 
 	class Material

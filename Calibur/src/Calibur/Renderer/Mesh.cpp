@@ -118,7 +118,7 @@ namespace Calibur
 				aiColor3D aiColor;
 				if (aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor) == AI_SUCCESS)
 				{
-					material->GetMaterialUniforms().Albedo = {aiColor.r, aiColor.g, aiColor.b};
+					material->GetMaterialUniforms().Albedo = {aiColor.r, aiColor.g, aiColor.b, 1.0f};
 				}
 
 				if (aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiColor) == AI_SUCCESS)
@@ -159,7 +159,7 @@ namespace Calibur
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
 					material->SetNormalMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
 
-					material->GetMaterialUniforms().useNormalMap = true;
+					material->GetMaterialUniforms().useNormalMap = 1;
 				}
 				else material->SetNormalMap(Renderer::GetWhiteTexture());
 
