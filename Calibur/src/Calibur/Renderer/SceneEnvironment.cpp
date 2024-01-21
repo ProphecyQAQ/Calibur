@@ -70,9 +70,19 @@ namespace Calibur
 		s_Cube->camera = UniformBuffer::Create(sizeof(glm::mat4), 30);
 
 		// Init textures
-		m_EquirectangularMap = Texture2D::Create(path, isVerticalFlip);
-		m_Skybox = TextureCube::Create(512, 512);
-		m_IrradianceMap = TextureCube::Create(32, 32);
+		TextureSpecification spec;
+		spec.isVerticalFlip = isVerticalFlip;
+		m_EquirectangularMap = Texture2D::Create(spec, path);
+
+		spec.Width = 512;
+		spec.Height = 512;
+		spec.Format = ImageFormat::RGB16F;
+		spec.Wrap = TextureWrap::Clamp;
+		m_Skybox = TextureCube::Create(spec);
+
+		spec.Width = 32;
+		spec.Height = 32;
+		m_IrradianceMap = TextureCube::Create(spec);
 
 		m_SkyboxShader = Renderer::GetShaderLibrary()->Get("Skybox");
 		m_EquirectangularToCubemapShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCube");

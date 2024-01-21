@@ -1,9 +1,24 @@
 #pragma once
 
 #include "Calibur/Core/Base.h"
+#include "Calibur/Renderer/Image.h"
 
 namespace Calibur
 {
+	struct TextureSpecification
+	{
+		ImageFormat Format = ImageFormat::RGBA;
+		TextureWrap Wrap = TextureWrap::Repeat;
+		TextureFilter Filter = TextureFilter::Linear;
+
+		uint32_t Width = 1;
+		uint32_t Height = 1;
+		uint32_t Samples = 1;
+		
+		bool isGenerateMipMap = false;
+		bool isVerticalFlip = true;
+	};
+
 	class Texture
 	{
 	public:
@@ -25,14 +40,14 @@ namespace Calibur
 	class Texture2D : public Texture
 	{
 	public:
-		static Ref<Texture2D> Create(uint32_t width, uint32_t height);
-		static Ref<Texture2D> Create(const std::string& path, bool isVerticalFlip = true);
+		static Ref<Texture2D> Create(const TextureSpecification& specification);
+		static Ref<Texture2D> Create(const TextureSpecification& specification, const std::string& path);
 	};
 
 	class TextureCube : public Texture
 	{
 	public:
-		static Ref<TextureCube> Create(uint32_t width, uint32_t height);
-		static Ref<TextureCube> Create(const std::string& directoryPath, bool isVerticalFlip = false);
+		static Ref<TextureCube> Create(const TextureSpecification& specification);
+		static Ref<TextureCube> Create(const TextureSpecification& specification, const std::string& directoryPath);
 	};
 }

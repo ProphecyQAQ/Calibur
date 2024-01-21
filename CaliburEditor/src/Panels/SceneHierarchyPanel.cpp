@@ -344,7 +344,8 @@ namespace Calibur
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
 						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-						Ref<Texture2D> texture = Texture2D::Create(texturePath.string());
+						TextureSpecification spec;
+						Ref<Texture2D> texture = Texture2D::Create(spec, texturePath.string());
 						if (texture->IsLoaded())
 							component.Texture = texture;
 						else

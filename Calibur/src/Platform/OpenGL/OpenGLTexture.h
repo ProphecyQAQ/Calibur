@@ -9,8 +9,8 @@ namespace Calibur
 	class OpenGLTexture2D : public Texture2D
 	{
 	public:
-		OpenGLTexture2D(uint32_t width, uint32_t height);
-		OpenGLTexture2D(const std::string& path, bool isVerticalFlip);
+		OpenGLTexture2D(const TextureSpecification& specification);
+		OpenGLTexture2D(const TextureSpecification& specification, const std::string& path);
 		virtual ~OpenGLTexture2D();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
@@ -30,14 +30,14 @@ namespace Calibur
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
-		GLenum m_InternalFormat, m_DataFormat;
+		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Filter;
 	};
 
 	class OpenGLTextureCube : public TextureCube
 	{
 	public:
-		OpenGLTextureCube(uint32_t width, uint32_t height);
-		OpenGLTextureCube(const std::string& directoryPath, bool isVerticalFlip);
+		OpenGLTextureCube(const TextureSpecification& specification);
+		OpenGLTextureCube(const TextureSpecification& specification, const std::string& directoryPath);
 		virtual ~OpenGLTextureCube();
 
 		virtual uint32_t GetWidth() const override { return m_Width; }
@@ -59,6 +59,6 @@ namespace Calibur
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
-		GLenum m_InternalFormat, m_DataFormat;
+		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Filter;
 	};
 }

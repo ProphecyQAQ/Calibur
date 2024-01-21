@@ -24,7 +24,8 @@ namespace Calibur
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(SceneLightData), 3);
 		
 		s_RenderData = new RenderData();
-		s_RenderData->s_WhiteTexture = Texture2D::Create(1, 1);
+		TextureSpecification spec;
+		s_RenderData->s_WhiteTexture = Texture2D::Create(spec);
 		uint32_t whiteTextureData = 0xffffffff;
 		s_RenderData->s_WhiteTexture->SetData(&whiteTextureData, sizeof(uint32_t));
 		s_RenderData->s_ShaderLibrary = ShaderLibrary::Create();

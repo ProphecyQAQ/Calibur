@@ -7,7 +7,7 @@
 
 namespace Calibur
 {
-	Ref<Texture2D> Texture2D::Create(uint32_t width, uint32_t height)
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -16,7 +16,7 @@ namespace Calibur
 			return nullptr;
 		
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTexture2D>(width, height);
+			return CreateRef<OpenGLTexture2D>(specification);
 		}
 		
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -24,7 +24,7 @@ namespace Calibur
 		return nullptr;
 	}
 
-	Ref<Texture2D> Texture2D::Create(const std::string& path, bool isVerticalFlip)
+	Ref<Texture2D> Texture2D::Create(const TextureSpecification& specification, const std::string& path)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -33,7 +33,7 @@ namespace Calibur
 			return nullptr;
 		
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTexture2D>(path, isVerticalFlip);
+			return CreateRef<OpenGLTexture2D>(specification, path);
 		}
 		
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -41,7 +41,24 @@ namespace Calibur
 		return nullptr;
 	}
 
-	Ref<TextureCube> TextureCube::Create(uint32_t width, uint32_t height)
+	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification)
+	{
+		switch (Renderer::GetAPI()) {
+
+		case RendererAPI::API::None:
+			HZ_CORE_ASSERT(false, "RendererAPI::None is not supported!");
+			return nullptr;
+
+		case RendererAPI::API::OpenGL:
+			return CreateRef<OpenGLTextureCube>(specification);
+		}
+		
+		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
+		
+		return nullptr;
+	}
+
+	Ref<TextureCube> TextureCube::Create(const TextureSpecification& specification, const std::string& directoryPath)
 	{
 		switch (Renderer::GetAPI()){
 		
@@ -50,24 +67,7 @@ namespace Calibur
 			return nullptr;
 		
 		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(width, height);
-		}
-		
-		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");
-		
-		return nullptr;
-	}
-
-	Ref<TextureCube> TextureCube::Create(const std::string& directoryPath, bool isVerticalFlip)
-	{
-		switch (Renderer::GetAPI()){
-		
-		case RendererAPI::API::None:
-			HZ_CORE_ASSERT(false, "RendererAPI::None is not supported!");
-			return nullptr;
-		
-		case RendererAPI::API::OpenGL:
-			return CreateRef<OpenGLTextureCube>(directoryPath, isVerticalFlip);
+			return CreateRef<OpenGLTextureCube>(specification, directoryPath);
 		}
 		
 		HZ_CORE_ASSERT(false, "Unknown RendererAPI!");

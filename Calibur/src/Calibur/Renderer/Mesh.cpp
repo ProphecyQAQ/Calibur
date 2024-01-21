@@ -138,7 +138,9 @@ namespace Calibur
 				///////////////////////////////////////////////
 
 				///////////// Material Textures  //////////////
-				// Now one material only can load one texture for each textures. 
+				// Now one material only can load one texture for each textures.
+
+				TextureSpecification spec;
 				if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 				{
 					aiString path;
@@ -146,7 +148,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetDiffuseMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
+					material->SetDiffuseMap(Texture2D::Create(spec, texturePath));
 				}
 				else material->SetDiffuseMap(Renderer::GetWhiteTexture());
 
@@ -157,7 +159,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetNormalMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
+					material->SetNormalMap(Texture2D::Create(spec, texturePath));
 
 					material->GetMaterialUniforms().useNormalMap = 1;
 				}
@@ -170,7 +172,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetRoughnessMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
+					material->SetRoughnessMap(Texture2D::Create(spec, texturePath));
 				}
 				else material->SetRoughnessMap(Renderer::GetWhiteTexture());
 
@@ -181,7 +183,7 @@ namespace Calibur
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
-					material->SetSpecMap(Texture2D::Create(texturePath, m_IsVerticalFlip));
+					material->SetSpecMap(Texture2D::Create(spec, texturePath));
 				}
 				else material->SetSpecMap(Renderer::GetWhiteTexture());
 
