@@ -359,9 +359,23 @@ namespace Calibur
 		DrawComponent<MeshComponent>("Mesh", entity, [](auto& component)
 			{
 				ImGui::Text("Mesh Name: %s", component.mesh->GetFilePath().c_str());
+
+				const ImGuiTreeNodeFlags treeNodeFlags =  ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 				for (size_t i = 0; i < component.mesh->GetSubMeshes().size(); i++)
 				{
-					ImGui::Text("SubMesh %s", component.mesh->GetSubMeshes()[i].MeshName.c_str());
+					std::string meshName = component.mesh->GetSubMeshes()[i].MeshName;
+					bool open = ImGui::TreeNodeEx((void*)(meshName.c_str()), treeNodeFlags, meshName.c_str());
+
+					if (open)
+					{
+						int materialIndex = component.mesh->GetSubMeshes()[i].MaterialIndex;
+						Ref<Material>& material = component.mesh->GetMaterials()[materialIndex];
+
+						ImGui::DragFloat3("Albedo", (float*)& material->GetMaterialUniforms().Albedo, 0.01, 0.01, 1.0);
+						ImGui::DragFloat("Roughness", &material->GetMaterialUniforms().Roughness, 0.001f, 0.0f, 1.0f);
+						ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
+						ImGui::TreePop();
+					}
 				}
 			});
 
