@@ -6,9 +6,12 @@ namespace Calibur
 	{
 		Nono = 0,
 		RGB,
-		RGBA,
 		RGB16F,
+
+		RGBA,
 		RGBA16F,
+		
+		RG16F,
 	};
 
 	enum class TextureWrap
@@ -23,5 +26,6 @@ namespace Calibur
 		None = 0,
 		Linear,
 		Nearest,
+
 	};
 }

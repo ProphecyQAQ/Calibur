@@ -41,6 +41,7 @@ namespace Calibur
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
 		//glPolygonMode(GL_FRONT, GL_LINE);
 	}

@@ -45,6 +45,8 @@ namespace Calibur
 		Ref<IndexBuffer> ibo;
 		Ref<UniformBuffer> camera;
 	}* s_Cube;
+	
+	Ref<Texture2D> SceneEnvironment::s_BrdfLut = nullptr;
 
 	/*
 	* @ param path: the path of the equirectangular map
@@ -55,55 +57,75 @@ namespace Calibur
 		HZ_PROFILE_FUNCTION();
 
 		//Init Cube 
-		s_Cube = new CubeData();
+		if (s_Cube == nullptr) 
+		{
+			s_Cube = new CubeData();
+			// Set up the box
+			s_Cube->vbo = VertexBuffer::Create(boxVertices, sizeof(boxVertices));
+			s_Cube->ibo = IndexBuffer::Create(boxIndices, sizeof(boxIndices));
+			BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }};
+			s_Cube->vbo->SetLayout(layout);
 
-		// Set up the box
-		s_Cube->vbo = VertexBuffer::Create(boxVertices, sizeof(boxVertices));
-		s_Cube->ibo = IndexBuffer::Create(boxIndices, sizeof(boxIndices));
-		BufferLayout layout = {{ ShaderDataType::Float3, "a_Position" }};
-		s_Cube->vbo->SetLayout(layout);
+			s_Cube->vao = VertexArray::Create();
+			s_Cube->vao->SetIndexBuffer(s_Cube->ibo);
+			s_Cube->vao->AddVertexBuffer(s_Cube->vbo);
 
-		s_Cube->vao = VertexArray::Create();
-		s_Cube->vao->SetIndexBuffer(s_Cube->ibo);
-		s_Cube->vao->AddVertexBuffer(s_Cube->vbo);
-
-		s_Cube->camera = UniformBuffer::Create(sizeof(glm::mat4), 30);
+			s_Cube->camera = UniformBuffer::Create(sizeof(glm::mat4), 30);
+		}
 
 		// Init textures
 		TextureSpecification spec;
 		spec.isVerticalFlip = isVerticalFlip;
 		m_EquirectangularMap = Texture2D::Create(spec, path);
 
+		spec.Width = 32;
+		spec.Height = 32;
+		spec.Format = ImageFormat::RGB16F;
+		spec.Filter = TextureFilter::Linear;
+		spec.isGenerateMipMap = false;
+		spec.isVerticalFlip = false;
+		m_IrradianceMap = TextureCube::Create(spec);
+		
+		spec.Width = 128;
+		spec.Height = 128;
+		spec.isGenerateMipMap = true;
+		spec.Format = ImageFormat::RGB16F;
+		m_PrefilterMap = TextureCube::Create(spec);
+
 		spec.Width = 512;
 		spec.Height = 512;
 		spec.Format = ImageFormat::RGB16F;
 		spec.Wrap = TextureWrap::Clamp;
+		spec.isGenerateMipMap = true;
 		m_Skybox = TextureCube::Create(spec);
 
-		spec.Width = 32;
-		spec.Height = 32;
-		m_IrradianceMap = TextureCube::Create(spec);
-
+		// Init shader
 		m_SkyboxShader = Renderer::GetShaderLibrary()->Get("Skybox");
 		m_EquirectangularToCubemapShader = Renderer::GetShaderLibrary()->Get("EquirectangularToCube");
 		m_IrradianceShader = Renderer::GetShaderLibrary()->Get("irradianceConvolution");
-
-		// Set up the framebuffer
-		FramebufferSpecification fbSpec;
-		fbSpec.Width = 512;
-		fbSpec.Height = 512;
-		fbSpec.Samples = 1;
-		fbSpec.Attachments = {FramebufferTextureFormat::DEPTH24STENCIL8};
-
-		m_CaptureFramebuffer = Framebuffer::Create(fbSpec);
+		m_PrefilterShader = Renderer::GetShaderLibrary()->Get("prefilteredConvolution");
 
 		DrawEquirectangularToCubemap(m_EquirectangularMap);
 		DrawIrradianceMap();
+		DrawPrefilterMap();
+
+		// Init brdf Lut
+		if (!s_BrdfLut)
+		{
+			DrawBrdfLut();
+		}
 	}
 
 	void SceneEnvironment::DrawEquirectangularToCubemap(Ref<Texture2D> equirectangularMap)
 	{
-		m_CaptureFramebuffer->Bind();
+		m_FboSpec.Width = 512;
+		m_FboSpec.Height = 512;
+		m_FboSpec.Samples = 1;
+		m_FboSpec.Attachments = {FramebufferTextureFormat::DEPTH24STENCIL8};
+		Ref<Framebuffer> fbo = Framebuffer::Create(m_FboSpec);
+
+		// Set framebuffer
+		fbo->Bind();
 
 		RenderCommand::SetViewport(0, 0, 512, 512);
 		s_Cube->vao->Bind();
@@ -116,20 +138,29 @@ namespace Calibur
 
 			glm::mat4 viewProjecion = captureProjection * captureViews[i];
 			s_Cube->camera->SetData(&viewProjecion, sizeof(glm::mat4));
-			m_CaptureFramebuffer->SetRenderTargetToCubeMap(skyboxId, i);
+			fbo->SetRenderTargetToTextureCube(skyboxId, i);
 
 			RenderCommand::Clear();
 
 			Renderer::Submit(m_EquirectangularToCubemapShader, s_Cube->vao);
 		}
 
+		m_Skybox->GenerateMipmap();
+
 		s_Cube->vao->Unbind();
-		m_CaptureFramebuffer->Unbind();
+		fbo->Unbind();
 	}
 
 	void SceneEnvironment::DrawIrradianceMap()
 	{
-		m_CaptureFramebuffer->Bind();
+		// Set framebuffer
+		m_FboSpec.Width = 32;
+		m_FboSpec.Height = 32;
+		m_FboSpec.Samples = 1;
+		m_FboSpec.Attachments = {FramebufferTextureFormat::DEPTH24STENCIL8};
+		Ref<Framebuffer> fbo = Framebuffer::Create(m_FboSpec);
+
+		fbo->Bind();
 
 		RenderCommand::SetViewport(0, 0, 32, 32);
 		s_Cube->vao->Bind();
@@ -142,7 +173,7 @@ namespace Calibur
 
 			glm::mat4 viewProjecion = captureProjection * captureViews[i];
 			s_Cube->camera->SetData(&viewProjecion, sizeof(glm::mat4));
-			m_CaptureFramebuffer->SetRenderTargetToCubeMap(IrradianceId, i);
+			fbo->SetRenderTargetToTextureCube(IrradianceId, i);
 
 			RenderCommand::Clear();
 
@@ -150,11 +181,97 @@ namespace Calibur
 		}
 
 		s_Cube->vao->Unbind();
-		m_CaptureFramebuffer->Unbind();
-		
+		fbo->Unbind();	
 	}
 
-	
-	
+	void SceneEnvironment::DrawPrefilterMap()
+	{
+		//Set framebuffer 
 
+		uint32_t maxMipLevels = 5;
+		Ref<UniformBuffer> roughnessBuffer = UniformBuffer::Create(sizeof(float), 31);
+		uint32_t prefilter = m_PrefilterMap->GetRendererID();
+		for (uint32_t mip = 0; mip < maxMipLevels; mip++)
+		{
+			m_FboSpec.Width = static_cast<uint32_t>(128 * std::pow(0.5, mip));
+			m_FboSpec.Height = static_cast<uint32_t>(128 * std::pow(0.5, mip));
+			m_FboSpec.Samples = 1;
+			m_FboSpec.Attachments = {FramebufferTextureFormat::DEPTH24STENCIL8};
+			Ref<Framebuffer> fbo = Framebuffer::Create(m_FboSpec);
+			RenderCommand::SetViewport(0, 0, m_FboSpec.Width, m_FboSpec.Width);
+
+			fbo->Bind();
+
+			float roughness = (float)mip / (float)(maxMipLevels - 1);
+			roughnessBuffer->SetData(&roughness, sizeof(float));
+			
+			for (uint32_t i = 0; i < 6; i++)
+			{
+				m_PrefilterShader->Bind();
+				m_Skybox->Bind(0);
+
+				glm::mat4 viewProjecion = captureViews[i];
+				s_Cube->camera->SetData(&viewProjecion, sizeof(glm::mat4));
+				fbo->SetRenderTargetToTextureCube(prefilter, i, mip);
+				
+				RenderCommand::Clear();
+				Renderer::Submit(m_PrefilterShader, s_Cube->vao);
+			}
+			fbo->Unbind();
+		}
+	}
+
+	// Static method
+	void SceneEnvironment::DrawBrdfLut()
+	{
+		TextureSpecification lutSpec;
+		lutSpec.Height = 512;
+		lutSpec.Width = 512;
+		lutSpec.Format = ImageFormat::RG16F;
+		lutSpec.Wrap = TextureWrap::Clamp;
+		lutSpec.isGenerateMipMap = false;
+		s_BrdfLut = Texture2D::Create(lutSpec);
+		
+		// Rectangle data
+		float vertices[] = {
+			 1.0f,  1.0f, 0.0f, 1.0f, 1.0f, 
+			 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 
+			-1.0f,  1.0f, 0.0f, 0.0f, 1.0f  
+		};
+		uint32_t indices[] = {
+			0, 1, 3,
+			1, 2, 3
+		};
+		Ref<VertexArray> vao = VertexArray::Create();
+		Ref<VertexBuffer> vbo = VertexBuffer::Create(vertices, sizeof(vertices));
+		Ref<IndexBuffer> ibo = IndexBuffer::Create(indices, sizeof(indices));
+		vbo->SetLayout({
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+			});
+		vao->AddVertexBuffer(vbo);
+		vao->SetIndexBuffer(ibo);
+
+		// Shader
+		Ref<Shader> shader = Renderer::GetShaderLibrary()->Get("BrdfLut");
+		
+		FramebufferSpecification FboSpec;
+		FboSpec.Height = 512;
+		FboSpec.Width = 512;
+		FboSpec.Attachments = {FramebufferTextureFormat::DEPTH24STENCIL8};
+		Ref<Framebuffer> fbo = Framebuffer::Create(FboSpec);
+		RenderCommand::SetViewport(0, 0, 512, 512);
+		
+		fbo->Bind();
+
+		fbo->SetRenderTargetToTexture2D(s_BrdfLut->GetRendererID());
+		RenderCommand::Clear();
+		Renderer::Submit(shader, vao);
+
+		vao->Unbind();
+		fbo->Unbind();
+
+		s_BrdfLut->Bind(7);
+	}
 }

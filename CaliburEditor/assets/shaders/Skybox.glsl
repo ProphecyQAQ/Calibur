@@ -29,7 +29,7 @@ layout(binding = 1) uniform samplerCube u_TextureCube;
 
 void main()
 {
-	color = texture(u_TextureCube, v_Position);
+	color = textureLod(u_TextureCube, v_Position, 0.0);
 
 	color2 = -1;
 }

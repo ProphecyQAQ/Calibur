@@ -39,7 +39,7 @@ namespace Calibur
 		Ref<Shader> m_FlatColorShader;
 		Ref<VertexArray> m_SquareVA;
 		Ref<Framebuffer> m_Framebuffer;
-
+		
 		Ref<Scene> m_ActiveScene;
 		Ref<SceneRenderer> m_SceneRenderer;
 		Entity m_Square;
@@ -52,8 +52,6 @@ namespace Calibur
 		glm::vec2 m_ViewportBounds[2]; //global viewport bounds
 		EditorCamera m_EditorCamera;
 		Entity m_HoveredEntity;
-
-		Ref<Texture2D> m_CheckerboardTexture;
 
 		glm::vec4 m_SquareColor = { 0.2f, 0.3f, 0.8f, 1.0f };
 

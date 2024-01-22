@@ -18,7 +18,8 @@ namespace Calibur
 		virtual void Resize(uint32_t width, uint32_t height) override;
 		virtual int ReadPixel(uint32_t attachmentIndex, int x, int y) override;
 
-		virtual void SetRenderTargetToCubeMap(uint32_t renderID, uint32_t index) override;
+		virtual void SetRenderTargetToTextureCube(uint32_t renderID, uint32_t index, uint32_t mipLevel) override;
+		virtual void SetRenderTargetToTexture2D(uint32_t renderID, uint32_t mipLevel = 0) override;
 
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) override;
 

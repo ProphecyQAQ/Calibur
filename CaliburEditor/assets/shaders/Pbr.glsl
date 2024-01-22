@@ -80,6 +80,11 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0)
 	return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }
 
+vec3 fresnelSchlickRoughness(float cosTheta, vec3 F0, float roughness)
+{
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+}
+
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
 	float a = roughness * roughness;
@@ -131,16 +136,17 @@ void main()
 	}
 
 	vec3 camPos = u_CameraPosition.xyz;
-
+	
+	// lighting vector
 	vec3 lightDir = normalize(u_DirectionalLight.Direction);
 	vec3 viewDir = normalize(camPos - Input.worldPosition);
 	vec3 halfDir = normalize(lightDir + viewDir);
+	vec3 refilectDir = normalize(reflect(-viewDir, normal));
 
 	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
 	vec3 specColor = texture(u_SpecTexture, Input.texCoord).rgb;
-
-	vec3 irradiance = texture(u_EnvIrradianceTex, normal).rgb;
-
+	
+	// Base fresnel
 	vec3 F0 = vec3(0.04);
 	F0 = myMix(F0, diffuseColor, Metallic);
 
@@ -162,8 +168,18 @@ void main()
 
 	vec3 Lo = (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
 
-	//ambient
-	vec3 ambient = irradiance * Albedo.rgb * kD;
+	// ambient based IBL
+	vec3 irradiance = texture(u_EnvIrradianceTex, normal).rgb;
+	const float MAX_REFLECTION_LOD = 4.0;
+	vec3 prefilter = texture(u_EnvPrefilterTex, refilectDir, Roughness * MAX_REFLECTION_LOD).rgb;
+	vec2 brdf  = texture(u_BrdfLut, vec2(max(dot(normal, viewDir), 0.0), Roughness)).rg;
+
+	F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, Roughness);
+	kS = F;
+	kD = 1.0 - kS;
+	specular = (prefilter * (F * brdf.x + brdf.y));
+
+	vec3 ambient = irradiance * Albedo.rgb * kD + specular;
 
 	Lo = Lo + ambient;
 	// HDR tonemapping

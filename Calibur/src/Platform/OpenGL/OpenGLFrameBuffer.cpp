@@ -220,13 +220,21 @@ namespace Calibur
 		return pixelData;
 	}
 
-	void OpenGLFramebuffer::SetRenderTargetToCubeMap(uint32_t renderID, uint32_t index)
+	void OpenGLFramebuffer::SetRenderTargetToTextureCube(uint32_t renderID, uint32_t index, uint32_t mipLevel)
 	{
 		HZ_CORE_ASSERT(index < 6);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, renderID, 0);
-		GLenum buffers[1] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, buffers);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + index, renderID, mipLevel);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
+	}
+
+	void OpenGLFramebuffer::SetRenderTargetToTexture2D(uint32_t renderID, uint32_t mipLevel)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderID, 0);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
 	}

@@ -111,6 +111,8 @@ namespace Calibur
 			s_Skybox.shader->Bind();
 			//s_Skybox.texture->Bind(1);
 			m_SceneEnv->GetSkybox()->Bind(1);
+			//m_SceneEnv->GetIrradianceMap()->Bind(1);
+			//m_SceneEnv->GetPreFilterMap()->Bind(1);
 			RenderCommand::DrawIndexed(s_Skybox.vao);
 			s_Skybox.shader->Unbind();
 			RenderCommand::SetDepthTest(true);
@@ -148,6 +150,7 @@ namespace Calibur
 
 				//Set Environment
 				m_SceneEnv->GetIrradianceMap()->Bind(6);
+				m_SceneEnv->GetPreFilterMap()->Bind(5);
 
 				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);

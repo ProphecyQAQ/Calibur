@@ -352,7 +352,7 @@ namespace Calibur
 		UI_ToolBar();
 
 		ImGui::End();
-		
+
 		m_SceneHierarchyPanel.OnImGuiRender();
 		m_ContextBrowserPanel.OnImguiRender();
 	}

@@ -16,6 +16,8 @@ namespace Calibur
 					return GL_RGB;
 				case ImageFormat::RGBA:	
 					return GL_RGBA;
+				case ImageFormat::RG16F:
+					return GL_RG;
 			}
 
 			HZ_CORE_ASSERT(false, "Unknown TextureFormat!");
@@ -32,6 +34,8 @@ namespace Calibur
 					return GL_RGBA8;
 				case ImageFormat::RGB16F:	
 					return GL_RGB16F;
+				case ImageFormat::RG16F:
+					return GL_RG16F;
 			}
 
 			HZ_CORE_ASSERT(false, "Unknown TextureFormat!");
@@ -45,7 +49,8 @@ namespace Calibur
 				case ImageFormat::RGB:		
 				case ImageFormat::RGBA:		
 					return GL_UNSIGNED_BYTE;
-				case ImageFormat::RGB16F:	
+				case ImageFormat::RGB16F:
+				case ImageFormat::RG16F:
 					return GL_FLOAT;
 			}
 
@@ -105,16 +110,16 @@ namespace Calibur
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
+		if (specification.isGenerateMipMap) {
+			glGenerateTextureMipmap(m_RendererID);
+			m_Filter = GL_LINEAR_MIPMAP_LINEAR;
+		}
+
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Filter);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Filter);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_Wrap);
-
-		if (specification.isGenerateMipMap)
-		{
-			glGenerateTextureMipmap(m_RendererID);
-		}
 	}
 
 	OpenGLTexture2D::OpenGLTexture2D(const TextureSpecification& specification, const std::string& path)
@@ -141,24 +146,34 @@ namespace Calibur
 			m_Height = height;
 
 			GLenum internalFormat = 0, dataFormat = 0;
-			if (channels == 4)
-			{
-				internalFormat = GL_RGBA8;
-				dataFormat = GL_RGBA;
-				type = GL_UNSIGNED_BYTE;
-			}
-			else if (channels == 3)
-			{
-				internalFormat = GL_RGB8;
-				dataFormat = GL_RGB;
-				type = GL_UNSIGNED_BYTE;
-			}
 
 			if (stbi_is_hdr(path.c_str()))
 			{
-				internalFormat = GL_RGB16F;
-				dataFormat = GL_RGB;
+				if (channels == 3)
+				{
+					internalFormat = GL_RGB16F;
+					dataFormat = GL_RGB;
+				}
+				else if (channels == 2)
+				{
+					internalFormat = GL_RG16F;
+					dataFormat = GL_RG;
+				}
 				type = GL_FLOAT;
+			}
+			else
+			{
+				if (channels == 4)
+				{
+					internalFormat = GL_RGBA8;
+					dataFormat = GL_RGBA;
+				}
+				else if (channels == 3)
+				{
+					internalFormat = GL_RGB8;
+					dataFormat = GL_RGB;
+				}
+				type = GL_UNSIGNED_BYTE;
 			}
 
 			m_InternalFormat = internalFormat;
@@ -200,6 +215,11 @@ namespace Calibur
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
 	}
 
+	void OpenGLTexture2D::GenerateMipmap()
+	{
+		glGenerateTextureMipmap(m_RendererID);
+	}
+
 	void OpenGLTexture2D::Bind(uint32_t slot) const
 	{
 		HZ_PROFILE_FUNCTION();
@@ -220,7 +240,11 @@ namespace Calibur
 		m_DataFormat = Utils::OpenGLTextureFormat(specification.Format);
 		m_DataType = Utils::OpenGLTextureDataType(specification.Format);
 		m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
-		m_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+		m_Mag_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+		if (specification.isGenerateMipMap) {
+			m_Min_Filter = GL_LINEAR_MIPMAP_LINEAR;
+		}
+		else m_Min_Filter = m_Mag_Filter;
 
 		glGenTextures(1, &m_RendererID);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, m_RendererID);
@@ -228,17 +252,17 @@ namespace Calibur
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, m_InternalFormat, m_Width, m_Height, 0, m_DataFormat, m_DataType, nullptr);
 		}
+
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_Wrap);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_R, m_Wrap);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Filter);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Filter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Min_Filter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Mag_Filter);
 
-		if (specification.isGenerateMipMap)
-		{
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		if (specification.isGenerateMipMap) {
+			glGenerateTextureMipmap(m_RendererID);
 		}
+
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 	}
 
@@ -274,7 +298,8 @@ namespace Calibur
 			m_DataFormat = dataFormat;
 			m_DataType = GL_UNSIGNED_BYTE;
 			m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
-			m_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+			m_Min_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+			m_Mag_Filter = m_Min_Filter;
 			
 			if (i == 0) {
 				glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &m_RendererID);
@@ -285,8 +310,8 @@ namespace Calibur
 
 			stbi_image_free(data);
 		}
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, m_Filter);
-		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, m_Filter);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, m_Min_Filter);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, m_Mag_Filter);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, m_Wrap);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, m_Wrap);
@@ -295,6 +320,11 @@ namespace Calibur
 	OpenGLTextureCube::~OpenGLTextureCube()
 	{
 		glDeleteTextures(1, &m_RendererID);
+	}
+
+	void OpenGLTextureCube::GenerateMipmap()
+	{
+		glGenerateTextureMipmap(m_RendererID);
 	}
 
 	void OpenGLTextureCube::Bind(uint32_t slot) const

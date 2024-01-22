@@ -36,6 +36,8 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/EquirectangularToCube.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/irradianceConvolution.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/prefilteredConvolution.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/BrdfLut.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -74,8 +76,8 @@ namespace Calibur
 		const glm::mat4& transform)
 	{
 		shader->Bind();
-
 		vertexArray->Bind();
+
 		RenderCommand::DrawIndexed(vertexArray);
 	}
 

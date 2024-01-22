@@ -16,7 +16,7 @@ namespace Calibur
 		uint32_t Samples = 1;
 		
 		bool isGenerateMipMap = false;
-		bool isVerticalFlip = true;
+		bool isVerticalFlip = false;
 	};
 
 	class Texture
@@ -29,6 +29,7 @@ namespace Calibur
 		virtual uint32_t GetRendererID() const = 0;
 
 		virtual void SetData(void* data, uint32_t size) = 0;
+		virtual void GenerateMipmap() = 0;
 
 		virtual void Bind(uint32_t slot = 0) const = 0;
 
