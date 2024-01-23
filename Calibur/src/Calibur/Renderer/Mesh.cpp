@@ -143,6 +143,7 @@ namespace Calibur
 				TextureSpecification spec;
 				spec.isVerticalFlip = m_IsVerticalFlip;
 				spec.isGenerateMipMap = true;
+				// Diffuse
 				if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 				{
 					aiString path;
@@ -153,11 +154,11 @@ namespace Calibur
 					material->SetDiffuseMap(Texture2D::Create(spec, texturePath));
 				}
 				else material->SetDiffuseMap(Renderer::GetWhiteTexture());
-
-				if (aiMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0)
+				// Normal
+				if (aiMaterial->GetTextureCount(aiTextureType_NORMALS) > 0)
 				{
 					aiString path;
-					aiMaterial->GetTexture(aiTextureType_HEIGHT, 0, &path);
+					aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &path);
 
 					size_t lastSlash = m_FilePath.find_last_of('/');
 					std::string texturePath = m_FilePath.substr(0, lastSlash + 1) + path.C_Str();
@@ -166,7 +167,7 @@ namespace Calibur
 					material->GetMaterialUniforms().useNormalMap = 1;
 				}
 				else material->SetNormalMap(Renderer::GetWhiteTexture());
-
+				// Roughness
 				if (aiMaterial->GetTextureCount(aiTextureType_SHININESS) > 0)
 				{
 					aiString path;
@@ -177,7 +178,7 @@ namespace Calibur
 					material->SetRoughnessMap(Texture2D::Create(spec, texturePath));
 				}
 				else material->SetRoughnessMap(Renderer::GetWhiteTexture());
-
+				// Specular// Metallic
 				if (aiMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0)
 				{
 					aiString path;

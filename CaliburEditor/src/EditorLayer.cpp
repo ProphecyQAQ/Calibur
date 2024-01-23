@@ -110,6 +110,13 @@ namespace Calibur
 		entity.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
 		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
+		Ref<Material> mi = entity.GetComponent<MeshComponent>().mesh->GetMaterials()[0];
+		TextureSpecification spec1;
+		spec.isGenerateMipMap = true;
+		spec.isVerticalFlip = true;
+		mi->SetNormalMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_N.tga"));
+		mi->SetRoughnessMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_R.tga"));
+		mi->SetSpecMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_M.tga"));
 	}
 
 	void EditorLayer::OnDetach()

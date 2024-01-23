@@ -23,9 +23,12 @@ namespace Calibur
 		virtual MaterialUniforms& GetMaterialUniforms() override { return m_MaterialUniforms; };
 
 		virtual void SetDiffuseMap(const Ref<Texture2D>& texture) override { m_DiffuseMap = texture; };
-		virtual void SetNormalMap(const Ref<Texture2D>& texture) override { m_NormalMap = texture; };
 		virtual void SetSpecMap(const Ref<Texture2D>& texture) override { m_SpecMap = texture; };
 		virtual void SetRoughnessMap(const Ref<Texture2D>& texture) override { m_RoughnessMap = texture; };
+		virtual void SetNormalMap(const Ref<Texture2D>& texture) override {  
+			m_NormalMap = texture;
+			m_MaterialUniforms.useNormalMap = 1;
+		};
 
 		virtual Ref<Texture2D> GetDiffuseMap() override { return m_DiffuseMap; };
 		virtual Ref<Texture2D> GetNormalMap() override { return m_NormalMap; };

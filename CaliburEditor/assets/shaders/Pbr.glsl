@@ -134,6 +134,25 @@ float CalculateLOD(vec2 texCoord)
 	return 0.5 * log2(dxdy_max_vtc);
 }
 
+vec3 IBL(vec3 F0, vec3 normal, vec3 viewDir, vec3 reflectDir, float roughness, float metallic)
+{
+	vec3 irradiance = texture(u_EnvIrradianceTex, normal).rgb;
+	vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, roughness);
+
+	vec3 kS = F;
+	vec3 kD = (1.0 - kS) * (1.0 - metallic);
+
+	const float MAX_REFLECTION_LOD = textureQueryLevels(u_EnvPrefilterTex);
+	vec3 prefilter = textureLod(u_EnvPrefilterTex, reflectDir, roughness * MAX_REFLECTION_LOD).rgb;
+	vec2 brdf  = texture(u_BrdfLut, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
+
+	vec3 specular = (prefilter * (F * brdf.x + brdf.y));
+
+	vec3 ambient = irradiance * Albedo.rgb * kD + specular;
+
+	return ambient;
+}
+
 void main()
 {
 	//Normal map
@@ -151,20 +170,21 @@ void main()
 	vec3 lightDir = normalize(u_DirectionalLight.Direction);
 	vec3 viewDir = normalize(camPos - Input.worldPosition);
 	vec3 halfDir = normalize(lightDir + viewDir);
-	vec3 refilectDir = normalize(reflect(-viewDir, normal));
+	vec3 reflectDir = normalize(reflect(-viewDir, normal));
 	
 	float lod = CalculateLOD(Input.texCoord);
-
+	
 	vec3 diffuseColor = textureLod(u_DiffuseTexture, Input.texCoord, lod).rgb;
-	vec3 specColor = texture(u_SpecTexture, Input.texCoord).rgb;
+	float metallic = textureLod(u_SpecTexture, Input.texCoord, 0.0).r * Metallic;
+	float roughness = textureLod(u_RoughnessTexture, Input.texCoord, 0.0).r * Roughness;
 	
 	// Base fresnel
 	vec3 F0 = vec3(0.04);
-	F0 = myMix(F0, diffuseColor, Metallic);
+	F0 = myMix(F0, diffuseColor, metallic);
 
 	// Cook-Torrance BRDF
-	float NDF = DistributionGGX(normal, halfDir, Roughness);
-	float G   = GeometrySmith(normal, viewDir, lightDir, Roughness);
+	float NDF = DistributionGGX(normal, halfDir, roughness);
+	float G   = GeometrySmith(normal, viewDir, lightDir, roughness);
 	vec3 F    = fresnelSchlick(clamp(dot(normal, viewDir), 0.0, 1.0), F0);
 
 	vec3 numerator    = NDF * G * F; 
@@ -174,31 +194,22 @@ void main()
 	vec3 kS = F; // specular fresnel
 	vec3 kD = vec3(1.0) - kS;
 
-	kD *= 1.0 - Metallic;
+	kD *= 1.0 - metallic;
 
 	float NdotL = max(dot(normal, lightDir), 0.0);
 
 	vec3 Lo = (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLight.Radiance * NdotL; 
-
-	// ambient based IBL
-	vec3 irradiance = texture(u_EnvIrradianceTex, normal).rgb;
-	const float MAX_REFLECTION_LOD = 4.0;
-	vec3 prefilter = texture(u_EnvPrefilterTex, refilectDir, Roughness * MAX_REFLECTION_LOD).rgb;
-	vec2 brdf  = texture(u_BrdfLut, vec2(max(dot(normal, viewDir), 0.0), Roughness)).rg;
-
-	F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), F0, Roughness);
-	kS = F;
-	kD = 1.0 - kS;
-	specular = (prefilter * (F * brdf.x + brdf.y));
-
-	vec3 ambient = irradiance * Albedo.rgb * kD + specular;
-
+	
+	// IBL
+	vec3 ambient = IBL(F0, normal, viewDir, reflectDir, roughness, metallic);
+	
+	// final color
 	Lo = Lo + ambient;
 	// HDR tonemapping
     Lo = Lo / (Lo + vec3(1.0));
     // gamma correct
-    Lo = pow(Lo, vec3(1.0/2.2));
+    //Lo = pow(Lo, vec3(1.0/2.2));
 
-	FragColor = vec4(diffuseColor, 1.0);
+	FragColor = vec4(Lo, 1.0);
 	ID = -1;
 }
