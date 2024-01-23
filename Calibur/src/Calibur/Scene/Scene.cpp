@@ -173,6 +173,47 @@ namespace Calibur
 
 	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts)
 	{
+		// Light
+		SceneLightData lightData;
+		{
+			//Directional Light 
+			// Now only one dir light
+			auto view = m_Registry.view<DirectionalLightComponent, TransformComponent>();
+			for (auto entity : view)
+			{
+				auto& light = view.get<DirectionalLightComponent>(entity);
+				auto& transform = view.get<TransformComponent>(entity);
+				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
+				lightData.DirectionalLights =
+				{
+					light.Radiance,
+					direction,
+					light.Intensity
+				};
+			}
+		}
+		Renderer::SubmitLight(lightData);
+		
+		// Find camera data
+		Camera* mainCamera = nullptr;
+		glm::mat4 cameraTransform;
+		glm::vec3 cameraPosition;
+		{
+			auto view = m_Registry.view<TransformComponent, CameraComponent>();
+			for (auto entity : view) 
+			{
+				auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
+
+				if (camera.Primary)
+				{
+					mainCamera = &camera.Camera;
+					cameraTransform = transform.GetTransform();
+					cameraPosition = transform.Translation;
+					break;
+				}
+			}
+		}
+
 		// Update scripts
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
@@ -188,38 +229,41 @@ namespace Calibur
 			});
 
 		}
-
-		Camera* mainCamera = nullptr;
-		glm::mat4 cameraTransform;
-		{
-			auto view = m_Registry.view<TransformComponent, CameraComponent>();
-			for (auto entity : view) 
-			{
-				auto& [transform, camera] = view.get<TransformComponent, CameraComponent>(entity);
-
-				if (camera.Primary)
-				{
-					mainCamera = &camera.Camera;
-					cameraTransform = transform.GetTransform();
-					break;
-				}
-			}
-		}
 		
+		// Begin to render
 		if (mainCamera)
-		{
-			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+		{		
+			//renderer->SetScene(this);
+			renderer->BeginScene({mainCamera->GetProjection(), glm::inverse(cameraTransform), cameraPosition});
 
+			// Skybox
+			Renderer::BeginScene(*mainCamera, cameraTransform);
+			{
+				RenderCommand::SetDepthTest(false);
+				RenderCommand::SetFaceCulling(false);
+				s_Skybox.shader->Bind();
+				//s_Skybox.texture->Bind(1);
+				m_SceneEnv->GetSkybox()->Bind(1);
+				//m_SceneEnv->GetIrradianceMap()->Bind(1);
+				//m_SceneEnv->GetPreFilterMap()->Bind(1);
+				RenderCommand::DrawIndexed(s_Skybox.vao);
+				s_Skybox.shader->Unbind();
+				RenderCommand::SetDepthTest(true);
+				RenderCommand::SetFaceCulling(true);
+			}
+			Renderer::EndScene();
+			
+			//Render 2D
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
 				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
 			}
-
 			Renderer2D::EndScene();
-
-
+			
+			// Render 3D
 			Renderer::BeginScene(*mainCamera, cameraTransform);
 			
 			auto view = m_Registry.view<TransformComponent, MeshComponent>();
@@ -248,6 +292,8 @@ namespace Calibur
 			}
 
 			Renderer::EndScene();
+
+			renderer->EndScene();
 		}
 	}
 
