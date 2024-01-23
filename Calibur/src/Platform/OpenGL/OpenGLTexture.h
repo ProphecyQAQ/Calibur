@@ -32,7 +32,7 @@ namespace Calibur
 		bool m_IsLoaded = false;
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
-		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Filter;
+		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Min_Filter, m_Mag_Filter;
 	};
 
 	class OpenGLTextureCube : public TextureCube

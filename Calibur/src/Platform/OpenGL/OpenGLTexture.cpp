@@ -105,18 +105,19 @@ namespace Calibur
 		m_DataFormat = Utils::OpenGLTextureFormat(specification.Format);
 		m_DataType = Utils::OpenGLTextureDataType(specification.Format);
 		m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
-		m_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+		m_Mag_Filter = Utils::OpenGLTextureFilter(specification.Filter);
 
 		glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 		glTextureStorage2D(m_RendererID, 1, m_InternalFormat, m_Width, m_Height);
 
 		if (specification.isGenerateMipMap) {
 			glGenerateTextureMipmap(m_RendererID);
-			m_Filter = GL_LINEAR_MIPMAP_LINEAR;
+			m_Min_Filter = GL_LINEAR_MIPMAP_LINEAR;
 		}
+		else m_Min_Filter = m_Mag_Filter;
 
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Filter);
-		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Filter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Min_Filter);
+		glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Mag_Filter);
 
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_Wrap);
 		glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_Wrap);
@@ -173,6 +174,11 @@ namespace Calibur
 					internalFormat = GL_RGB8;
 					dataFormat = GL_RGB;
 				}
+				else if (channels == 1)
+				{
+					internalFormat = GL_R8;
+					dataFormat = GL_RED;
+				}
 				type = GL_UNSIGNED_BYTE;
 			}
 
@@ -180,20 +186,31 @@ namespace Calibur
 			m_DataFormat = dataFormat;
 			m_DataType = type;
 			m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
-			m_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+			m_Mag_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+			uint32_t level = 1;
+			if (specification.isGenerateMipMap) {
+				m_Min_Filter = GL_LINEAR_MIPMAP_LINEAR;
+				level = 1 + floor(log2(std::max(m_Width, m_Height)));
+			}
+			else m_Min_Filter = m_Mag_Filter;
 
 			HZ_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
 
 			glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
-			glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
+			glTextureStorage2D(m_RendererID, level, internalFormat, m_Width, m_Height);
 
-			glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Filter);
-			glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Filter);
+			glTextureParameteri(m_RendererID, GL_TEXTURE_MIN_FILTER, m_Min_Filter);
+			glTextureParameteri(m_RendererID, GL_TEXTURE_MAG_FILTER, m_Mag_Filter);
 
 			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_S, m_Wrap);
 			glTextureParameteri(m_RendererID, GL_TEXTURE_WRAP_T, m_Wrap);
 
 			glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, dataFormat, type, data);
+
+			if (specification.isGenerateMipMap)
+			{
+				glGenerateTextureMipmap(m_RendererID);
+			}
 			
 			stbi_image_free(data);
 		}

@@ -124,6 +124,16 @@ vec3 myMix(vec3 x, vec3 y, float a) {
     return x * (1.0 - a) + y * a;
 }
 
+float CalculateLOD(vec2 texCoord)
+{
+	vec2 size = vec2(textureSize(u_DiffuseTexture, 0));
+	vec2 dx_vtc = dFdx(texCoord * size);
+	vec2 dy_vtc = dFdy(texCoord * size);
+
+	float dxdy_max_vtc = max(dot(dx_vtc, dx_vtc), dot(dy_vtc, dy_vtc));
+	return 0.5 * log2(dxdy_max_vtc);
+}
+
 void main()
 {
 	//Normal map
@@ -142,8 +152,10 @@ void main()
 	vec3 viewDir = normalize(camPos - Input.worldPosition);
 	vec3 halfDir = normalize(lightDir + viewDir);
 	vec3 refilectDir = normalize(reflect(-viewDir, normal));
+	
+	float lod = CalculateLOD(Input.texCoord);
 
-	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
+	vec3 diffuseColor = textureLod(u_DiffuseTexture, Input.texCoord, lod).rgb;
 	vec3 specColor = texture(u_SpecTexture, Input.texCoord).rgb;
 	
 	// Base fresnel
@@ -186,7 +198,7 @@ void main()
     Lo = Lo / (Lo + vec3(1.0));
     // gamma correct
     Lo = pow(Lo, vec3(1.0/2.2));
-	
-	FragColor = vec4(Lo, 1.0);
+
+	FragColor = vec4(diffuseColor, 1.0);
 	ID = -1;
 }

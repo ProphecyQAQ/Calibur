@@ -29,6 +29,7 @@ namespace Calibur
 			switch (format)
 			{
 			case FramebufferTextureFormat::DEPTH24STENCIL8: return true;
+			case FramebufferTextureFormat::DEPTH32FSTENCIL8: return true;
 			}
 			return false;
 		}
@@ -164,6 +165,8 @@ namespace Calibur
 				case FramebufferTextureFormat::DEPTH24STENCIL8:
 					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 					break;
+				case FramebufferTextureFormat::DEPTH32FSTENCIL8:
+					Utils::AttachDepthTexture(m_DepthAttachment, m_Specification.Samples, GL_DEPTH32F_STENCIL8, GL_DEPTH_STENCIL_ATTACHMENT, m_Specification.Width, m_Specification.Height);
 			}
 		}
 

@@ -15,6 +15,7 @@ namespace Calibur
 
 		//Depth/stencil
 		DEPTH24STENCIL8,
+		DEPTH32FSTENCIL8,
 		
 		//Defaults
 		Depth = DEPTH24STENCIL8,

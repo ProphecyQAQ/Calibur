@@ -43,6 +43,8 @@ namespace Calibur
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+		glDepthFunc(GL_LEQUAL);
+
 		//glPolygonMode(GL_FRONT, GL_LINE);
 	}
 
@@ -67,6 +69,16 @@ namespace Calibur
 			glEnable(GL_DEPTH_TEST);
 		else
 			glDisable(GL_DEPTH_TEST);
+	}
+
+	void OpenGLRenderer::SetFaceCulling(bool flag)
+	{
+		if (flag)
+		{
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
+		}
+		else glDisable(GL_CULL_FACE);
 	}
 
 	void OpenGLRenderer::RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)

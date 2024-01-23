@@ -108,6 +108,7 @@ namespace Calibur
 		Renderer::BeginScene(camera);
 		{
 			RenderCommand::SetDepthTest(false);
+			RenderCommand::SetFaceCulling(false);
 			s_Skybox.shader->Bind();
 			//s_Skybox.texture->Bind(1);
 			m_SceneEnv->GetSkybox()->Bind(1);
@@ -116,6 +117,7 @@ namespace Calibur
 			RenderCommand::DrawIndexed(s_Skybox.vao);
 			s_Skybox.shader->Unbind();
 			RenderCommand::SetDepthTest(true);
+			RenderCommand::SetFaceCulling(true);
 		}
 		Renderer::EndScene();
 

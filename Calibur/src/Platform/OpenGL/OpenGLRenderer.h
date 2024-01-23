@@ -14,6 +14,7 @@ namespace Calibur
 		virtual void Clear() override;
 
 		virtual void SetDepthTest(bool flag) override;
+		virtual void SetFaceCulling(bool flag) override;
 
 		virtual void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex) override;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;

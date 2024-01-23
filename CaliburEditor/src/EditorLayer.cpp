@@ -35,14 +35,14 @@ namespace Calibur
 		m_SceneRenderer = CreateRef<SceneRenderer>(m_ActiveScene);
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::Depth};
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH32FSTENCIL8};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 		
 		m_CameraController.SetZoomLevel(4.f);
 
-		m_EditorCamera = EditorCamera(30.f, 16.f / 9.f, 0.001f, 1000.f);
+		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 0.001f, 100.f);
 		#if 0
 		auto square = m_ActiveScene->CreateEntity("Green square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4(0.f, 1.f, 1.f, 1.f));
@@ -103,11 +103,13 @@ namespace Calibur
 		
 		// Nanosuit
 		//auto& entity = m_ActiveScene->CreateEntity("Nano");
-		//entity.AddComponent<MeshComponent>("Resources/Model/backpack/backpack.obj", false);
+		//entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
 
 		// Sphere
 		auto& entity = m_ActiveScene->CreateEntity("Sphere");
-		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", true);
+		entity.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
+		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
 	}
 
 	void EditorLayer::OnDetach()

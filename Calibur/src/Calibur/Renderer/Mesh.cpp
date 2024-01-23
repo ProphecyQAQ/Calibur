@@ -141,6 +141,8 @@ namespace Calibur
 				// Now one material only can load one texture for each textures.
 
 				TextureSpecification spec;
+				spec.isVerticalFlip = m_IsVerticalFlip;
+				spec.isGenerateMipMap = true;
 				if (aiMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0)
 				{
 					aiString path;
