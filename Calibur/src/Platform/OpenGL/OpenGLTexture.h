@@ -35,6 +35,36 @@ namespace Calibur
 		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Min_Filter, m_Mag_Filter;
 	};
 
+	class OpenGLTexture2DArray : public Texture2DArray
+	{
+	public:
+		OpenGLTexture2DArray(const TextureSpecification& specification);
+
+		virtual ~OpenGLTexture2DArray() = default;
+
+		virtual uint32_t GetWidth() const override { return m_Width; }
+		virtual uint32_t GetHeight() const override { return m_Height; }
+		virtual uint32_t GetRendererID() const override { return m_RendererID; }
+
+		virtual void SetData(void* data, uint32_t size) override {}
+		virtual void GenerateMipmap() override {}
+		
+		virtual void Bind(uint32_t slot = 0) const override;
+		virtual bool IsLoaded() const override { return m_IsLoaded; }
+
+		virtual bool operator==(const Texture& other) const override 
+		{
+			return m_RendererID == ((OpenGLTexture2DArray&)other).m_RendererID;
+		};
+	private:
+		std::string m_Path;
+		bool m_IsLoaded = false;
+		uint32_t m_Width, m_Height;
+		uint32_t m_RendererID;
+		uint32_t m_ArraySize;
+		GLenum m_InternalFormat, m_DataFormat, m_DataType, m_Wrap, m_Min_Filter, m_Mag_Filter;
+	};
+
 	class OpenGLTextureCube : public TextureCube
 	{
 	public:

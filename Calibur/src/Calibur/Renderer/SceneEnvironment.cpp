@@ -95,7 +95,7 @@ namespace Calibur
 		spec.Width = 512;
 		spec.Height = 512;
 		spec.Format = ImageFormat::RGB16F;
-		spec.Wrap = TextureWrap::Clamp;
+		spec.Wrap = TextureWrap::ClampToEdge;
 		spec.isGenerateMipMap = true;
 		m_Skybox = TextureCube::Create(spec);
 
@@ -228,7 +228,7 @@ namespace Calibur
 		lutSpec.Height = 512;
 		lutSpec.Width = 512;
 		lutSpec.Format = ImageFormat::RG16F;
-		lutSpec.Wrap = TextureWrap::Clamp;
+		lutSpec.Wrap = TextureWrap::ClampToEdge;
 		lutSpec.isGenerateMipMap = false;
 		s_BrdfLut = Texture2D::Create(lutSpec);
 		

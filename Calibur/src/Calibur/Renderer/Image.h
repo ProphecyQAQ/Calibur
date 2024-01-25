@@ -12,13 +12,16 @@ namespace Calibur
 		RGBA16F,
 		
 		RG16F,
+
+		DEPTH32F,
 	};
 
 	enum class TextureWrap
 	{
 		None = 0,
-		Clamp,
 		Repeat,
+		ClampToEdge,
+		ClampToBorder,
 	};
 
 	enum class TextureFilter
@@ -26,6 +29,5 @@ namespace Calibur
 		None = 0,
 		Linear,
 		Nearest,
-
 	};
 }

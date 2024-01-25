@@ -14,6 +14,7 @@ namespace Calibur
 		uint32_t Width = 1;
 		uint32_t Height = 1;
 		uint32_t Samples = 1;
+		uint32_t ArraySize = 1;
 		
 		bool isGenerateMipMap = false;
 		bool isVerticalFlip = false;
@@ -43,6 +44,11 @@ namespace Calibur
 	public:
 		static Ref<Texture2D> Create(const TextureSpecification& specification);
 		static Ref<Texture2D> Create(const TextureSpecification& specification, const std::string& path);
+	};
+
+	class Texture2DArray : public Texture
+	{
+		static Ref<Texture2DArray> Create(const TextureSpecification& specification);
 	};
 
 	class TextureCube : public Texture

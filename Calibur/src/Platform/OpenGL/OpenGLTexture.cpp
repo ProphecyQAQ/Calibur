@@ -18,6 +18,8 @@ namespace Calibur
 					return GL_RGBA;
 				case ImageFormat::RG16F:
 					return GL_RG;
+				case ImageFormat::DEPTH32F:
+					return GL_DEPTH_COMPONENT;
 			}
 
 			HZ_CORE_ASSERT(false, "Unknown TextureFormat!");
@@ -36,6 +38,8 @@ namespace Calibur
 					return GL_RGB16F;
 				case ImageFormat::RG16F:
 					return GL_RG16F;
+				case ImageFormat::DEPTH32F:
+					return GL_DEPTH_COMPONENT32F;
 			}
 
 			HZ_CORE_ASSERT(false, "Unknown TextureFormat!");
@@ -51,6 +55,7 @@ namespace Calibur
 					return GL_UNSIGNED_BYTE;
 				case ImageFormat::RGB16F:
 				case ImageFormat::RG16F:
+				case ImageFormat::DEPTH32F:
 					return GL_FLOAT;
 			}
 
@@ -64,8 +69,10 @@ namespace Calibur
 			{
 				case TextureWrap::None:		
 					return GL_NONE;
-				case TextureWrap::Clamp:	
+				case TextureWrap::ClampToEdge:	
 					return GL_CLAMP_TO_EDGE;
+				case TextureWrap::ClampToBorder:
+					return GL_CLAMP_TO_BORDER;
 				case TextureWrap::Repeat:	
 					return GL_REPEAT;
 			}
@@ -348,6 +355,44 @@ namespace Calibur
 	{
 		HZ_PROFILE_FUNCTION();
 
+		glBindTextureUnit(slot, m_RendererID);
+	}
+
+	
+	////////////////////////////////
+	////////Texture 2D Array////////
+	////////////////////////////////
+	OpenGLTexture2DArray::OpenGLTexture2DArray(const TextureSpecification& specification)
+		: m_Width(specification.Width), m_Height(specification.Height), m_ArraySize(specification.ArraySize)
+	{
+
+		m_InternalFormat = Utils::OpenGLTextureInternalFormat(specification.Format);
+		m_DataFormat = Utils::OpenGLTextureFormat(specification.Format);
+		m_DataType = Utils::OpenGLTextureDataType(specification.Format);
+		m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
+		m_Mag_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+
+		glGenTextures(1, &m_RendererID);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, m_RendererID);
+
+		glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, m_InternalFormat, m_Width, m_Height, m_ArraySize, 0, m_DataFormat, m_DataType, nullptr);
+
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, m_Min_Filter);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, m_Mag_Filter);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, m_Wrap);
+		glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, m_Wrap);
+		
+		if (m_Wrap == GL_CLAMP_TO_BORDER)
+		{
+			constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+			glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+		}
+
+		glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	}
+
+	void OpenGLTexture2DArray::Bind(uint32_t slot) const
+	{
 		glBindTextureUnit(slot, m_RendererID);
 	}
 }
