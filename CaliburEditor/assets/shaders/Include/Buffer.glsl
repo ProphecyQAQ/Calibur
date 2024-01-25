@@ -11,8 +11,8 @@ layout(std140, binding = 0) uniform SceneData
 struct DirectionLight
 {
 	vec3 Radiance;
-	vec3 Direction;
 	float Intensity;
+	vec3 Direction;
 };
 
 layout(std140, binding = 3) uniform DirectionalLightData
@@ -24,8 +24,8 @@ layout(std140, binding = 3) uniform DirectionalLightData
 struct PointLight
 {
 	vec3 Radiance;
-	vec3 Position;
 	float Intensity;
+	vec3 Position;
 	float Radius;
 	float SourceSize;
 	uint CastShadow;

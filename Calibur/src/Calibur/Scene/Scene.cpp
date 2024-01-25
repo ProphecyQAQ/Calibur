@@ -95,9 +95,9 @@ namespace Calibur
 				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
 				lightData.DirectionalLights[lightData.DirectionalLightCount++] =
 				{
-					glm::vec4{light.Radiance, 0.0f},
-					glm::vec4{direction, 0.0f},
-					light.Intensity
+					light.Radiance,
+					light.Intensity,
+					direction,
 				};
 			}
 
@@ -111,9 +111,9 @@ namespace Calibur
 				auto& transform = view1.get<TransformComponent>(entity);
 				lightData.PointLights[pointLightIndex++] = 
 				{
-					glm::vec4{light.Radiance, 0.0f},
-					glm::vec4{transform.Translation, 0.0f },
+					light.Radiance,
 					light.Intensity,
+					transform.Translation,
 					light.Radius,
 					light.SourceSize,
 					light.CastShadow == true ? 1u : 0u
@@ -208,9 +208,9 @@ namespace Calibur
 				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
 				lightData.DirectionalLights[lightData.DirectionalLightCount++] =
 				{
-					glm::vec4{light.Radiance, 0.0f},
-					glm::vec4{direction, 0.0f},
-					light.Intensity
+					light.Radiance,
+					light.Intensity,
+					direction,
 				};
 			}
 		}

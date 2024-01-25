@@ -372,6 +372,7 @@ namespace Calibur
 				const ImGuiTreeNodeFlags treeNodeFlags =  ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 				for (size_t i = 0; i < component.mesh->GetSubMeshes().size(); i++)
 				{
+					ImGui::PushID(i);
 					std::string meshName = component.mesh->GetSubMeshes()[i].MeshName;
 					bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
 					
@@ -385,6 +386,7 @@ namespace Calibur
 						ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
 						ImGui::TreePop();
 					}
+					ImGui::PopID();
 				}
 			});
 

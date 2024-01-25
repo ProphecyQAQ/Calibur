@@ -18,9 +18,9 @@ namespace Calibur
 
 	struct DirectionalLight
 	{
-		glm::vec4 Radiance{ 0.0f };
-		glm::vec4 Direction{ 0.0f };;
+		glm::vec3 Radiance{ 0.0f };
 		float Intensity = 0.0f;
+		glm::vec3 Direction{ 0.0f };
 
 		void clear() {
 			Radiance = glm::vec4(0.0f);
@@ -31,9 +31,9 @@ namespace Calibur
 	
 	struct PointLight
 	{
-		glm::vec4 Radiance{ 0.0f };
-		glm::vec4 Position{ 0.0f};
+		glm::vec3 Radiance{ 0.0f };
 		float Intensity = 0.0f;
+		glm::vec3 Position{ 0.0f};
 		float Radius = 25.0f;
 		float SourceSize = 0.1f;
 		uint32_t CastShadow = 0;

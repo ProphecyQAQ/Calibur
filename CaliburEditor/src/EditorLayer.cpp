@@ -42,7 +42,7 @@ namespace Calibur
 		
 		m_CameraController.SetZoomLevel(4.f);
 
-		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 0.001f, 100.f);
+		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 0.001f, 1000.f);
 		#if 0
 		auto square = m_ActiveScene->CreateEntity("Green square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4(0.f, 1.f, 1.f, 1.f));
@@ -103,9 +103,9 @@ namespace Calibur
 		
 		// Teapos
 		auto& entity = m_ActiveScene->CreateEntity("teapot");
-		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
-		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+		entity.AddComponent<MeshComponent>("Resources/Model/teapot1/teapot.obj", false);
+		//entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
+		//entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 
 		// gun
 		/*auto& entity = m_ActiveScene->CreateEntity("Sphere");

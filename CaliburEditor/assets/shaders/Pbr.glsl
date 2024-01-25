@@ -118,13 +118,14 @@ void main()
 	vec3 F0 = vec3(0.04);
 	F0 = myMix(F0, diffuseColor, metallic);
 
+	vec3 test;
 	
 	vec3 Lo = vec3(0.0);
 	// Calculate Directional light
 	for (uint i = 0; i < u_DirectionalLightCount; i ++)
 	{
 		// lighting vector
-		vec3 lightDir = normalize(u_DirectionalLights[0].Direction);
+		vec3 lightDir = normalize(u_DirectionalLights[i].Direction);
 		vec3 halfDir = normalize(lightDir + viewDir);
 
 		// Cook-Torrance BRDF
@@ -143,10 +144,9 @@ void main()
 
 		float NdotL = max(dot(normal, lightDir), 0.0);
 
-		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLights[0].Radiance * NdotL; 
+		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLights[i].Radiance * u_DirectionalLights[i].Intensity * NdotL; 
 	}
 	
-	vec3 test;
 	for (uint i = 0; i < u_PointLightCount; i ++)
 	{
 		// lighting vector
