@@ -5,9 +5,6 @@
 
 namespace Calibur
 {
-	static Ref<UniformBuffer> s_CameraUniformBuffer;
-	static Ref<UniformBuffer> s_DirectionalLightUniformBuffer;
-
 	static struct RenderData
 	{
 		Ref<ShaderLibrary> s_ShaderLibrary;
@@ -20,9 +17,7 @@ namespace Calibur
 		HZ_PROFILE_FUNCTION();
 
 		RenderCommand::Init();
-
-		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(SceneLightData), 3);
-		
+	
 		s_RenderData = new RenderData();
 		TextureSpecification spec;
 		s_RenderData->s_WhiteTexture = Texture2D::Create(spec);
@@ -63,11 +58,6 @@ namespace Calibur
 
 	void Renderer::EndScene()
 	{
-	}
-
-	void Renderer::SubmitLight(SceneLightData& light)
-	{
-		s_DirectionalLightUniformBuffer->SetData(&light.DirectionalLights, sizeof(SceneLightData));
 	}
 
 	void Renderer::Submit(

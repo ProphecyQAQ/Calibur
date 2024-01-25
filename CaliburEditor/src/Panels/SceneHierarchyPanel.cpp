@@ -246,6 +246,15 @@ namespace Calibur
 				ImGui::CloseCurrentPopup();
 			}
 
+			if (ImGui::MenuItem("Point Light"))
+			{
+				if (!m_SelectionContext.HasComponent<PointLightComponent>())
+					m_SelectionContext.AddComponent<PointLightComponent>();
+				else
+					HZ_CORE_WARN("This entity already has the Point Light Component!");
+				ImGui::CloseCurrentPopup();
+			}
+
 			ImGui::EndPopup();
 		}
 
@@ -383,6 +392,15 @@ namespace Calibur
 			{
 				ImGui::ColorEdit3("Radiance", glm::value_ptr(component.Radiance));
 				ImGui::DragFloat("Intensity", &component.Intensity, 0.2f, 0.001f, 1000.f);
+			});
+
+		DrawComponent<PointLightComponent>("Point Light", entity, [](auto& component)
+			{
+				ImGui::ColorEdit3("Radiance", glm::value_ptr(component.Radiance));
+				ImGui::DragFloat("Intensity", &component.Intensity, 0.2f, 0.001f, 1000.f);
+				ImGui::DragFloat("Radius", &component.Radius, 0.2f, 0.001f, 1000.f);
+				ImGui::DragFloat("Soruce Size", &component.SourceSize, 0.2f, 0.001f, 1000.f);
+				ImGui::Checkbox("Cast Shadow", &component.CastShadow);
 			});
 	}
 }

@@ -85,18 +85,18 @@ void main()
 	normal = normalize(normal * 2.0 - 1.0);
 	normal = normalize(Input.tbn * normal);
 
-	vec3 lightDir = normalize(u_DirectionalLight.Direction);
+	vec3 lightDir = normalize(u_DirectionalLights[0].Direction);
 	vec3 viewDir = normalize(u_CameraPosition.xyz - Input.worldPosition);
 
 	vec3 diffuseColor = texture(u_DiffuseTexture, Input.texCoord).rgb;
 	//ambient
 	vec3 ambient = 0.05 * diffuseColor;
 
-	vec3 diffuse = Albedo * u_DirectionalLight.Radiance * max(dot(normal, lightDir), 0.0);
+	vec3 diffuse = Albedo * u_DirectionalLights[0].Radiance * max(dot(normal, lightDir), 0.0);
 	diffuse = diffuse * diffuseColor;
 	
 	vec3 halfDir = normalize(lightDir + viewDir);
-	vec3 spec = pow(max(dot(normal, halfDir), 0.0), 32.0) * u_DirectionalLight.Radiance;
+	vec3 spec = pow(max(dot(normal, halfDir), 0.0), 32.0) * u_DirectionalLights[0].Radiance;
 	
 	color = vec4(ambient + diffuse + spec, 1.0);
 

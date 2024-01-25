@@ -6,25 +6,44 @@
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 #include "Calibur/Renderer/SceneEnvironment.h"
-#include "Calibur/Renderer/SceneRenderer.h"
 
 #include <glm/glm.hpp>
 
 namespace Calibur
 {
 	class Entity;
+	class SceneRenderer;
+
+	// Using glm::vec4 to Padding for radiance and position
 
 	struct DirectionalLight
 	{
-		glm::vec3 Radiance{ 0.0f, 0.0f, 0.0f };
-		glm::vec3 Direction{ 0.0f, 0.0f, 0.0f };
+		glm::vec4 Radiance{ 0.0f };
+		glm::vec4 Direction{ 0.0f };;
 		float Intensity = 0.0f;
+
+		void clear() {
+			Radiance = glm::vec4(0.0f);
+			Direction = glm::vec4(0.0f);
+			Intensity = 0.0f;
+		}
+	};
+	
+	struct PointLight
+	{
+		glm::vec4 Radiance{ 0.0f };
+		glm::vec4 Position{ 0.0f};
+		float Intensity = 0.0f;
+		float Radius = 25.0f;
+		float SourceSize = 0.1f;
+		uint32_t CastShadow = 0;
 	};
 
 	struct SceneLightData
 	{
-		DirectionalLight DirectionalLights;
-		//int DirectionalLightIndex = 0;
+		uint32_t DirectionalLightCount = 0;
+		DirectionalLight DirectionalLights[4];
+		std::vector<PointLight> PointLights;
 	};
 
 	class Scene

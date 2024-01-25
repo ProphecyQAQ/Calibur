@@ -166,7 +166,7 @@ namespace Calibur
 
 					material->GetMaterialUniforms().useNormalMap = 1;
 				}
-				else material->SetNormalMap(Renderer::GetWhiteTexture());
+
 				// Roughness
 				if (aiMaterial->GetTextureCount(aiTextureType_SHININESS) > 0)
 				{

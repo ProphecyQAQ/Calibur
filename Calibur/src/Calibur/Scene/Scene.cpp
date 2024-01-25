@@ -2,6 +2,7 @@
 #include "Calibur/Scene/Scene.h"
 #include "Calibur/Scene/Entity.h"
 #include "Calibur/Scene/Components.h"
+#include "Calibur/Renderer/SceneRenderer.h"
 #include "Calibur/Renderer/Renderer2D.h"
 #include "Calibur/Renderer/Material.h"
 #include "Calibur/Renderer/Renderer.h"
@@ -92,18 +93,38 @@ namespace Calibur
 				auto& light = view.get<DirectionalLightComponent>(entity);
 				auto& transform = view.get<TransformComponent>(entity);
 				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
-				lightData.DirectionalLights =
+				lightData.DirectionalLights[lightData.DirectionalLightCount++] =
 				{
-					light.Radiance,
-					direction,
+					glm::vec4{light.Radiance, 0.0f},
+					glm::vec4{direction, 0.0f},
 					light.Intensity
 				};
 			}
-		}
-		Renderer::SubmitLight(lightData);
 
+			// Point Light
+			auto view1 = m_Registry.view<PointLightComponent, TransformComponent>();
+			lightData.PointLights.resize(view1.size_hint());
+			uint32_t pointLightIndex = 0;
+			for (auto entity : view1)
+			{
+				auto& light = view1.get<PointLightComponent>(entity);
+				auto& transform = view1.get<TransformComponent>(entity);
+				lightData.PointLights[pointLightIndex++] = 
+				{
+					glm::vec4{light.Radiance, 0.0f},
+					glm::vec4{transform.Translation, 0.0f },
+					light.Intensity,
+					light.Radius,
+					light.SourceSize,
+					light.CastShadow == true ? 1u : 0u
+				};
+			}
+		}
+
+		// Render Scene Init
 		//renderer->SetScene(this);
 		renderer->BeginScene({camera.GetProjection(), camera.GetViewMatrix(), camera.GetPosition()});
+		renderer->SubmitLight(lightData);
 		// Skybox
 		Renderer::BeginScene(camera);
 		{
@@ -156,7 +177,8 @@ namespace Calibur
 
 				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);
-				material->GetNormalMap()->Bind(1);
+				if (material->GetMaterialUniforms().useNormalMap == 1)
+					material->GetNormalMap()->Bind(1);
 				material->GetSpecMap()->Bind(2);
 				material->GetRoughnessMap()->Bind(3);
 
@@ -184,15 +206,14 @@ namespace Calibur
 				auto& light = view.get<DirectionalLightComponent>(entity);
 				auto& transform = view.get<TransformComponent>(entity);
 				glm::vec3 direction = -glm::normalize(glm::mat3(transform.GetTransform()) * glm::vec3(1.0f));
-				lightData.DirectionalLights =
+				lightData.DirectionalLights[lightData.DirectionalLightCount++] =
 				{
-					light.Radiance,
-					direction,
+					glm::vec4{light.Radiance, 0.0f},
+					glm::vec4{direction, 0.0f},
 					light.Intensity
 				};
 			}
 		}
-		Renderer::SubmitLight(lightData);
 		
 		// Find camera data
 		Camera* mainCamera = nullptr;
@@ -364,6 +385,11 @@ namespace Calibur
 
 	template<>
 	void Scene::OnComponentAdded<DirectionalLightComponent>(Entity entity, DirectionalLightComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component)
 	{
 	}
 }

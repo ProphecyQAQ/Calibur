@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Calibur/Scene/Scene.h"
 #include "Calibur/Renderer/Camera.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 
@@ -14,8 +15,6 @@ namespace Calibur
 		glm::vec3 position;
 	};
 
-	class Scene;
-
 	class SceneRenderer
 	{
 	public:
@@ -23,20 +22,38 @@ namespace Calibur
 		~SceneRenderer() = default;
 
 		void BeginScene(const SceneRenderCamera &camera);
+		void SubmitLight(SceneLightData& lightData);
 		void EndScene();
 
 		void SetScene(Ref<Scene> scene) { m_Scene = scene; } // not work for raw pointer
 	private:
 
-		struct CameraData
-		{
-			glm::mat4 ViewProjectionMatrix;
-			glm::vec4 CameraPosition;
-		} m_CameraUBData;
-
 		Ref<Scene> m_Scene;
 
 		//Unfirom buffer
-		Ref<UniformBuffer> m_CameraUB;
+		Ref<UniformBuffer> m_CameraUniformBuffer;
+
+	private:
+
+		struct CameraUBData
+		{
+			glm::mat4 ViewProjectionMatrix;
+			glm::vec4 CameraPosition;
+		} CameraUB;
+
+		struct DirectionalLightUBData
+		{
+			uint32_t Count = 0;
+			glm::vec3 Padding{ 0.0 };
+			DirectionalLight lights[4];
+		} DirectionalLightUB;
+
+		struct PointLightUBData
+		{
+			uint32_t Count = 0;
+			glm::vec3 Padding{ 0.0 };
+			PointLight lights[16];
+		} PointLightUB;
+
 	};
 }

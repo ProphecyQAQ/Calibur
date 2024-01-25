@@ -101,12 +101,14 @@ namespace Calibur
 		#endif
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		
-		// Nanosuit
-		//auto& entity = m_ActiveScene->CreateEntity("Nano");
-		//entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
+		// Teapos
+		auto& entity = m_ActiveScene->CreateEntity("teapot");
+		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
+		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
+		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 
-		// Sphere
-		auto& entity = m_ActiveScene->CreateEntity("Sphere");
+		// gun
+		/*auto& entity = m_ActiveScene->CreateEntity("Sphere");
 		entity.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
 		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -116,7 +118,7 @@ namespace Calibur
 		spec.isVerticalFlip = true;
 		mi->SetNormalMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_N.tga"));
 		mi->SetRoughnessMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_R.tga"));
-		mi->SetSpecMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_M.tga"));
+		mi->SetSpecMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_M.tga"));*/
 	}
 
 	void EditorLayer::OnDetach()

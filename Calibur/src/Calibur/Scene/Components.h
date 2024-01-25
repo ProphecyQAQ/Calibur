@@ -103,4 +103,13 @@ namespace Calibur
 		glm::vec3 Radiance{1.0f};
 		float Intensity = 1.0f;
 	};
+
+	struct PointLightComponent
+	{
+		glm::vec3 Radiance{1.0f};
+		float Intensity = 0.0f;
+		float Radius = 25.0f;
+		float SourceSize = 0.1f;
+		bool CastShadow = 0;
+	};
 }
