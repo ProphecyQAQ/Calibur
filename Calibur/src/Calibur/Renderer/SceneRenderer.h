@@ -26,12 +26,15 @@ namespace Calibur
 		void EndScene();
 
 		void SetScene(Ref<Scene> scene) { m_Scene = scene; } // not work for raw pointer
+
+		Ref<UniformBuffer>& GetTransformUB() { return m_TransformBuffer; }
 	private:
 
 		Ref<Scene> m_Scene;
 
 		//Unfirom buffer
 		Ref<UniformBuffer> m_CameraUniformBuffer;
+		Ref<UniformBuffer> m_TransformBuffer;
 
 	private:
 

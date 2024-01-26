@@ -33,6 +33,7 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/irradianceConvolution.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/prefilteredConvolution.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/BrdfLut.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/DirLightCSM.glsl");
 	}
 
 	void Renderer::Shutdown()

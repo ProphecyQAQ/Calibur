@@ -71,7 +71,6 @@ namespace Calibur
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth, m_ViewportHeight;
 		
-		Ref<UniformBuffer> m_TransformBuffer;
 		Ref<UniformBuffer> m_MaterialUniform;
 
 		friend class Entity;

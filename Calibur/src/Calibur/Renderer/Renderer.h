@@ -27,9 +27,6 @@ namespace Calibur
 		static void BeginScene(EditorCamera& camera);
 		static void EndScene();
 
-		// Light
-		static void SubmitLight(SceneLightData& light);
-
 		static void Submit(
 			const Ref<Shader>& shader, 
 			const Ref<VertexArray>& vertexArray,

@@ -19,6 +19,8 @@ namespace Calibur {
 				return GL_VERTEX_SHADER;
 			if (type == "fragment" || type == "pixel")
 				return GL_FRAGMENT_SHADER;
+			if (type == "geometry")
+				return GL_GEOMETRY_SHADER;
 
 			HZ_CORE_ASSERT(false, "Unkonow shader type!");
 			return 0;
@@ -42,6 +44,7 @@ namespace Calibur {
 			{
 				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+				case GL_GEOMETRY_SHADER: return shaderc_glsl_geometry_shader;
 			}
 			HZ_CORE_ASSERT(false);
 			return (shaderc_shader_kind)0;
@@ -53,6 +56,7 @@ namespace Calibur {
 			{
 				case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 				case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+				case GL_GEOMETRY_SHADER: return "GL_GEOMETRY_SHADER";
 			}
 			HZ_CORE_ASSERT(false);
 			return nullptr;
@@ -64,6 +68,7 @@ namespace Calibur {
 			{
 			case GL_VERTEX_SHADER:   return ".cached_opengl.vert";
 			case GL_FRAGMENT_SHADER: return ".cached_opengl.frag";
+			case GL_GEOMETRY_SHADER: return ".cached_opengl.geom";
 			}
 			
 			HZ_CORE_ASSERT(false);
@@ -76,6 +81,7 @@ namespace Calibur {
 			{
 			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
 			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+			case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geom";
 			}
 			HZ_CORE_ASSERT(false);
 			return "";

@@ -11,6 +11,8 @@ namespace Calibur
 		: m_Scene(scene) 
 	{
 		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraUBData), 0);
+		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
+
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(DirectionalLightUBData), 3);
 		s_PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLightUBData), 4);
 	}
