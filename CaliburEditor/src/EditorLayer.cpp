@@ -150,7 +150,7 @@ namespace Calibur
 
 		// Clear entity id to -1
 		m_Framebuffer->ClearAttachment(1, -1);
-		
+		m_SceneRenderer->SetFramebuffer(m_Framebuffer);
 		switch (m_SceneState)
 		{
 			case SceneState::Edit:

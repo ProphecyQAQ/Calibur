@@ -30,10 +30,13 @@ namespace Calibur
 		void SubmitLight(SceneLightData& lightData);
 		void GenerateShadowMap(const SceneLightData& lightData);
 
-		void SetScene(Ref<Scene> scene) { m_Scene = scene; } // not work for raw pointer
+		void SetScene(Ref<Scene> scene) { m_Scene = scene; } 
+		void SetFramebuffer(Ref<Framebuffer>& fbo) { m_ActiveFramebuffer = fbo; }
 
 		Ref<UniformBuffer>& GetTransformUB() { return m_TransformBuffer; }
 	private:
+		// Framebuffer will render for scene
+		Ref<Framebuffer> m_ActiveFramebuffer; 
 
 		Ref<Scene> m_Scene;
 

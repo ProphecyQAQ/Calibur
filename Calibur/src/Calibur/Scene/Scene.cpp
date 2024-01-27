@@ -88,7 +88,7 @@ namespace Calibur
 			lightData.DirectionalLightCount = 0;
 			lightData.PointLights.clear();
 
-			//Directional Light 
+			// Directional Light 
 			// Now only one dir light
 			auto view = m_Registry.view<DirectionalLightComponent, TransformComponent>();
 			for (auto entity : view)
@@ -152,52 +152,10 @@ namespace Calibur
 		Renderer::EndScene();
 
 		// Render 2D
-		Renderer2D::BeginScene();
-		
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-		for (auto entity : group)
-		{
-			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-			Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
-		}
-		
-		Renderer2D::EndScene();
+		RenderScene2D(renderer);
 		
 		// Render 3D
-		Renderer::BeginScene();
-		
-		auto view = m_Registry.view<TransformComponent, MeshComponent>();
-		for (auto entity : view)
-		{
-			auto& transform = view.get<TransformComponent>(entity);
-
-			auto& mesh = view.get<MeshComponent>(entity);
-			auto& submeshs = mesh.mesh->GetSubMeshes();
-
-			renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
-			for (size_t id = 0; id < submeshs.size(); id++)
-			{
-				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
-				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
-
-				//Set Environment
-				m_SceneEnv->GetIrradianceMap()->Bind(6);
-				m_SceneEnv->GetPreFilterMap()->Bind(5);
-
-				material->GetShader()->Bind();
-				material->GetDiffuseMap()->Bind(0);
-				if (material->GetMaterialUniforms().useNormalMap == 1)
-					material->GetNormalMap()->Bind(1);
-				material->GetSpecMap()->Bind(2);
-				material->GetRoughnessMap()->Bind(3);
-
-				Renderer::RenderMesh(mesh.mesh, id);
-
-				material->GetShader()->Unbind();
-			}
-		}
-
-		Renderer::EndScene();
+		RenderScene3D(renderer);
 
 		renderer->EndScene();
 	}
@@ -284,47 +242,64 @@ namespace Calibur
 			Renderer::EndScene();
 			
 			//Render 2D
-			Renderer2D::BeginScene();
-			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
-			for (auto entity : group)
-			{
-				auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
-			}
-			Renderer2D::EndScene();
-			
-			// Render 3D
-			Renderer::BeginScene();
-			
-			auto view = m_Registry.view<TransformComponent, MeshComponent>();
-			for (auto entity : view)
-			{
-				auto& transform = view.get<TransformComponent>(entity);
+			RenderScene2D(renderer);
 
-				auto& mesh = view.get<MeshComponent>(entity);
-				auto& submeshs = mesh.mesh->GetSubMeshes();
-
-				renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
-				for (size_t id = 0; id < submeshs.size(); id++)
-				{
-					auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
-
-					material->GetShader()->Bind();
-					material->GetDiffuseMap()->Bind(0);
-					material->GetNormalMap()->Bind(1);
-					material->GetSpecMap()->Bind(2);
-					material->GetRoughnessMap()->Bind(3);
-
-					Renderer::RenderMesh(mesh.mesh, id);
-
-					material->GetShader()->Unbind();
-				}
-			}
-
-			Renderer::EndScene();
+			// Render 3D	
+			RenderScene3D(renderer);
 
 			renderer->EndScene();
 		}
+	}
+
+	void Scene::RenderScene2D(Ref<SceneRenderer> renderer)
+	{
+		//Render 2D
+		Renderer2D::BeginScene();
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group)
+		{
+			auto& [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+		}
+		Renderer2D::EndScene();
+	}
+
+	void Scene::RenderScene3D(Ref<SceneRenderer> renderer)
+	{
+		Renderer::BeginScene();
+		
+		auto view = m_Registry.view<TransformComponent, MeshComponent>();
+		for (auto entity : view)
+		{
+			auto& transform = view.get<TransformComponent>(entity);
+
+			auto& mesh = view.get<MeshComponent>(entity);
+			auto& submeshs = mesh.mesh->GetSubMeshes();
+
+			renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+			for (size_t id = 0; id < submeshs.size(); id++)
+			{
+				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
+				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
+
+				//Set Environment
+				m_SceneEnv->GetIrradianceMap()->Bind(6);
+				m_SceneEnv->GetPreFilterMap()->Bind(5);
+
+				material->GetShader()->Bind();
+				material->GetDiffuseMap()->Bind(0);
+				if (material->GetMaterialUniforms().useNormalMap == 1)
+					material->GetNormalMap()->Bind(1);
+				material->GetSpecMap()->Bind(2);
+				material->GetRoughnessMap()->Bind(3);
+
+				Renderer::RenderMesh(mesh.mesh, id);
+
+				material->GetShader()->Unbind();
+			}
+		}
+
+		Renderer::EndScene();
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -341,11 +316,6 @@ namespace Calibur
 				cameraComponent.Camera.SetViewportSize(width, height);  
 			}
 		}
-	}
-
-	void Scene::RenderScene2D()
-	{
-
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()

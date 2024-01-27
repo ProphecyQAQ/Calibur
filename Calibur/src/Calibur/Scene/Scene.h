@@ -61,7 +61,8 @@ namespace Calibur
 		void OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
-		void RenderScene2D();
+		void RenderScene2D(Ref<SceneRenderer> renderer);
+		void RenderScene3D(Ref<SceneRenderer> renderer);
 	
 		Entity GetPrimaryCameraEntity();
 
