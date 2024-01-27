@@ -31,6 +31,10 @@ namespace Calibur
 		glm::vec3 GetForwardDirection() const;
 		const glm::vec3& GetPosition() const { return m_Position; }
 		glm::quat GetOrientation() const;
+		float GetFov() { return m_FOV; };
+		float GetNearClip() { return m_NearClip; };
+		float GetFarClip() { return m_FarClip; };
+		float GetAspectRatio() { return m_AspectRatio; }
 
 		float GetPitch() const { return m_Pitch; }
 		float GetYaw() const { return m_Yaw; }

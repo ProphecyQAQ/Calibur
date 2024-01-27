@@ -46,7 +46,7 @@ namespace Calibur
 		std::vector<PointLight> PointLights;
 	};
 
-	class Scene
+	class Scene : public std::enable_shared_from_this<Scene>
 	{
 	public:
 		Scene();
@@ -60,7 +60,7 @@ namespace Calibur
 		void OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera);
 		void OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
-		
+	
 		Entity GetPrimaryCameraEntity();
 
 		Ref<SceneEnvironment> m_SceneEnv;

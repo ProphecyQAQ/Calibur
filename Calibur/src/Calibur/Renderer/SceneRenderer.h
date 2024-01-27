@@ -13,6 +13,9 @@ namespace Calibur
 		Camera camera;
 		glm::mat4 ViewMatrix;
 		glm::vec3 position;
+		float Fov;
+		float Near, Far; //Non-reversed
+		float AspectRatio;
 	};
 
 	class SceneRenderer
@@ -22,8 +25,10 @@ namespace Calibur
 		~SceneRenderer() = default;
 
 		void BeginScene(const SceneRenderCamera &camera);
-		void SubmitLight(SceneLightData& lightData);
 		void EndScene();
+
+		void SubmitLight(SceneLightData& lightData);
+		void GenerateShadowMap(const SceneLightData& lightData);
 
 		void SetScene(Ref<Scene> scene) { m_Scene = scene; } // not work for raw pointer
 
@@ -35,6 +40,15 @@ namespace Calibur
 		//Unfirom buffer
 		Ref<UniformBuffer> m_CameraUniformBuffer;
 		Ref<UniformBuffer> m_TransformBuffer;
+		Ref<UniformBuffer> m_LightMatricesBuffer;
+
+		// Dir CSM data
+		Ref<Framebuffer> m_CSMFramebuffer;
+		Ref<Texture2DArray> m_CSMTextureArray;
+		Ref<Shader> m_DirCSMShader;
+
+		// Current scene data
+		SceneRenderCamera m_SceneRenderCamera;
 
 	private:
 

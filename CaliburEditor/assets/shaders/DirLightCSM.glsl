@@ -22,7 +22,7 @@ layout(triangle_strip, max_vertices = 3) out;
 
 layout(std140, binding = 5) uniform LightSpaceMatrices
 {
-	mat4 u_lightSpaceMatrices[5];
+	mat4 u_lightSpaceMatrices[16];
 };
 
 void main()

@@ -182,7 +182,8 @@ namespace Calibur
 			glDrawBuffer(GL_NONE);
 		}
 
-		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
+		// Not check now
+		//HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
@@ -239,6 +240,16 @@ namespace Calibur
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderID, 0);
 		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
+		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
+	}
+
+	void OpenGLFramebuffer::SetDepthAttachment(uint32_t renderID)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, renderID, 0);
+	    glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		uint32_t state = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
 	}
 

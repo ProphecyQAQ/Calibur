@@ -371,6 +371,7 @@ namespace Calibur
 		m_DataType = Utils::OpenGLTextureDataType(specification.Format);
 		m_Wrap = Utils::OpenGLTextureWrap(specification.Wrap);
 		m_Mag_Filter = Utils::OpenGLTextureFilter(specification.Filter);
+		m_Min_Filter = m_Mag_Filter;
 
 		glGenTextures(1, &m_RendererID);
 		glBindTexture(GL_TEXTURE_2D_ARRAY, m_RendererID);

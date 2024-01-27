@@ -84,6 +84,10 @@ namespace Calibur
 		// Light
 		SceneLightData lightData;
 		{
+			// Clear light Data
+			lightData.DirectionalLightCount = 0;
+			lightData.PointLights.clear();
+
 			//Directional Light 
 			// Now only one dir light
 			auto view = m_Registry.view<DirectionalLightComponent, TransformComponent>();
@@ -121,8 +125,14 @@ namespace Calibur
 		}
 
 		// Render Scene Init
-		//renderer->SetScene(this);
-		renderer->BeginScene({camera.GetProjection(), camera.GetViewMatrix(), camera.GetPosition()});
+		renderer->SetScene(shared_from_this());
+		renderer->BeginScene(
+			{
+				camera.GetProjection(),
+				camera.GetViewMatrix(),
+				camera.GetPosition(),
+				camera.GetFov(), camera.GetNearClip(), camera.GetFarClip(), camera.GetAspectRatio()
+			});
 		renderer->SubmitLight(lightData);
 		// Skybox
 		Renderer::BeginScene(camera);

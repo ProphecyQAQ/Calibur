@@ -60,6 +60,7 @@ namespace Calibur
 
 		virtual void SetRenderTargetToTextureCube(uint32_t renderID, uint32_t index, uint32_t mipLevel = 0) = 0;
 		virtual void SetRenderTargetToTexture2D(uint32_t renderID, uint32_t mipLevel = 0) = 0;
+		virtual void SetDepthAttachment(uint32_t renderID) = 0;
 		
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
 

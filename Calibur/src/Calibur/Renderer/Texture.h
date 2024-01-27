@@ -48,6 +48,7 @@ namespace Calibur
 
 	class Texture2DArray : public Texture
 	{
+	public:
 		static Ref<Texture2DArray> Create(const TextureSpecification& specification);
 	};
 
