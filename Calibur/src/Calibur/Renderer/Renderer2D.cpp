@@ -126,17 +126,10 @@ namespace Calibur
 		StartBatch();
 	}
 
-	void Renderer2D::BeginScene(const EditorCamera& camera)
+	void Renderer2D::BeginScene()
 	{
 		HZ_PROFILE_FUNCTION();
 
-		StartBatch();
-	}
-
-	void Renderer2D::BeginScene(const Camera& camera, const glm::mat4& transform)
-	{
-		HZ_PROFILE_FUNCTION();
-		
 		StartBatch();
 	}
 

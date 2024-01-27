@@ -135,7 +135,7 @@ namespace Calibur
 			});
 		renderer->SubmitLight(lightData);
 		// Skybox
-		Renderer::BeginScene(camera);
+		Renderer::BeginScene();
 		{
 			RenderCommand::SetDepthTest(false);
 			RenderCommand::SetFaceCulling(false);
@@ -152,7 +152,7 @@ namespace Calibur
 		Renderer::EndScene();
 
 		// Render 2D
-		Renderer2D::BeginScene(camera);
+		Renderer2D::BeginScene();
 		
 		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 		for (auto entity : group)
@@ -164,7 +164,7 @@ namespace Calibur
 		Renderer2D::EndScene();
 		
 		// Render 3D
-		Renderer::BeginScene(camera);
+		Renderer::BeginScene();
 		
 		auto view = m_Registry.view<TransformComponent, MeshComponent>();
 		for (auto entity : view)
@@ -263,11 +263,11 @@ namespace Calibur
 		// Begin to render
 		if (mainCamera)
 		{		
-			//renderer->SetScene(this);
+			renderer->SetScene(shared_from_this());
 			renderer->BeginScene({mainCamera->GetProjection(), glm::inverse(cameraTransform), cameraPosition});
 
 			// Skybox
-			Renderer::BeginScene(*mainCamera, cameraTransform);
+			Renderer::BeginScene();
 			{
 				RenderCommand::SetDepthTest(false);
 				RenderCommand::SetFaceCulling(false);
@@ -284,7 +284,7 @@ namespace Calibur
 			Renderer::EndScene();
 			
 			//Render 2D
-			Renderer2D::BeginScene(*mainCamera, cameraTransform);
+			Renderer2D::BeginScene();
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group)
 			{
@@ -294,7 +294,7 @@ namespace Calibur
 			Renderer2D::EndScene();
 			
 			// Render 3D
-			Renderer::BeginScene(*mainCamera, cameraTransform);
+			Renderer::BeginScene();
 			
 			auto view = m_Registry.view<TransformComponent, MeshComponent>();
 			for (auto entity : view)
@@ -341,6 +341,11 @@ namespace Calibur
 				cameraComponent.Camera.SetViewportSize(width, height);  
 			}
 		}
+	}
+
+	void Scene::RenderScene2D()
+	{
+
 	}
 
 	Entity Scene::GetPrimaryCameraEntity()

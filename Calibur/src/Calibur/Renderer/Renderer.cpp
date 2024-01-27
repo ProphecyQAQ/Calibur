@@ -49,11 +49,7 @@ namespace Calibur
 	{
 	}
 
-	void Renderer::BeginScene(const Camera& camera, const glm::mat4& transform)
-	{
-	}
-
-	void Renderer::BeginScene(EditorCamera& camera)
+	void Renderer::BeginScene()
 	{
 	}
 
