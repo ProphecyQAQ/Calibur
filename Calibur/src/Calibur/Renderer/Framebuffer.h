@@ -67,6 +67,8 @@ namespace Calibur
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
 
 		virtual const FramebufferSpecification& GetSpecificaition() const = 0;
+		virtual float GetWidth() = 0;
+		virtual float GetHeight() = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferSpecification& spec);
 	};

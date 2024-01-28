@@ -105,23 +105,23 @@ namespace Calibur
 		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraUBData), 0);
 		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
 
-
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(DirectionalLightUBData), 3);
 		s_PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLightUBData), 4);
 
 		// Init Csm data
 		TextureSpecification specTex;
 		specTex.Format = ImageFormat::DEPTH32F;
-		specTex.Height = 4096;
-		specTex.Width = 4096;
+		specTex.Filter = TextureFilter::Nearest;
+		specTex.Height = 2048;
+		specTex.Width = 2048;
 		specTex.ArraySize = 5;
 		specTex.Wrap = TextureWrap::ClampToBorder;
 		m_CSMTextureArray = Texture2DArray::Create(specTex);
 
 		m_DirCSMShader = Renderer::GetShaderLibrary()->Get("DirLightCSM");
 		FramebufferSpecification specFbo;
-		specFbo.Height = 4096;
-		specFbo.Width = 4096;
+		specFbo.Height = 2048;
+		specFbo.Width = 2048;
 		m_CSMFramebuffer = Framebuffer::Create(specFbo);
 		m_CSMFramebuffer->SetDepthAttachment(m_CSMTextureArray->GetRendererID());
 
@@ -171,52 +171,27 @@ namespace Calibur
 		float cameraNearPlane = m_SceneRenderCamera.Near;
 		static std::vector<float> shadowCascadeLevels{cameraNearPlane, cameraFarPlane / 50.0f, cameraFarPlane / 25.0f, cameraFarPlane / 10.0f, cameraFarPlane / 2.0f, cameraFarPlane };
 
-		static uint32_t indices[] = {
-			0, 2, 3,
-			0, 3, 1,
-			4, 6, 2,
-			4, 2, 0,
-			5, 7, 6,
-			5, 6, 4,
-			1, 3, 7,
-			1, 7, 5,
-			6, 7, 3,
-			6, 3, 2,
-			1, 5, 4,
-			0, 1, 4
-		};
-
 		// Set light matrices uniform buffer
 		std::vector<glm::mat4>& lightMatrices = Utils::GetLightSpaceMatrices(shadowCascadeLevels, light.Direction, m_SceneRenderCamera);
 		for (size_t i = 0; i < lightMatrices.size(); i++)
 		{
 			m_LightMatricesBuffer->SetData(&lightMatrices[i], sizeof(glm::mat4), i * sizeof(glm::mat4));
 		}
+		
+		m_ActiveFramebuffer->Unbind();
+		m_CSMFramebuffer->Bind();
+		RenderCommand::SetViewport(0, 0, m_CSMTextureArray->GetWidth(), m_CSMTextureArray->GetHeight());
+		RenderCommand::Clear();
 
-		// Draw csm data
-		/*for (size_t i = 0; i < lightMatrices.size(); i++)
-		{
-			std::vector<glm::vec4> corners = Utils::getFrustumCornersWorldSpace(lightMatrices[i]);
-			std::vector<glm::vec3> vec3s;
-			for (auto& v : corners)
-			{
-				vec3s.push_back(glm::vec3(v));
-			}
+		m_Scene->RenderScene2D();
+		m_Scene->RenderScene3D(m_DirCSMShader);
 
-			Ref<VertexArray> vao = VertexArray::Create();
-			Ref<VertexBuffer> vbo = VertexBuffer::Create(vec3s.size() * sizeof(float));
-			Ref<IndexBuffer> ibo = IndexBuffer::Create(indices, sizeof(indices));
-			BufferLayout layout = { { ShaderDataType::Float3, "a_Position" } };
-			vbo->SetLayout(layout);
-			vao->AddVertexBuffer(vbo);
-			vao->SetIndexBuffer(ibo);
-
-			Renderer::Submit(m_DirCSMShader, vao);
-		}	*/
+		m_CSMFramebuffer->Unbind();
+		m_ActiveFramebuffer->Bind();
+		RenderCommand::SetViewport(0, 0, m_ActiveFramebuffer->GetWidth(), m_ActiveFramebuffer->GetHeight());
 	}
 
 	void SceneRenderer::EndScene()
 	{
 	}
-
 }

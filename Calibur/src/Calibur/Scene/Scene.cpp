@@ -81,6 +81,9 @@ namespace Calibur
 
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera)
 	{
+		// Record SceneRenderer
+		m_Renderer = renderer;
+
 		// Light
 		SceneLightData lightData;
 		{
@@ -152,16 +155,19 @@ namespace Calibur
 		Renderer::EndScene();
 
 		// Render 2D
-		RenderScene2D(renderer);
+		RenderScene2D();
 		
 		// Render 3D
-		RenderScene3D(renderer);
+		RenderScene3D();
 
 		renderer->EndScene();
 	}
 
 	void Scene::OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts)
 	{
+		// 
+		m_Renderer = renderer;
+
 		// Light
 		SceneLightData lightData;
 		{
@@ -224,6 +230,8 @@ namespace Calibur
 			renderer->SetScene(shared_from_this());
 			renderer->BeginScene({mainCamera->GetProjection(), glm::inverse(cameraTransform), cameraPosition});
 
+			renderer->SubmitLight(lightData);
+
 			// Skybox
 			Renderer::BeginScene();
 			{
@@ -237,21 +245,21 @@ namespace Calibur
 				RenderCommand::DrawIndexed(s_Skybox.vao);
 				s_Skybox.shader->Unbind();
 				RenderCommand::SetDepthTest(true);
-				RenderCommand::SetFaceCulling(true);
+				//RenderCommand::SetFaceCulling(true);
 			}
 			Renderer::EndScene();
 			
 			//Render 2D
-			RenderScene2D(renderer);
+			RenderScene2D();
 
 			// Render 3D	
-			RenderScene3D(renderer);
+			RenderScene3D();
 
 			renderer->EndScene();
 		}
 	}
 
-	void Scene::RenderScene2D(Ref<SceneRenderer> renderer)
+	void Scene::RenderScene2D()
 	{
 		//Render 2D
 		Renderer2D::BeginScene();
@@ -264,9 +272,13 @@ namespace Calibur
 		Renderer2D::EndScene();
 	}
 
-	void Scene::RenderScene3D(Ref<SceneRenderer> renderer)
+	void Scene::RenderScene3D(Ref<Shader> shader)
 	{
 		Renderer::BeginScene();
+		
+		// Set Environment map
+		m_SceneEnv->GetIrradianceMap()->Bind(6);
+		m_SceneEnv->GetPreFilterMap()->Bind(5);
 		
 		auto view = m_Registry.view<TransformComponent, MeshComponent>();
 		for (auto entity : view)
@@ -276,17 +288,17 @@ namespace Calibur
 			auto& mesh = view.get<MeshComponent>(entity);
 			auto& submeshs = mesh.mesh->GetSubMeshes();
 
-			renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+			m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
 				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
 
-				//Set Environment
-				m_SceneEnv->GetIrradianceMap()->Bind(6);
-				m_SceneEnv->GetPreFilterMap()->Bind(5);
+				if (shader == nullptr)
+					material->GetShader()->Bind();
+				else
+					shader->Bind();
 
-				material->GetShader()->Bind();
 				material->GetDiffuseMap()->Bind(0);
 				if (material->GetMaterialUniforms().useNormalMap == 1)
 					material->GetNormalMap()->Bind(1);
@@ -295,7 +307,10 @@ namespace Calibur
 
 				Renderer::RenderMesh(mesh.mesh, id);
 
-				material->GetShader()->Unbind();
+				if (shader == nullptr)
+					material->GetShader()->Unbind();
+				else
+					shader->Unbind();
 			}
 		}
 

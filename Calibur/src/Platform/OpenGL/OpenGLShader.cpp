@@ -327,6 +327,13 @@ namespace Calibur {
 
 		glLinkProgram(program);
 
+		GLint numAttachedShaders;
+		glGetProgramiv(program, GL_ATTACHED_SHADERS, &numAttachedShaders);
+		if (numAttachedShaders != m_OpenGLSPIRV.size())
+		{
+			HZ_CORE_ASSERT("Shader number is not right!");
+		}
+
 		GLint isLinked;
 		glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
 

@@ -61,8 +61,8 @@ namespace Calibur
 		void OnUpdateRuntime(Ref<SceneRenderer> renderer, TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
-		void RenderScene2D(Ref<SceneRenderer> renderer);
-		void RenderScene3D(Ref<SceneRenderer> renderer);
+		void RenderScene2D();
+		void RenderScene3D(Ref<Shader> shader = nullptr);
 	
 		Entity GetPrimaryCameraEntity();
 
@@ -75,6 +75,7 @@ namespace Calibur
 		uint32_t m_ViewportWidth, m_ViewportHeight;
 		
 		Ref<UniformBuffer> m_MaterialUniform;
+		Ref<SceneRenderer> m_Renderer;
 
 		friend class Entity;
 		friend class SceneSerializer;

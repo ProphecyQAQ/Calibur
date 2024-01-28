@@ -246,9 +246,8 @@ namespace Calibur
 	void OpenGLFramebuffer::SetDepthAttachment(uint32_t renderID)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, renderID, 0);
-	    glDrawBuffer(GL_NONE);
-		glReadBuffer(GL_NONE);
+		glNamedFramebufferTexture(m_RendererID, GL_DEPTH_ATTACHMENT, renderID, 0);
+
 		uint32_t state = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		HZ_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE, "Framebuffer is in complete!");
 	}

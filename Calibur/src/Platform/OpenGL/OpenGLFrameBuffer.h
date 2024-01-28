@@ -28,6 +28,8 @@ namespace Calibur
 			HZ_CORE_ASSERT(index < m_ColorAttachments.size()); return m_ColorAttachments[index]; }
 
 		virtual const FramebufferSpecification& GetSpecificaition() const override { return m_Specification; }
+		float GetWidth() override { return m_Specification.Width; }
+		float GetHeight() override { return m_Specification.Height; }
 
 	private:
 		uint32_t m_RendererID = 0;
