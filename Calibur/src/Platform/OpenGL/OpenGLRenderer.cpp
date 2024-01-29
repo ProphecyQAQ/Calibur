@@ -71,12 +71,14 @@ namespace Calibur
 			glDisable(GL_DEPTH_TEST);
 	}
 
-	void OpenGLRenderer::SetFaceCulling(bool flag)
+	void OpenGLRenderer::SetFaceCulling(bool flag, int type)
 	{
-		if (flag)
+		if (flag == true)
 		{
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+
+			if (type == 0) glCullFace(GL_BACK);
+			else if (type == 1) glCullFace(GL_FRONT);
 		}
 		else glDisable(GL_CULL_FACE);
 	}

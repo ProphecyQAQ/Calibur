@@ -87,7 +87,6 @@ namespace Calibur
 		// Light
 		SceneLightData lightData;
 		{
-			// Clear light Data
 			lightData.DirectionalLightCount = 0;
 			lightData.PointLights.clear();
 

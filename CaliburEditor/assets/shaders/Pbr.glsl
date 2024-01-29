@@ -49,6 +49,7 @@ void main()
 
 #include "Buffer.glsl"
 #include "PbrCommon.glsl"
+#include "ShadowCommon.glsl"
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out int ID;
@@ -73,6 +74,40 @@ struct VertexOutput
 };
 
 layout (location = 0) in VertexOutput Input;
+
+float shadowCalculate(vec3 lightDir)
+{
+	// According view space z value to select cascade level
+	vec4 viewSpacePos = u_ViewMatrix * vec4(Input.worldPosition, 1.0);
+	float depthValue = viewSpacePos.z;
+
+	uint layer = 0;
+	const uint SHADOW_MAP_CASCADE_COUNT = 5;
+	for (int i = 0; i < SHADOW_MAP_CASCADE_COUNT - 1; i++)
+	{
+		if (depthValue < u_CascadePlaneDistances[i])
+		{
+			layer = i + 1;
+		}
+	}
+
+	// Calculate shadow
+	vec4 viewLightPos =  u_lightSpaceMatrices[layer] * vec4(Input.worldPosition, 1.0);
+
+	vec3 projCoord = viewLightPos.xyz / viewLightPos.w;
+	projCoord = projCoord * 0.5 + 0.5;
+	float currentDepth = projCoord.z;
+	
+	if (currentDepth > 1.0) return 0.0;
+
+	vec3 normal = normalize(Input.worldNormal);
+	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
+	
+	float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).x;
+	
+	return step(depth + bias, currentDepth);
+}
 
 vec3 IBL(vec3 F0, vec3 normal, vec3 viewDir, vec3 reflectDir, float roughness, float metallic)
 {
@@ -127,6 +162,10 @@ void main()
 		// lighting vector
 		vec3 lightDir = normalize(u_DirectionalLights[i].Direction);
 		vec3 halfDir = normalize(lightDir + viewDir);
+
+		// Calculate shadow
+		float shadow = shadowCalculate(lightDir);
+		if (shadow == 1.0) continue;
 
 		// Cook-Torrance BRDF
 		float NDF = DistributionGGX(normal, halfDir, roughness);

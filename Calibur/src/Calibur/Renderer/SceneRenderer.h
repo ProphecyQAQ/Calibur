@@ -28,7 +28,16 @@ namespace Calibur
 		void EndScene();
 
 		void SubmitLight(SceneLightData& lightData);
+
+
+		struct CascadeData
+		{
+			glm::mat4 ViewProj;
+			glm::mat4 View;
+			float SplitDepth;
+		};
 		void GenerateShadowMap(const SceneLightData& lightData);
+		void CalculateCascades(const glm::vec3& lightDirection);
 
 		void SetScene(Ref<Scene> scene) { m_Scene = scene; } 
 		void SetFramebuffer(Ref<Framebuffer>& fbo) { m_ActiveFramebuffer = fbo; }
@@ -49,6 +58,9 @@ namespace Calibur
 		Ref<Framebuffer> m_CSMFramebuffer;
 		Ref<Texture2DArray> m_CSMTextureArray;
 		Ref<Shader> m_DirCSMShader;
+		uint32_t m_DirCSMCount = 5;
+		std::vector<CascadeData> m_CascadeData;
+		std::vector<float> m_CascadeSplits;
 
 		// Current scene data
 		SceneRenderCamera m_SceneRenderCamera;
@@ -58,6 +70,7 @@ namespace Calibur
 		struct CameraUBData
 		{
 			glm::mat4 ViewProjectionMatrix;
+			glm::mat4 ViewMatrix;
 			glm::vec4 CameraPosition;
 		} CameraUB;
 

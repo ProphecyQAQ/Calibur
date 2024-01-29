@@ -76,6 +76,7 @@ namespace Calibur
 		}
 
 		UpdateView();
+		UpdateProjection();
 	}
 
 	void EditorCamera::OnEvent(Event& e)

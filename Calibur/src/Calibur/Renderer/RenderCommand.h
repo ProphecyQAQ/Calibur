@@ -27,9 +27,9 @@ namespace Calibur
 			s_RendererAPI->SetDepthTest(flag);
 		}
 
-		static void SetFaceCulling(bool flag)
+		static void SetFaceCulling(bool flag, int type = 0)
 		{
-			s_RendererAPI->SetFaceCulling(flag);
+			s_RendererAPI->SetFaceCulling(flag, type);
 		}
 
 		static void Clear()

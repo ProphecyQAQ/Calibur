@@ -25,7 +25,7 @@ namespace Calibur
 		virtual void Clear() = 0;
 
 		virtual void SetDepthTest(bool flag) = 0;
-		virtual void SetFaceCulling(bool flag) = 0;
+		virtual void SetFaceCulling(bool flag, int type = 0) = 0;
 		
 		virtual void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex) = 0;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;

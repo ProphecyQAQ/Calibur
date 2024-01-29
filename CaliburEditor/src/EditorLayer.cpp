@@ -105,7 +105,7 @@ namespace Calibur
 		auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("Resources/Model/teapot1/teapot.obj", false);
 		//entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		//entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+		//entity.GetComponent<TransformComponent>().Translation = glm::vec3(5.0, 0.0, 0.0);
 
 		// gun
 		/*auto& entity = m_ActiveScene->CreateEntity("Sphere");
