@@ -75,13 +75,15 @@ struct VertexOutput
 
 layout (location = 0) in VertexOutput Input;
 
+float test = 0.0;
+
 float shadowCalculate(vec3 lightDir)
 {
 	// According view space z value to select cascade level
 	vec4 viewSpacePos = u_ViewMatrix * vec4(Input.worldPosition, 1.0);
 	float depthValue = viewSpacePos.z;
 
-	uint layer = 0;
+	uint layer = 1;
 	const uint SHADOW_MAP_CASCADE_COUNT = 5;
 	for (int i = 0; i < SHADOW_MAP_CASCADE_COUNT - 1; i++)
 	{
@@ -89,7 +91,7 @@ float shadowCalculate(vec3 lightDir)
 		{
 			layer = i + 1;
 		}
-	}
+	}	
 
 	// Calculate shadow
 	vec4 viewLightPos =  u_lightSpaceMatrices[layer] * vec4(Input.worldPosition, 1.0);
@@ -152,8 +154,6 @@ void main()
 	// Base fresnel
 	vec3 F0 = vec3(0.04);
 	F0 = myMix(F0, diffuseColor, metallic);
-
-	vec3 test;
 	
 	vec3 Lo = vec3(0.0);
 	// Calculate Directional light
@@ -211,7 +211,6 @@ void main()
 		kD *= 1.0 - metallic;
 
 		float NdotL = max(dot(normal, lightDir), 0.0);
-		test = vec3(NdotL, 0.0, 0.0);
 
 		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * radiance * NdotL; 
 	}
