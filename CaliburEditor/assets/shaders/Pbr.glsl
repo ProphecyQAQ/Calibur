@@ -106,9 +106,10 @@ float shadowCalculate(vec3 lightDir)
 	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 	bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
 	
-	float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).x;
-	
-	return step(depth + bias, currentDepth);
+	//float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).x;
+	//return step(depth + bias, currentDepth);
+	float shadow = PCF_DirectionalCascadeShadow(u_DirCSM, layer, projCoord, bias);
+	return shadow;
 }
 
 vec3 IBL(vec3 F0, vec3 normal, vec3 viewDir, vec3 reflectDir, float roughness, float metallic)
@@ -166,6 +167,7 @@ void main()
 		// Calculate shadow
 		float shadow = shadowCalculate(lightDir);
 		if (shadow == 1.0) continue;
+		shadow = 1.0 - shadow;
 
 		// Cook-Torrance BRDF
 		float NDF = DistributionGGX(normal, halfDir, roughness);
@@ -183,7 +185,7 @@ void main()
 
 		float NdotL = max(dot(normal, lightDir), 0.0);
 
-		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLights[i].Radiance * u_DirectionalLights[i].Intensity * NdotL; 
+		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLights[i].Radiance * u_DirectionalLights[i].Intensity * NdotL * shadow; 
 	}
 	
 	for (uint i = 0; i < u_PointLightCount; i ++)

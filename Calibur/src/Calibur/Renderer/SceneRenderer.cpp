@@ -89,7 +89,7 @@ namespace Calibur
 		RenderCommand::SetViewport(0, 0, m_CSMTextureArray->GetWidth(), m_CSMTextureArray->GetHeight());
 		RenderCommand::Clear();
 
-		RenderCommand::SetFaceCulling(true, 1);
+		//RenderCommand::SetFaceCulling(true, 1);
 
 		m_Scene->RenderScene2D();
 		m_Scene->RenderScene3D(m_DirCSMShader);
