@@ -67,6 +67,8 @@ namespace Calibur
 		s_PointLightUniformBuffer->SetData(&PointLightUB, sizeof(PointLightUBData));
 		
 		// Generate Csm for directional map
+		glm::vec3 lightDirection = lightData.DirectionalLights[0].Direction;
+		CalculateCascades(lightDirection);
 		GenerateShadowMap(lightData);
 	}
 	
@@ -74,15 +76,12 @@ namespace Calibur
 	// Now only support one light
 	void SceneRenderer::GenerateShadowMap(const SceneLightData& lightData)
 	{
-		if (lightData.DirectionalLightCount == 0) return;
-		
-		glm::vec3 lightDirection = lightData.DirectionalLights[0].Direction;
+		if (lightData.DirectionalLightCount == 0) return;		
 
-		CalculateCascades(lightDirection);
-		
+		// Upload light viewProj matrix
 		for (size_t i = 0; i < m_CascadeData.size(); i++)
 		{
-			m_LightMatricesBuffer->SetData(&m_CascadeData[i], sizeof(glm::mat4), i * sizeof(glm::mat4));
+			m_LightMatricesBuffer->SetData(&m_CascadeData[i].ViewProj, sizeof(glm::mat4), i * sizeof(glm::mat4));
 		}
 		
 		m_ActiveFramebuffer->Unbind();
@@ -112,9 +111,9 @@ namespace Calibur
 	void SceneRenderer::CalculateCascades(const glm::vec3& lightDirection)
 	{
 		glm::mat4 viewMatrix = m_SceneRenderCamera.ViewMatrix;
-		const glm::vec4 origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
 		glm::mat4 viewProj = m_SceneRenderCamera.camera.GetProjection() * viewMatrix;
+
+		const glm::vec4 origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 
 		std:: vector<float> cascadeSplits(m_DirCSMCount);
 
@@ -191,7 +190,7 @@ namespace Calibur
 			
 			glm::vec3 lightDir = -lightDirection;	
 			glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, 0.0f, maxExtents.z - minExtents.z + 0.0f);
+			glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, -50.0f, maxExtents.z - minExtents.z + 50.0f);
 
 			glm::mat4 shadowMatrix = lightOrthoMatrix * lightViewMatrix;
 			float ShadowMapWidth = (float)m_CSMTextureArray->GetWidth();

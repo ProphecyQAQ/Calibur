@@ -140,7 +140,6 @@ namespace Calibur
 		Renderer::BeginScene();
 		{
 			RenderCommand::SetDepthTest(false);
-			RenderCommand::SetFaceCulling(false);
 			s_Skybox.shader->Bind();
 			//s_Skybox.texture->Bind(1);
 			m_SceneEnv->GetSkybox()->Bind(1);
@@ -149,9 +148,12 @@ namespace Calibur
 			RenderCommand::DrawIndexed(s_Skybox.vao);
 			s_Skybox.shader->Unbind();
 			RenderCommand::SetDepthTest(true);
-			RenderCommand::SetFaceCulling(true);
 		}
 		Renderer::EndScene();
+
+		// Set Environment map
+		m_SceneEnv->GetIrradianceMap()->Bind(6);
+		m_SceneEnv->GetPreFilterMap()->Bind(5);
 
 		// Render 2D
 		RenderScene2D();
@@ -274,11 +276,7 @@ namespace Calibur
 	void Scene::RenderScene3D(Ref<Shader> shader)
 	{
 		Renderer::BeginScene();
-		
-		// Set Environment map
-		m_SceneEnv->GetIrradianceMap()->Bind(6);
-		m_SceneEnv->GetPreFilterMap()->Bind(5);
-		
+			
 		auto view = m_Registry.view<TransformComponent, MeshComponent>();
 		for (auto entity : view)
 		{

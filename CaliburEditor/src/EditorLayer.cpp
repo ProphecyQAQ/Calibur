@@ -103,16 +103,19 @@ namespace Calibur
 		
 		// Teapos
 		auto& entity = m_ActiveScene->CreateEntity("teapot");
-		entity.AddComponent<MeshComponent>("Resources/Model/teapot1/teapot.obj", false);
-		//entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		//entity.GetComponent<TransformComponent>().Translation = glm::vec3(5.0, 0.0, 0.0);
-
-		// gun
-		/*auto& entity = m_ActiveScene->CreateEntity("Sphere");
-		entity.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
-		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		Ref<Material> mi = entity.GetComponent<MeshComponent>().mesh->GetMaterials()[0];
+		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+
+		auto& entity1 = m_ActiveScene->CreateEntity("plane");
+		entity1.AddComponent<MeshComponent>("Resources/Model/common/plane.obj", false);
+		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 1.0, 10.0);
+		// gun
+		/*auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
+		entity1.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
+		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
+		entity1.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
+		Ref<Material> mi = entity1.GetComponent<MeshComponent>().mesh->GetMaterials()[0];
 		TextureSpecification spec1;
 		spec.isGenerateMipMap = true;
 		spec.isVerticalFlip = true;

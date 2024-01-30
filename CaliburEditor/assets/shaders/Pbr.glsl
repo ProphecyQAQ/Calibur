@@ -84,7 +84,7 @@ float shadowCalculate(vec3 lightDir)
 	float depthValue = viewSpacePos.z;
 
 	uint layer = 1;
-	const uint SHADOW_MAP_CASCADE_COUNT = 5;
+	const uint SHADOW_MAP_CASCADE_COUNT = 4;
 	for (int i = 0; i < SHADOW_MAP_CASCADE_COUNT - 1; i++)
 	{
 		if (depthValue < u_CascadePlaneDistances[i])
