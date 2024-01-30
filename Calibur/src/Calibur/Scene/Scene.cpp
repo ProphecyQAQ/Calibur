@@ -155,6 +155,8 @@ namespace Calibur
 		m_SceneEnv->GetIrradianceMap()->Bind(6);
 		m_SceneEnv->GetPreFilterMap()->Bind(5);
 
+		RenderCommand::SetFaceCulling(false);
+
 		// Render 2D
 		RenderScene2D();
 		

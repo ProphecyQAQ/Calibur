@@ -4,7 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
-namespace Calibur { namespace Math {
+namespace Calibur::Math {
 
 	bool DecomposeTransform(glm::mat4& transform, glm::vec3& translation, glm::vec3& rotation, glm::vec3& scale)
 	{
@@ -78,4 +78,4 @@ namespace Calibur { namespace Math {
 		return true;
 	}
 	
-}}
+}

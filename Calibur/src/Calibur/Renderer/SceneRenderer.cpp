@@ -94,7 +94,7 @@ namespace Calibur
 		m_Scene->RenderScene2D();
 		m_Scene->RenderScene3D(m_DirCSMShader);
 
-		RenderCommand::SetFaceCulling(true, 0);
+		//RenderCommand::SetFaceCulling(true, 0);
 
 		m_CSMFramebuffer->Unbind();
 		m_ActiveFramebuffer->Bind();

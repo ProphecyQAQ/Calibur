@@ -109,7 +109,7 @@ namespace Calibur
 
 		auto& entity1 = m_ActiveScene->CreateEntity("plane");
 		entity1.AddComponent<MeshComponent>("Resources/Model/common/plane.obj", false);
-		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 1.0, 10.0);
+		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 10.0, 10.0);
 		// gun
 		/*auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
 		entity1.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
