@@ -4,6 +4,19 @@
 
 namespace Calibur
 {
+	namespace Utils
+	{
+		glm::mat4 ConvertAiMat4ToGlm(const aiMatrix4x4& aiMat) {
+			// glm::mat4 is column-major, while aiMatrix4x4 is row-major
+			return glm::mat4(
+				aiMat.a1, aiMat.a2, aiMat.a3, aiMat.a4,
+				aiMat.b1, aiMat.b2, aiMat.b3, aiMat.b4,
+				aiMat.c1, aiMat.c2, aiMat.c3, aiMat.c4,
+				aiMat.d1, aiMat.d2, aiMat.d3, aiMat.d4
+			);
+		}
+	}
+
 	static const uint32_t s_MeshImportFlags =
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_Triangulate |             // Make sure we're triangles
@@ -81,6 +94,9 @@ namespace Calibur
 				}
 			}
 		}
+
+		MeshNode& root = m_MeshNodes.emplace_back();
+		TraverseNodes(scene->mRootNode, 0);
 
 		LoadMaterials(scene);
 			
@@ -194,6 +210,36 @@ namespace Calibur
 
 				///////////////////////////////////////////////
 			}
+		}
+	}
+
+	void Mesh::TraverseNodes(aiNode* aNode, uint32_t nodeIndex, const glm::mat4& parentTransform)
+	{
+		MeshNode& node = m_MeshNodes[nodeIndex];
+		node.Name = aNode->mName.C_Str();
+		node.LocalTransform = Utils::ConvertAiMat4ToGlm(aNode->mTransformation);
+
+		glm::mat4 transform = parentTransform * node.LocalTransform;
+		for (size_t i = 0; i < aNode->mNumMeshes; i++)
+		{
+			uint32_t submeshIndex = aNode->mMeshes[i];
+			auto& submesh = m_SubMeshes[submeshIndex];
+			submesh.NodeName = node.Name;
+			submesh.Transform = transform;
+			submesh.LocalTransform = node.LocalTransform;
+
+			node.SubMeshes.push_back(submeshIndex);
+		}
+
+		uint32_t parentNodeIndex = (uint32_t)m_MeshNodes.size() - 1;
+		node.Children.resize(aNode->mNumChildren);
+		for (size_t i = 0; i < aNode->mNumChildren; i++)
+		{
+			MeshNode& child = m_MeshNodes.emplace_back();
+			size_t childIndex = m_MeshNodes.size() - 1;
+			child.Parent = parentNodeIndex;
+			m_MeshNodes[nodeIndex].Children[i] = childIndex;
+			TraverseNodes(aNode->mChildren[i], (uint32_t)childIndex, transform);
 		}
 	}
 }

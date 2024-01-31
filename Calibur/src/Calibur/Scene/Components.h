@@ -23,7 +23,7 @@ namespace Calibur
 		TagComponent(const std::string& tag)
 			: Tag(tag) {}
 	};
-	
+
 	struct TransformComponent
 	{
 		glm::vec3 Translation = {0.0f, 0.0f, 0.0f};

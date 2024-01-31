@@ -36,7 +36,23 @@ namespace Calibur
 		uint32_t IndexCount;
 		uint32_t VertexCount;
 
-		std::string MeshName;
+		glm::mat4 Transform{ 1.0f };
+		glm::mat4 LocalTransform{ 1.0f };
+
+		std::string MeshName, NodeName;
+	};
+
+	class MeshNode
+	{
+	public:
+		uint32_t Parent = 0xffffffff;
+		std::vector<uint32_t> Children;
+		std::vector<uint32_t> SubMeshes;
+		
+		std::string Name;
+		glm::mat4 LocalTransform;
+
+		inline bool IsRoot() const { return Parent == 0xffffffff; }
 	};
 
 	class Mesh
@@ -56,6 +72,8 @@ namespace Calibur
 		std::vector<SubMesh>& GetSubMeshes() { return m_SubMeshes; }
 		std::vector<Ref<Material>>& GetMaterials() { return m_Materials; }
 		std::string& GetFilePath() { return m_FilePath; }
+	private:
+		void TraverseNodes(aiNode* aNode, uint32_t nodeIndex, const glm::mat4& parentTransform = glm::mat4(1.0f));
 
 	private:
 		Ref<VertexBuffer> m_VertexBuffer;
@@ -63,6 +81,7 @@ namespace Calibur
 		Ref<VertexArray> m_VertexArray;
 
 		std::vector<SubMesh> m_SubMeshes;
+		std::vector<MeshNode> m_MeshNodes;
 
 		std::vector<Vertex> m_Vertices;
 		std::vector<Index> m_Indices;
