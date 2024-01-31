@@ -53,11 +53,11 @@ namespace Calibur
 		s_Skybox.vao->AddVertexBuffer(vbo);
 		Ref<IndexBuffer> ibo = IndexBuffer::Create(skyboxIndices, sizeof(skyboxIndices));
 		s_Skybox.vao->SetIndexBuffer(ibo);
-		//s_Skybox.texture = TextureCube::Create("Resources/sIbl/hallstatt4_hd.hdr");
+		//s_Skybox.texture = TextureCube::Create("assets/sIbl/hallstatt4_hd.hdr");
 
 		m_MaterialUniform = UniformBuffer::Create(sizeof(MaterialUniforms), 2);
 
-		m_SceneEnv = CreateRef<SceneEnvironment>("Resources/sIbl/hallstatt4_hd.hdr", true);
+		m_SceneEnv = CreateRef<SceneEnvironment>("assets/sIbl/hallstatt4_hd.hdr", true);
 	}
 
 	Scene::~Scene()
@@ -285,6 +285,7 @@ namespace Calibur
 			auto& transform = view.get<TransformComponent>(entity);
 
 			auto& mesh = view.get<MeshComponent>(entity);
+			if (!mesh.mesh->IsLoaded()) continue;
 			auto& submeshs = mesh.mesh->GetSubMeshes();
 
 			m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));

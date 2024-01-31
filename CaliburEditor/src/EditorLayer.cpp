@@ -28,8 +28,8 @@ namespace Calibur
 		
 		TextureSpecification spec;
 		spec.Wrap = TextureWrap::Repeat;
-		m_IconPlay = Texture2D::Create(spec, "Resources/Icons/PlayButton.png");
-		m_IconStop = Texture2D::Create(spec, "Resources/Icons/StopButton.png");
+		m_IconPlay = Texture2D::Create(spec, "assets/Icons/PlayButton.png");
+		m_IconStop = Texture2D::Create(spec, "assets/Icons/StopButton.png");
 
 		m_ActiveScene = CreateRef<Scene>();
 		m_SceneRenderer = CreateRef<SceneRenderer>(m_ActiveScene);
@@ -103,25 +103,25 @@ namespace Calibur
 		
 		// Teapos
 		auto& entity = m_ActiveScene->CreateEntity("teapot");
-		entity.AddComponent<MeshComponent>("Resources/Model/teapot/teapot.obj", false);
+		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
 		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 
 		auto& entity1 = m_ActiveScene->CreateEntity("plane");
-		entity1.AddComponent<MeshComponent>("Resources/Model/common/plane.obj", false);
+		entity1.AddComponent<MeshComponent>("assets/Model/common/plane.obj", false);
 		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 10.0, 10.0);
 		// gun
 		/*auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
-		entity1.AddComponent<MeshComponent>("Resources/Model/Cerberus/Cerberus_LP.FBX", true);
+		entity1.AddComponent<MeshComponent>("assets/Model/Cerberus/Cerberus_LP.FBX", true);
 		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 		entity1.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
 		Ref<Material> mi = entity1.GetComponent<MeshComponent>().mesh->GetMaterials()[0];
 		TextureSpecification spec1;
 		spec.isGenerateMipMap = true;
 		spec.isVerticalFlip = true;
-		mi->SetNormalMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_N.tga"));
-		mi->SetRoughnessMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_R.tga"));
-		mi->SetSpecMap(Texture2D::Create(spec1, "Resources/Model/Cerberus/Textures/Cerberus_M.tga"));*/
+		mi->SetNormalMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_N.tga"));
+		mi->SetRoughnessMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_R.tga"));
+		mi->SetSpecMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_M.tga"));*/
 	}
 
 	void EditorLayer::OnDetach()

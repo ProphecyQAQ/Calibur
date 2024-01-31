@@ -13,8 +13,8 @@ namespace Calibur
 		TextureSpecification spec;
 		spec.isVerticalFlip = true;
 		spec.Wrap = TextureWrap::Repeat;
-		m_DirectoryIcon = Texture2D::Create(spec, "Resources/Icons/ContentBrowser/DirectoryIcon.png");
-		m_FileIcon = Texture2D::Create(spec, "Resources/Icons/ContentBrowser/FileIcon.png");
+		m_DirectoryIcon = Texture2D::Create(spec, "assets/Icons/ContentBrowser/DirectoryIcon.png");
+		m_FileIcon = Texture2D::Create(spec, "assets/Icons/ContentBrowser/FileIcon.png");
 	}
 
 	void ContentBrowserPanel::OnImguiRender()

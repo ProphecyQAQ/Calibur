@@ -24,8 +24,10 @@ namespace Calibur
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HZ_CORE_ERROR("Assimp import error::{0}", importer.GetErrorString());
-			HZ_CORE_ASSERT(false);
+			//HZ_CORE_ASSERT(false);
 		}
+		
+		m_IsLoaded = true;
 
 		if (scene->HasMeshes())
 		{

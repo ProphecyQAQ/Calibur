@@ -51,6 +51,7 @@ namespace Calibur
 		Ref<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
 		Ref<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
 		Ref<VertexArray> GetVertexArray() { return m_VertexArray; }
+		bool IsLoaded() const { return m_IsLoaded; }
 
 		std::vector<SubMesh>& GetSubMeshes() { return m_SubMeshes; }
 		std::vector<Ref<Material>>& GetMaterials() { return m_Materials; }
@@ -68,6 +69,7 @@ namespace Calibur
 
 		std::vector<Ref<Material>> m_Materials;
 		bool m_IsVerticalFlip = false;
+		bool m_IsLoaded = false;
 
 		std::string m_FilePath;
 	};

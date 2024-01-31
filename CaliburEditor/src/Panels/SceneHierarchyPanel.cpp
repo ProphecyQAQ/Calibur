@@ -369,11 +369,27 @@ namespace Calibur
 			{
 				ImGui::Text("Mesh Name: %s", component.mesh->GetFilePath().c_str());
 
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM"))
+					{
+						const wchar_t* path = (const wchar_t*)payload->Data;
+						std::string filePath = (std::filesystem::path(g_AssetPath) / path).string();
+						Ref<Mesh> newMesh = CreateRef<Mesh>(filePath, false);
+						if (newMesh->IsLoaded())
+							component.mesh = newMesh;
+					}
+
+					ImGui::EndDragDropTarget(); 
+				}
+
 				const ImGuiTreeNodeFlags treeNodeFlags =  ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
 				for (size_t i = 0; i < component.mesh->GetSubMeshes().size(); i++)
 				{
 					ImGui::PushID(i);
+
 					std::string meshName = component.mesh->GetSubMeshes()[i].MeshName;
+
 					bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
 					
 					if (open)
