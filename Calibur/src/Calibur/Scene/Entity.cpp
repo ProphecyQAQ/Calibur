@@ -1,7 +1,6 @@
 #include "hzpch.h"
 #include "Calibur/Scene/Entity.h"
 
-
 namespace Calibur
 {
 	Entity::Entity(entt::entity handle, Scene* scene)

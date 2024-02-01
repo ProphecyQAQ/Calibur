@@ -5,14 +5,21 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 
+#include "Calibur/Core/UUID.h"
 #include "Calibur/Scene/SceneCamera.h"
-#include "Calibur/Scene/ScriptableEntity.h"
 #include "Calibur/Renderer/Mesh.h"
 #include "Calibur/Renderer/Texture.h"
 #include "Calibur/Renderer/Material.h"
 
 namespace Calibur
 {
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(const IDComponent&) = default;
+	};
 	
 	struct TagComponent
 	{
@@ -65,7 +72,8 @@ namespace Calibur
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;
 	};
-
+	
+	class ScriptableEntity;
 	struct NativeScriptComponent
 	{
 		ScriptableEntity* Instance = nullptr;

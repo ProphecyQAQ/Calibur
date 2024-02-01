@@ -1,6 +1,8 @@
 #pragma once
 
+#include "Calibur/Core/UUID.h"
 #include "Calibur/Scene/Scene.h"
+#include "Calibur/Scene/Components.h"
 
 #include "entt.hpp"
 
@@ -51,6 +53,8 @@ namespace Calibur
 		operator bool() const {return m_EntityHandle != entt::null; }
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 		operator entt::entity() const { return (entt::entity)m_EntityHandle; }
+
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 
 		bool operator==(const Entity& other) const { 
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene; }

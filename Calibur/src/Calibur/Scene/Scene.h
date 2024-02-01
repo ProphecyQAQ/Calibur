@@ -2,6 +2,7 @@
 
 #include "entt.hpp"
 #include "Calibur/Core/TimeStep.h"
+#include "Calibur/Core/UUID.h"
 #include "Calibur/Renderer/EditorCamera.h"
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
@@ -53,6 +54,7 @@ namespace Calibur
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
 
 		entt::registry& Reg() { return m_Registry; }
