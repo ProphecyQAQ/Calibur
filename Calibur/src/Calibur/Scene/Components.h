@@ -20,6 +20,17 @@ namespace Calibur
 		IDComponent() = default;
 		IDComponent(const IDComponent&) = default;
 	};
+
+	struct RelationshipComponent
+	{
+		UUID ParentID;
+		std::vector<UUID> Children;
+
+		RelationshipComponent() = default;
+		RelationshipComponent(const RelationshipComponent& other) = default;
+		RelationshipComponent(UUID parent)
+			: ParentID(parent) {}
+	};
 	
 	struct TagComponent
 	{
@@ -92,6 +103,7 @@ namespace Calibur
 	struct MeshComponent
 	{
 		Ref<Mesh> mesh;
+		uint32_t SubmeshIndex = 0;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;

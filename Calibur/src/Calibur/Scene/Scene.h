@@ -54,6 +54,7 @@ namespace Calibur
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		Entity CreateChildEntity(Entity parent, const std::string& name = std::string());
 		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
 

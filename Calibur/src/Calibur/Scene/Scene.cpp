@@ -67,7 +67,24 @@ namespace Calibur
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		return CreateEntityWithUUID(UUID(), name);
+		return CreateChildEntity({}, name);
+	}
+
+	Entity Scene::CreateChildEntity(Entity parent, const std::string& name)
+	{
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<IDComponent>(UUID());
+
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.Tag = name.empty() ? "Entity" : name;
+
+		auto& relationship = entity.AddComponent<RelationshipComponent>();
+
+		if (parent)
+			entity.SetParent(parent);
+
+		return entity;
 	}
 
 	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
@@ -359,6 +376,11 @@ namespace Calibur
 
 	template<>
 	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<RelationshipComponent>(Entity entity, RelationshipComponent& component)
 	{
 	}
 

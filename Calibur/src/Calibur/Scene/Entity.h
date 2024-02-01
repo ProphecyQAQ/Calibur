@@ -56,6 +56,33 @@ namespace Calibur
 
 		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 
+		void SetParent(Entity parent)
+		{
+			// Set parent
+			SetParentUUID(parent.GetUUID());
+
+			// Set parent's children
+			parent.Children().emplace_back(GetUUID());
+		}
+
+		void SetParentUUID(UUID uuid) { GetComponent<RelationshipComponent>().ParentID = uuid; }
+		UUID GetParentUUID() { return GetComponent<RelationshipComponent>().ParentID; }
+		std::vector<UUID>& Children() { return GetComponent<RelationshipComponent>().Children; }
+
+		bool RemoveChild(Entity child)
+		{
+			UUID childID = child.GetUUID();
+			std::vector<UUID>& children = Children();
+			auto it = std::find(children.begin(), children.end(), childID);
+
+			if (it != children.end())
+			{
+				children.erase(it);
+				return true;
+			}
+			return false;
+		}
+
 		bool operator==(const Entity& other) const { 
 			return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene; }
 		bool operator!=(const Entity& other) const { return !(*this == other); }
