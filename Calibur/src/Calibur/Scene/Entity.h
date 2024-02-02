@@ -56,6 +56,7 @@ namespace Calibur
 
 		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 
+		bool HasParent();
 		void SetParent(Entity parent)
 		{
 			// Set parent

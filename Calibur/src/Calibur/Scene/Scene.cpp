@@ -84,6 +84,8 @@ namespace Calibur
 		if (parent)
 			entity.SetParent(parent);
 
+		m_EntityMap[entity.GetUUID()] = entity;
+
 		return entity;
 	}
 
@@ -95,11 +97,23 @@ namespace Calibur
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 
+		m_EntityMap[uuid] = entity;
+
 		return entity;
 	}
 
+	// Remove child entity
 	void Scene::DestroyEntity(Entity entity)
 	{
+		UUID id = entity.GetUUID();
+		
+		// Remove Children
+		for (auto child : entity.Children())
+		{
+			DestroyEntity(m_EntityMap[id]);
+		}
+
+		m_EntityMap.erase(id);
 		m_Registry.destroy(entity);
 	}
 
@@ -303,16 +317,18 @@ namespace Calibur
 	{
 		Renderer::BeginScene();
 			
-		auto view = m_Registry.view<TransformComponent, MeshComponent>();
-		for (auto entity : view)
+		auto view = m_Registry.view<TransformComponent, RelationshipComponent>();
+		for (auto entityID : view)
 		{
-			auto& transform = view.get<TransformComponent>(entity);
+			Entity entity(entityID, this);
 
-			auto& mesh = view.get<MeshComponent>(entity);
-			if (!mesh.mesh->IsLoaded()) continue;
-			auto& submeshs = mesh.mesh->GetSubMeshes();
+			if (entity.HasParent()) continue;
 
-			m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+			auto& transform = entity.GetComponent<TransformComponent>();
+		
+			TraverseRenderScene3D(entity, glm::mat4(1.0f), shader);
+
+			/*m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
@@ -335,10 +351,51 @@ namespace Calibur
 					material->GetShader()->Unbind();
 				else
 					shader->Unbind();
-			}
+			}*/
 		}
 
 		Renderer::EndScene();
+	}
+
+	void Scene::TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, Ref<Shader> shader)
+	{
+		glm::mat4 transform = parentTransform * entity.GetComponent<TransformComponent>().GetTransform();
+
+		if (entity.HasComponent<MeshComponent>())
+		{
+			// Render
+			auto& mesh = entity.GetComponent<MeshComponent>();
+			uint32_t submeshIndex = mesh.SubmeshIndex;
+			auto& submeshs = mesh.mesh->GetSubMeshes()[submeshIndex];
+			auto& material = mesh.mesh->GetMaterials()[submeshs.MaterialIndex];
+
+			m_Renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
+			m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
+
+			if (shader == nullptr)
+				material->GetShader()->Bind();
+			else
+				shader->Bind();
+
+			material->GetDiffuseMap()->Bind(0);
+			if (material->GetMaterialUniforms().useNormalMap == 1)
+				material->GetNormalMap()->Bind(1);
+			material->GetSpecMap()->Bind(2);
+			material->GetRoughnessMap()->Bind(3);
+
+			Renderer::RenderMesh(mesh.mesh, submeshIndex);
+
+			if (shader == nullptr)
+				material->GetShader()->Unbind();
+			else
+				shader->Unbind();
+		}
+
+		auto& children = entity.Children();
+		for (auto& childID : children)
+		{
+			TraverseRenderScene3D(m_EntityMap[childID], transform, shader);
+		}
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -366,6 +423,37 @@ namespace Calibur
 			if (camera.Primary) return Entity(entity, this);
 		}
 		return {};
+	}
+
+	void Scene::LoadModel(const std::string& filepath, bool isVerticalFilp)
+	{
+		Ref<Mesh> mesh = CreateRef<Mesh>(filepath, isVerticalFilp);
+		size_t slashId = filepath.find_last_of('/');
+		size_t dotId = filepath.find_last_of('.');
+
+		std::string name = filepath.substr(slashId + 1, dotId - slashId - 1);
+		TravserCreateEntity(mesh, {}, 0);
+ 	}
+
+	void Scene::TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t meshNodeId)
+	{
+		auto& meshNode = mesh->GetMeshNodes()[meshNodeId];
+		auto& subMeshs = meshNode.SubMeshes;
+		auto& children = meshNode.Children;
+		std::string& name = meshNode.Name;
+		Entity entity = CreateChildEntity(parent, name);
+
+		// Set entity sub mesh
+		for (size_t i = 0; i < subMeshs.size(); i++)
+		{
+			entity.AddComponent<MeshComponent>(mesh, subMeshs[i]);
+		}
+		
+		// Traverse children
+		for (size_t i = 0; i < children.size(); i++)
+		{
+			TravserCreateEntity(mesh, entity, children[i]);
+		}
 	}
 
 	template<typename T>

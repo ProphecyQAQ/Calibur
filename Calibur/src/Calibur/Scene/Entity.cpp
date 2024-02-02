@@ -8,5 +8,15 @@ namespace Calibur
 	{
 	}
 
+	bool Entity::HasParent()
+	{
+		UUID& parentID = GetComponent<RelationshipComponent>().ParentID;
+
+		if (m_Scene->m_EntityMap.find(parentID) != m_Scene->m_EntityMap.end())
+		{
+			return true;
+		}
+		return false;
+	}
 
 }

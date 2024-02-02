@@ -70,6 +70,7 @@ namespace Calibur
 		bool IsLoaded() const { return m_IsLoaded; }
 
 		std::vector<SubMesh>& GetSubMeshes() { return m_SubMeshes; }
+		std::vector<MeshNode>& GetMeshNodes() { return m_MeshNodes; }
 		std::vector<Ref<Material>>& GetMaterials() { return m_Materials; }
 		std::string& GetFilePath() { return m_FilePath; }
 	private:

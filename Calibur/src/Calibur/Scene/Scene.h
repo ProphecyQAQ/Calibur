@@ -66,8 +66,12 @@ namespace Calibur
 
 		void RenderScene2D();
 		void RenderScene3D(Ref<Shader> shader = nullptr);
+		void TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, Ref<Shader> shader = nullptr);
 	
 		Entity GetPrimaryCameraEntity();
+
+		void LoadModel(const std::string& filepath, bool isVerticalFilp = false);
+		void TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t subMeshId);
 
 		Ref<SceneEnvironment> m_SceneEnv;
 	private:
@@ -79,6 +83,8 @@ namespace Calibur
 		
 		Ref<UniformBuffer> m_MaterialUniform;
 		Ref<SceneRenderer> m_Renderer;
+
+		std::unordered_map<UUID, Entity> m_EntityMap;
 
 		friend class Entity;
 		friend class SceneSerializer;

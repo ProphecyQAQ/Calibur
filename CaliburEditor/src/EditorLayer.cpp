@@ -102,6 +102,9 @@ namespace Calibur
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 		
 		// Teapos
+		/*auto& entity = m_ActiveScene->CreateEntity("nanosuit");
+		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
+		m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
 		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -111,7 +114,7 @@ namespace Calibur
 		entity1.AddComponent<MeshComponent>("assets/Model/common/plane.obj", false);
 		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 10.0, 10.0);*/
 		// gun
-		auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
+		/*auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
 		entity1.AddComponent<MeshComponent>("assets/Model/Cerberus/Cerberus_LP.FBX", true);
 		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
 		entity1.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -120,8 +123,7 @@ namespace Calibur
 		spec.isGenerateMipMap = true;
 		spec.isVerticalFlip = true;
 		mi->SetNormalMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_N.tga"));
-		mi->SetRoughnessMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_R.tga"));
-		mi->SetSpecMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_M.tga"));
+		mi->SetRoughnessMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_R.tg*/
 	}
 
 	void EditorLayer::OnDetach()

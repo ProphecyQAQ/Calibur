@@ -23,7 +23,7 @@ namespace Calibur
 
 	struct RelationshipComponent
 	{
-		UUID ParentID;
+		UUID ParentID = 0;
 		std::vector<UUID> Children;
 
 		RelationshipComponent() = default;
@@ -109,8 +109,8 @@ namespace Calibur
 		MeshComponent(const MeshComponent&) = default;
 		MeshComponent(const std::string& filepath, bool isVerticalFlip)
 			: mesh(std::make_shared<Mesh>(filepath, isVerticalFlip)) {}
-		MeshComponent(const Ref<Mesh>& mesh)
-			: mesh(mesh) {}
+		MeshComponent(const Ref<Mesh>& mesh, uint32_t index)
+			: mesh(mesh), SubmeshIndex(index) {}
 	};
 
 	enum class LightType
