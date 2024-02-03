@@ -43,7 +43,9 @@ namespace Calibur
 		m_Context->m_Registry.each([this](auto entityID)
 			{
 				Entity entity{ entityID, m_Context.get() };
-				DrawEntityNode(entity);
+
+				if (!entity.HasParent()) // start form parent entity
+					DrawEntityNode(entity);
 			});
 	
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -97,10 +99,12 @@ namespace Calibur
 
 		if (opened)
 		{
-			ImGuiTreeNodeFlags flags = ((m_SelectionContext == entity) ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-			bool opened = ImGui::TreeNodeEx((void*)123456, flags, tag.c_str());
-			if (opened)
-				ImGui::TreePop();
+			auto& children = entity.Children();
+			for (auto& child : children)
+			{
+				DrawEntityNode(m_Context->m_EntityMap[child]);
+			}
+
 			ImGui::TreePop();
 		}
 
@@ -384,25 +388,22 @@ namespace Calibur
 				}
 
 				const ImGuiTreeNodeFlags treeNodeFlags =  ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
-				for (size_t i = 0; i < component.mesh->GetSubMeshes().size(); i++)
+				uint32_t submeshID = component.SubmeshIndex;
+				auto &submesh = component.mesh->GetSubMeshes()[submeshID];
+
+				std::string meshName = submesh.MeshName;
+
+				bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
+				
+				if (open)
 				{
-					ImGui::PushID(i);
+					int materialIndex = submesh.MaterialIndex;
+					Ref<Material>& material = component.mesh->GetMaterials()[materialIndex];
 
-					std::string meshName = component.mesh->GetSubMeshes()[i].MeshName;
-
-					bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
-					
-					if (open)
-					{
-						int materialIndex = component.mesh->GetSubMeshes()[i].MaterialIndex;
-						Ref<Material>& material = component.mesh->GetMaterials()[materialIndex];
-
-						ImGui::DragFloat3("Albedo", (float*)& material->GetMaterialUniforms().Albedo, 0.01, 0.01, 1.0);
-						ImGui::DragFloat("Roughness", &material->GetMaterialUniforms().Roughness, 0.001f, 0.0f, 1.0f);
-						ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
-						ImGui::TreePop();
-					}
-					ImGui::PopID();
+					ImGui::DragFloat3("Albedo", (float*)& material->GetMaterialUniforms().Albedo, 0.01, 0.01, 1.0);
+					ImGui::DragFloat("Roughness", &material->GetMaterialUniforms().Roughness, 0.001f, 0.0f, 1.0f);
+					ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
+					ImGui::TreePop();
 				}
 			});
 

@@ -104,7 +104,8 @@ namespace Calibur
 		// Teapos
 		/*auto& entity = m_ActiveScene->CreateEntity("nanosuit");
 		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
-		m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
+		//m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
+		m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", false);
 		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
