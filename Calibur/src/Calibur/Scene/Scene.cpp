@@ -80,7 +80,6 @@ namespace Calibur
 		tag.Tag = name.empty() ? "Entity" : name;
 
 		auto& relationship = entity.AddComponent<RelationshipComponent>();
-
 		if (parent)
 			entity.SetParent(parent);
 
@@ -322,13 +321,18 @@ namespace Calibur
 		{
 			Entity entity(entityID, this);
 
-			if (entity.HasParent()) continue;
+			//if (entity.HasParent()) continue;
 
 			auto& transform = entity.GetComponent<TransformComponent>();
-		
-			TraverseRenderScene3D(entity, glm::mat4(1.0f), shader);
 
-			/*m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
+			//TraverseRenderScene3D(entity, glm::mat4(1.0f), shader);
+			if (!entity.HasComponent<MeshComponent>())
+			{
+				continue;
+			}
+			auto& mesh = entity.GetComponent<MeshComponent>();
+			auto& submeshs = mesh.mesh->GetSubMeshes();
+			m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
 			for (size_t id = 0; id < submeshs.size(); id++)
 			{
 				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
@@ -351,7 +355,7 @@ namespace Calibur
 					material->GetShader()->Unbind();
 				else
 					shader->Unbind();
-			}*/
+			}
 		}
 
 		Renderer::EndScene();
@@ -365,30 +369,35 @@ namespace Calibur
 		{
 			// Render
 			auto& mesh = entity.GetComponent<MeshComponent>();
-			uint32_t submeshIndex = mesh.SubmeshIndex;
-			auto& submeshs = mesh.mesh->GetSubMeshes()[submeshIndex];
-			auto& material = mesh.mesh->GetMaterials()[submeshs.MaterialIndex];
 
-			m_Renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
-			m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
+			for (size_t i = 0; i < mesh.SubmeshIndices.size(); i++)
+			{
+				uint32_t submeshIndex = mesh.SubmeshIndices[i];
+				auto& submeshs = mesh.mesh->GetSubMeshes()[submeshIndex];
+				auto& material = mesh.mesh->GetMaterials()[submeshs.MaterialIndex];
 
-			if (shader == nullptr)
-				material->GetShader()->Bind();
-			else
-				shader->Bind();
+				m_Renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
+				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
 
-			material->GetDiffuseMap()->Bind(0);
-			if (material->GetMaterialUniforms().useNormalMap == 1)
-				material->GetNormalMap()->Bind(1);
-			material->GetSpecMap()->Bind(2);
-			material->GetRoughnessMap()->Bind(3);
+				if (shader == nullptr)
+					material->GetShader()->Bind();
+				else
+					shader->Bind();
 
-			Renderer::RenderMesh(mesh.mesh, submeshIndex);
+				material->GetDiffuseMap()->Bind(0);
+				if (material->GetMaterialUniforms().useNormalMap == 1)
+					material->GetNormalMap()->Bind(1);
+				material->GetSpecMap()->Bind(2);
+				material->GetRoughnessMap()->Bind(3);
 
-			if (shader == nullptr)
-				material->GetShader()->Unbind();
-			else
-				shader->Unbind();
+				Renderer::RenderMesh(mesh.mesh, submeshIndex);
+
+				if (shader == nullptr)
+					material->GetShader()->Unbind();
+				else
+					shader->Unbind();
+
+			}
 		}
 
 		auto& children = entity.Children();
@@ -442,11 +451,15 @@ namespace Calibur
 		auto& children = meshNode.Children;
 		std::string& name = meshNode.Name;
 		Entity entity = CreateChildEntity(parent, name);
+		entity.GetComponent<TransformComponent>().SetTransform(meshNode.LocalTransform);
+
+		if (subMeshs.size() > 0) 
+			entity.AddComponent<MeshComponent>(mesh);
 
 		// Set entity sub mesh
 		for (size_t i = 0; i < subMeshs.size(); i++)
 		{
-			entity.AddComponent<MeshComponent>(mesh, subMeshs[i]);
+			entity.GetComponent<MeshComponent>().SubmeshIndices.push_back(subMeshs[i]);
 		}
 		
 		// Traverse children
@@ -454,6 +467,20 @@ namespace Calibur
 		{
 			TravserCreateEntity(mesh, entity, children[i]);
 		}
+	}
+
+	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		glm::mat4 transform(1.0f);
+
+		if (entity.HasParent())
+		{
+			transform = GetWorldSpaceTransformMatrix(m_EntityMap[entity.GetParentUUID()]);
+		}
+
+		return transform * entity.GetComponent<TransformComponent>().GetTransform();
 	}
 
 	template<typename T>

@@ -124,9 +124,9 @@ vec3 IBL(vec3 F0, vec3 normal, vec3 viewDir, vec3 reflectDir, float roughness, f
 	vec3 prefilter = textureLod(u_EnvPrefilterTex, reflectDir, roughness * MAX_REFLECTION_LOD).rgb;
 	vec2 brdf  = texture(u_BrdfLut, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
 
-	vec3 specular = (prefilter * (F * brdf.x + brdf.y));
+	vec3 specular = prefilter * (F * brdf.x + brdf.y);
 
-	vec3 ambient = irradiance * Albedo.rgb * kD + specular;
+	vec3 ambient = irradiance * m_Params.Albedo * kD + specular;
 
 	return ambient;
 }
@@ -149,8 +149,9 @@ void main()
 	float lod = CalculateLOD(Input.texCoord);
 
 	vec3 diffuseColor = textureLod(u_DiffuseTexture, Input.texCoord, lod).rgb;
+	m_Params.Albedo = diffuseColor * Albedo.rgb;
 	float metallic = textureLod(u_SpecTexture, Input.texCoord, 0.0).r * Metallic;
-	float roughness = textureLod(u_RoughnessTexture, Input.texCoord, 0.0).r * Roughness;
+	float roughness = max(textureLod(u_RoughnessTexture, Input.texCoord, 0.0).r * Roughness, 0.05);
 
 	// Base fresnel
 	vec3 F0 = vec3(0.04);
@@ -185,9 +186,11 @@ void main()
 
 		float NdotL = max(dot(normal, lightDir), 0.0);
 
-		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * u_DirectionalLights[i].Radiance * u_DirectionalLights[i].Intensity * NdotL * shadow; 
+		Lo += (kD * diffuseColor * m_Params.Albedo / PI + specular) * u_DirectionalLights[i].Radiance * u_DirectionalLights[i].Intensity * NdotL * shadow; 
 	}
 	
+
+	// Calcute Point light
 	for (uint i = 0; i < u_PointLightCount; i ++)
 	{
 		// lighting vector
@@ -214,7 +217,7 @@ void main()
 
 		float NdotL = max(dot(normal, lightDir), 0.0);
 
-		Lo += (kD * diffuseColor * Albedo.rgb / PI + specular) * radiance * NdotL; 
+		Lo += (kD * diffuseColor * m_Params.Albedo / PI + specular) * radiance * NdotL * u_PointLights[i].Intensity; 
 	}
 
 	// IBL

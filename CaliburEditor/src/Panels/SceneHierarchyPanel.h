@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Calibur/Core/Base.h"
-#include "Calibur/Core/Log.h"
 #include "Calibur/Scene/Scene.h"
 #include "Calibur/Scene/Entity.h"
 

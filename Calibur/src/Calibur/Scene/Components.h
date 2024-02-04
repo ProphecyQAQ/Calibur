@@ -6,6 +6,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Calibur/Core/UUID.h"
+#include "Calibur/Math/Math.h"
 #include "Calibur/Scene/SceneCamera.h"
 #include "Calibur/Renderer/Mesh.h"
 #include "Calibur/Renderer/Texture.h"
@@ -60,6 +61,10 @@ namespace Calibur
 			return glm::translate(glm::mat4(1.0f), Translation) *
 				rotation * glm::scale(glm::mat4(1.0f), Scale);
 		}
+		void SetTransform(glm::mat4& transform)
+		{
+			Math::DecomposeTransform(transform, Translation, Rotation, Scale);
+		}
 	};
 
 	struct SpriteRendererComponent
@@ -103,14 +108,14 @@ namespace Calibur
 	struct MeshComponent
 	{
 		Ref<Mesh> mesh;
-		uint32_t SubmeshIndex = 0;
+		std::vector<uint32_t> SubmeshIndices;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
 		MeshComponent(const std::string& filepath, bool isVerticalFlip)
 			: mesh(std::make_shared<Mesh>(filepath, isVerticalFlip)) {}
-		MeshComponent(const Ref<Mesh>& mesh, uint32_t index)
-			: mesh(mesh), SubmeshIndex(index) {}
+		MeshComponent(Ref<Mesh> mesh)
+			: mesh(mesh) {}
 	};
 
 	enum class LightType

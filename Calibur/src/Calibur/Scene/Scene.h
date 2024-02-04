@@ -73,6 +73,8 @@ namespace Calibur
 		void LoadModel(const std::string& filepath, bool isVerticalFilp = false);
 		void TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t subMeshId);
 
+		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
+
 		Ref<SceneEnvironment> m_SceneEnv;
 	private:
 		template<typename T>

@@ -20,5 +20,5 @@ Intermediates/
 # Directories
 Calibur/vendor/VulkanSDK
 CaliburEditor/assets/cache
-CaliburEditor/assets/Model/Cerberus
+CaliburEditor/assets/LocalModel
 scripts/__pycache__

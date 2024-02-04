@@ -388,23 +388,31 @@ namespace Calibur
 				}
 
 				const ImGuiTreeNodeFlags treeNodeFlags =  ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_FramePadding;
-				uint32_t submeshID = component.SubmeshIndex;
-				auto &submesh = component.mesh->GetSubMeshes()[submeshID];
 
-				std::string meshName = submesh.MeshName;
-
-				bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
-				
-				if (open)
+				for (auto& submeshID : component.SubmeshIndices)
 				{
-					int materialIndex = submesh.MaterialIndex;
-					Ref<Material>& material = component.mesh->GetMaterials()[materialIndex];
+					ImGui::PushID(submeshID);
 
-					ImGui::DragFloat3("Albedo", (float*)& material->GetMaterialUniforms().Albedo, 0.01, 0.01, 1.0);
-					ImGui::DragFloat("Roughness", &material->GetMaterialUniforms().Roughness, 0.001f, 0.0f, 1.0f);
-					ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
-					ImGui::TreePop();
+					auto &submesh = component.mesh->GetSubMeshes()[submeshID];
+
+					std::string meshName = submesh.MeshName;
+
+					bool open = ImGui::TreeNodeEx((void*)(&meshName), treeNodeFlags, meshName.c_str());
+					
+					if (open)
+					{
+						int materialIndex = submesh.MaterialIndex;
+						Ref<Material>& material = component.mesh->GetMaterials()[materialIndex];
+
+						ImGui::DragFloat3("Albedo", (float*)& material->GetMaterialUniforms().Albedo, 0.01, 0.01, 1.0);
+						ImGui::DragFloat("Roughness", &material->GetMaterialUniforms().Roughness, 0.001f, 0.0f, 1.0f);
+						ImGui::DragFloat("Metallic", &material->GetMaterialUniforms().Metallic, 0.001f, 0.0f, 1.0f);
+						ImGui::TreePop();
+					}
+
+					ImGui::PopID();
 				}
+
 			});
 
 		DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](auto& component)

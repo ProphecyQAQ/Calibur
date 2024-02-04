@@ -38,6 +38,7 @@ namespace Calibur
 		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH32FSTENCIL8};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
+		fbSpec.Samples = 1;
 		m_Framebuffer = Framebuffer::Create(fbSpec);
 		
 		m_CameraController.SetZoomLevel(4.f);
@@ -104,8 +105,9 @@ namespace Calibur
 		// Teapos
 		/*auto& entity = m_ActiveScene->CreateEntity("nanosuit");
 		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
-		//m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
-		m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", false);
+		m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
+		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", true);
+		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", false);
 		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -339,7 +341,7 @@ namespace Calibur
 
 			// Entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
-			glm::mat4 transform = tc.GetTransform();
+			glm::mat4 transform = m_ActiveScene->GetWorldSpaceTransformMatrix(selectedEntity);
 
 			// Snapping
 			bool snap = Input::IsKeyPressed(Key::LeftControl);
@@ -349,10 +351,24 @@ namespace Calibur
 
 			float snapValues[3] = { snapValue, snapValue, snapValue };
 
-			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjeciton), (ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform), nullptr, snap ? snapValues : nullptr);
+			ImGuizmo::Manipulate(
+				glm::value_ptr(cameraView), 
+				glm::value_ptr(cameraProjeciton), 
+				(ImGuizmo::OPERATION)m_GizmoType, 
+				ImGuizmo::LOCAL, 
+				glm::value_ptr(transform), 
+				nullptr, 
+				snap ? snapValues : nullptr);
 
 			if (ImGuizmo::IsUsing())
 			{
+				if (selectedEntity.HasParent())
+				{
+					auto parent = selectedEntity.GetParentUUID();
+					glm::mat4 parentTransform = m_ActiveScene->GetWorldSpaceTransformMatrix(m_ActiveScene->CreateEntityWithUUID(parent));
+					transform = glm::inverse(parentTransform) * transform;
+				}
+
 				glm::vec3 translation, rotation, scale;
 				Math::DecomposeTransform(transform, translation, rotation, scale);
 

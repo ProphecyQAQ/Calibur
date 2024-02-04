@@ -21,11 +21,14 @@ namespace Calibur
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_Triangulate |             // Make sure we're triangles
 		aiProcess_GenNormals |              // Make sure we have legit normals
+		//aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_GenUVCoords |             // Convert UVs if required 
 		//aiProcess_OptimizeGraph |          
-		//aiProcess_OptimizeMeshes |          // Batch draws where possible
-		//aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
+		aiProcess_OptimizeMeshes |          // Batch draws where possible
+		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
+		aiProcess_GlobalScale |             // e.g. convert cm to m for fbx import (and other formats where cm is native)
 		aiProcess_ValidateDataStructure;    // Validation
+		//aiProcess_PreTransformVertices;
 
 
 	Mesh::Mesh(std::string filepath, bool isVerticalFlip)
@@ -37,7 +40,7 @@ namespace Calibur
 		if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 		{
 			HZ_CORE_ERROR("Assimp import error::{0}", importer.GetErrorString());
-			//HZ_CORE_ASSERT(false);
+			HZ_CORE_ASSERT(false);
 		}
 		
 		m_IsLoaded = true;
