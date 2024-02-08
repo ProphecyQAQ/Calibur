@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Calibur/Scene/Scene.h"
+#include "Calibur/Scene/Entity.h"
 #include "Calibur/Renderer/Camera.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 
@@ -29,7 +30,6 @@ namespace Calibur
 
 		void SubmitLight(SceneLightData& lightData);
 
-
 		struct CascadeData
 		{
 			glm::mat4 ViewProj;
@@ -38,14 +38,18 @@ namespace Calibur
 		};
 		void GenerateShadowMap(const SceneLightData& lightData);
 		void CalculateCascades(const glm::vec3& lightDirection);
+		
+		void TaaPass();
 
 		void SetScene(Ref<Scene> scene) { m_Scene = scene; } 
 		void SetFramebuffer(Ref<Framebuffer>& fbo) { m_ActiveFramebuffer = fbo; }
 
 		Ref<UniformBuffer>& GetTransformUB() { return m_TransformBuffer; }
 	private:
-		// Framebuffer will render for scene
-		Ref<Framebuffer> m_ActiveFramebuffer; 
+		// Framebuffer will show the final result
+		Ref<Framebuffer> m_ActiveFramebuffer;
+		// Main framebuffer
+		Ref<Framebuffer> m_MainFramebuffer;
 
 		Ref<Scene> m_Scene;
 
@@ -53,6 +57,7 @@ namespace Calibur
 		Ref<UniformBuffer> m_CameraUniformBuffer;
 		Ref<UniformBuffer> m_TransformBuffer;
 		Ref<UniformBuffer> m_LightMatricesBuffer;
+		Ref<UniformBuffer> m_TaaParamBuffer;
 
 		// Dir CSM data
 		Ref<Framebuffer> m_CSMFramebuffer;
@@ -65,12 +70,19 @@ namespace Calibur
 		// Current scene data
 		SceneRenderCamera m_SceneRenderCamera;
 
+		// Previous framebuffer reslut
+		Ref<Texture2D> m_PreviousFrame;
+		Ref<Texture2D> m_CurrentFrame;
+		Ref<Texture2D> m_MotionVertor;
+		Ref<Texture2D> m_CurrentDepth;
+
 	private:
 
 		struct CameraUBData
 		{
 			glm::mat4 ViewProjectionMatrix;
 			glm::mat4 ViewMatrix;
+			glm::mat4 ProjectionMatrix;
 			glm::vec4 CameraPosition;
 		} CameraUB;
 
@@ -88,5 +100,16 @@ namespace Calibur
 			PointLight lights[16];
 		} PointLightUB;
 
+		struct TaaParamUBData
+		{
+			glm::mat4 PreView;
+			glm::mat4 PreProjection;
+			float ScreenWidth;
+			float ScreenHeight;
+			float DeltaTime;
+			uint32_t FrameIndex;
+		} TaaParamUB;
+
+		friend class EditorLayer;
 	};
 }

@@ -23,9 +23,12 @@ namespace Calibur
 		virtual void SetDepthAttachment(uint32_t renderID) override;
 
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) override;
+		virtual void ClearAttachment(uint32_t attachmentIndex, glm::vec2& value) override;
 
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index) const override { 
 			HZ_CORE_ASSERT(index < m_ColorAttachments.size()); return m_ColorAttachments[index]; }
+		
+		virtual uint32_t GetDepthAttachmentRendererID() const override { return m_DepthAttachment; }
 
 		virtual const FramebufferSpecification& GetSpecificaition() const override { return m_Specification; }
 		float GetWidth() override { return m_Specification.Width; }

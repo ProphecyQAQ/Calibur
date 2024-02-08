@@ -132,7 +132,7 @@ namespace Calibur
 				auto aiMaterial = scene->mMaterials[i];
 				auto aiMateriaName = aiMaterial->GetName();
 
-				Ref<Material> material = Material::Create(Renderer::GetShaderLibrary()->Get("Pbr"), aiMateriaName.C_Str());
+				Ref<Material> material = Material::Create(Renderer::GetShaderLibrary()->Get("Pbr_withMotion"), aiMateriaName.C_Str());
 				m_Materials[i] = material;
 				
 				///////////// Material Properties //////////////

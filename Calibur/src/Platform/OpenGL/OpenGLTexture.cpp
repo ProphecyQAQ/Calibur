@@ -18,6 +18,8 @@ namespace Calibur
 					return GL_RGBA;
 				case ImageFormat::RG16F:
 					return GL_RG;
+				case ImageFormat::DEPTH24STENCIL8:
+					return GL_DEPTH_STENCIL;
 				case ImageFormat::DEPTH32F:
 					return GL_DEPTH_COMPONENT;
 			}
@@ -38,6 +40,8 @@ namespace Calibur
 					return GL_RGB16F;
 				case ImageFormat::RG16F:
 					return GL_RG16F;
+				case ImageFormat::DEPTH24STENCIL8:
+					return GL_DEPTH24_STENCIL8;
 				case ImageFormat::DEPTH32F:
 					return GL_DEPTH_COMPONENT32F;
 			}
@@ -55,6 +59,7 @@ namespace Calibur
 					return GL_UNSIGNED_BYTE;
 				case ImageFormat::RGB16F:
 				case ImageFormat::RG16F:
+				case ImageFormat::DEPTH24STENCIL8:
 				case ImageFormat::DEPTH32F:
 					return GL_FLOAT;
 			}
@@ -237,6 +242,13 @@ namespace Calibur
 		uint32_t bpc = m_DataFormat == GL_RGBA ? 4 : 3;
 		HZ_CORE_ASSERT(size == m_Height * m_Width * bpc, "Data must be entire texture!");
 		glTextureSubImage2D(m_RendererID, 0, 0, 0, m_Width, m_Height, m_DataFormat, GL_UNSIGNED_BYTE, data);
+	}
+
+	void OpenGLTexture2D::CopyDataFromAnotherTexture(uint32_t texID)
+	{
+		HZ_PROFILE_FUNCTION();
+
+		glCopyImageSubData(texID, GL_TEXTURE_2D, 0, 0, 0, 0, m_RendererID, GL_TEXTURE_2D, 0, 0, 0, 0, m_Width, m_Height, 1);
 	}
 
 	void OpenGLTexture2D::GenerateMipmap()

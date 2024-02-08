@@ -83,6 +83,7 @@ namespace Calibur
 			{
 			case FramebufferTextureFormat::RGBA8: return GL_RGBA8;
 			case FramebufferTextureFormat::RGB16F: return GL_RGB16F;
+			case FramebufferTextureFormat::RG16F: return GL_RG16F;
 			case FramebufferTextureFormat::RED_INTEGER: return GL_RED_INTEGER;
 			}
 			
@@ -147,6 +148,10 @@ namespace Calibur
 						
 					case FramebufferTextureFormat::RGB16F:
 						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RGB16F, GL_RGB, m_Specification.Width, m_Specification.Height, i);  
+						break;
+
+					case FramebufferTextureFormat::RG16F:
+						Utils::AttachColorTexture(m_ColorAttachments[i], m_Specification.Samples, GL_RG16F, GL_RG, m_Specification.Width, m_Specification.Height, i);  
 						break;
 
 					case FramebufferTextureFormat::RED_INTEGER:
@@ -259,5 +264,14 @@ namespace Calibur
 		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
 
 		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, Utils::CaliburFBTextureFormatToGL(spec.TextureFormat), GL_INT, &value);
+	}
+	// TODO : Remove
+	void OpenGLFramebuffer::ClearAttachment(uint32_t attachmentIndex, glm::vec2& value)
+	{
+		HZ_CORE_ASSERT(attachmentIndex < m_ColorAttachments.size());
+
+		auto& spec = m_ColorAttachmentSpecifications[attachmentIndex];
+
+		glClearTexImage(m_ColorAttachments[attachmentIndex], 0, GL_RG, GL_FLOAT, &value);
 	}
 }

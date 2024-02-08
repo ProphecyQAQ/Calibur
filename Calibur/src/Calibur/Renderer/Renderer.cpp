@@ -34,6 +34,8 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/prefilteredConvolution.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/BrdfLut.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/DirLightCSM.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr_withMotion.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/Taa.glsl");
 	}
 
 	void Renderer::Shutdown()

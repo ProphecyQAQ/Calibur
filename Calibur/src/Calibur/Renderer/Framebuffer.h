@@ -11,6 +11,7 @@ namespace Calibur
 		//Color
 		RGBA8,
 		RGB16F,
+		RG16F,
 		RED_INTEGER,
 
 		//Depth/stencil
@@ -63,8 +64,10 @@ namespace Calibur
 		virtual void SetDepthAttachment(uint32_t renderID) = 0;
 		
 		virtual void ClearAttachment(uint32_t attachmentIndex, int value) = 0;
+		virtual void ClearAttachment(uint32_t attachmentIndex, glm::vec2& value) = 0;
 
 		virtual uint32_t GetColorAttachmentRendererID(uint32_t index = 0) const = 0;
+		virtual uint32_t GetDepthAttachmentRendererID() const = 0;
 
 		virtual const FramebufferSpecification& GetSpecificaition() const = 0;
 		virtual float GetWidth() = 0;

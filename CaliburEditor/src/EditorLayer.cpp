@@ -35,7 +35,7 @@ namespace Calibur
 		m_SceneRenderer = CreateRef<SceneRenderer>(m_ActiveScene);
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::DEPTH32FSTENCIL8};
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH24STENCIL8};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		fbSpec.Samples = 1;
@@ -105,9 +105,10 @@ namespace Calibur
 		// Teapos
 		/*auto& entity = m_ActiveScene->CreateEntity("nanosuit");
 		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
-		m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
+		//m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
 		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", true);
 		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", false);
+		m_ActiveScene->LoadModel("assets/LocalModel/Sponza/sponza.obj", false);
 		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -116,17 +117,6 @@ namespace Calibur
 		auto& entity1 = m_ActiveScene->CreateEntity("plane");
 		entity1.AddComponent<MeshComponent>("assets/Model/common/plane.obj", false);
 		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 10.0, 10.0);*/
-		// gun
-		/*auto& entity1 = m_ActiveScene->CreateEntity("Sphere");
-		entity1.AddComponent<MeshComponent>("assets/Model/Cerberus/Cerberus_LP.FBX", true);
-		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
-		entity1.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		Ref<Material> mi = entity1.GetComponent<MeshComponent>().mesh->GetMaterials()[0];
-		TextureSpecification spec1;
-		spec.isGenerateMipMap = true;
-		spec.isVerticalFlip = true;
-		mi->SetNormalMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_N.tga"));
-		mi->SetRoughnessMap(Texture2D::Create(spec1, "assets/Model/Cerberus/Textures/Cerberus_R.tg*/
 	}
 
 	void EditorLayer::OnDetach()
@@ -153,11 +143,12 @@ namespace Calibur
 		// Render
 		Renderer2D::ResetStats();
 		m_Framebuffer->Bind();
-		RenderCommand::SetClearColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+		RenderCommand::SetClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 		RenderCommand::Clear();
 
 		// Clear entity id to -1
 		m_Framebuffer->ClearAttachment(1, -1);
+
 		m_SceneRenderer->SetFramebuffer(m_Framebuffer);
 		switch (m_SceneState)
 		{
@@ -365,7 +356,7 @@ namespace Calibur
 				if (selectedEntity.HasParent())
 				{
 					auto parent = selectedEntity.GetParentUUID();
-					glm::mat4 parentTransform = m_ActiveScene->GetWorldSpaceTransformMatrix(m_ActiveScene->CreateEntityWithUUID(parent));
+					glm::mat4 parentTransform = m_ActiveScene->GetWorldSpaceTransformMatrix(m_ActiveScene->GetEntity(parent));
 					transform = glm::inverse(parentTransform) * transform;
 				}
 
@@ -384,6 +375,11 @@ namespace Calibur
 
 		UI_ToolBar();
 
+		ImGui::End();
+
+		ImGui::Begin("Motion Vector");
+		ImGui::Image(reinterpret_cast<void*>(m_SceneRenderer->m_MainFramebuffer->GetDepthAttachmentRendererID()), ImVec2{256, 256}, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		//ImGui::Image(reinterpret_cast<void*>(m_SceneRenderer->m_MainFramebuffer->GetColorAttachmentRendererID(2)), ImVec2{256, 256}, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
 		ImGui::End();
 
 		m_SceneHierarchyPanel.OnImGuiRender();

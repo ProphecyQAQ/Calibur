@@ -11,11 +11,6 @@ layout(location = 2) in vec2 a_TexCoord;
 layout(location = 3) in vec3 a_Tangent;
 layout(location = 4) in vec3 a_Bitangent;
 
-layout(std140, binding = 1) uniform Transform
-{
-	mat4 u_Transform;
-};
-
 struct VertexOutput
 {
 	vec3 worldPosition;

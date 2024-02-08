@@ -66,12 +66,13 @@ namespace Calibur
 
 		void RenderScene2D();
 		void RenderScene3D(Ref<Shader> shader = nullptr);
-		void TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, Ref<Shader> shader = nullptr);
+		void TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, glm::mat4& preParentTransform, Ref<Shader> shader = nullptr);
 	
 		Entity GetPrimaryCameraEntity();
 
 		void LoadModel(const std::string& filepath, bool isVerticalFilp = false);
 		void TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t subMeshId);
+		Entity GetEntity(UUID uuid);
 
 		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
 

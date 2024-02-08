@@ -13,6 +13,7 @@ namespace Calibur
 		
 		RG16F,
 
+		DEPTH24STENCIL8,
 		DEPTH32F,
 	};
 

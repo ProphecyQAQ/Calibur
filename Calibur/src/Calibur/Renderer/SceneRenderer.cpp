@@ -1,21 +1,60 @@
 #include "hzpch.h"
-
 #include "Calibur/Renderer/SceneRenderer.h"
 
 namespace Calibur
 {
-
 	static Ref<UniformBuffer> s_DirectionalLightUniformBuffer;
 	static Ref<UniformBuffer> s_PointLightUniformBuffer;
+
+	static struct RecData
+	{	
+		Ref<VertexArray> vao;
+		Ref<VertexBuffer> vbo;
+		Ref<IndexBuffer> ibo;
+	}*s_RecData;
+
+	static float vertices[] = {
+		-1.0, -1.0, 0.0, 0.0, 0.0,
+		1.0, -1.0, 0.0, 1.0, 0.0,
+		1.0, 1.0, 0.0, 1.0, 1.0,
+		-1.0, 1.0, 0.0, 0.0, 1.0
+	};
+
+	static uint32_t indices[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
 
 	SceneRenderer::SceneRenderer(Ref<Scene> scene)
 		: m_Scene(scene) 
 	{
+		if (!s_RecData)
+		{
+			s_RecData = new RecData();
+			s_RecData->vao = VertexArray::Create();
+			s_RecData->vbo = VertexBuffer::Create(vertices, sizeof(vertices));	
+			s_RecData->vbo->SetLayout({
+				{ ShaderDataType::Float3, "a_Position" },
+				{ ShaderDataType::Float2, "a_TexCoord" }
+			});
+			s_RecData->vao->AddVertexBuffer(s_RecData->vbo);
+			s_RecData->ibo = IndexBuffer::Create(indices, sizeof(indices));
+			s_RecData->vao->SetIndexBuffer(s_RecData->ibo);
+		}
+
 		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraUBData), 0);
-		m_TransformBuffer = UniformBuffer::Create(sizeof(glm::mat4), 1);
+		m_TransformBuffer = UniformBuffer::Create(2 * sizeof(glm::mat4), 1);
+		m_TaaParamBuffer = UniformBuffer::Create(sizeof(TaaParamUBData), 6);
 
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(DirectionalLightUBData), 3);
 		s_PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLightUBData), 4);
+
+		FramebufferSpecification fbSpec;
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH24STENCIL8};
+		fbSpec.Width = 1920;
+		fbSpec.Height = 1080;
+		fbSpec.Samples = 1;
+		m_MainFramebuffer = Framebuffer::Create(fbSpec);
 
 		// Init Csm data
 		TextureSpecification specTex;
@@ -34,19 +73,64 @@ namespace Calibur
 		m_CSMFramebuffer = Framebuffer::Create(specFbo);
 		m_CSMFramebuffer->SetDepthAttachment(m_CSMTextureArray->GetRendererID());
 		m_CascadeData.resize(m_DirCSMCount);
-
+		
 		m_LightMatricesBuffer = UniformBuffer::Create(sizeof(glm::mat4) * m_DirCSMCount + m_DirCSMCount * sizeof(glm::vec4), 5);
+
+		// Taa 
+		TextureSpecification specTaaTex;
+		specTaaTex.Format = ImageFormat::RGBA;
+		specTaaTex.Width = 1920;
+		specTaaTex.Height = 1080;
+		specTaaTex.isGenerateMipMap = false;
+		m_PreviousFrame = Texture2D::Create(specTaaTex);
+		m_CurrentFrame = Texture2D::Create(specTaaTex);
+		specTaaTex.Format = ImageFormat::RG16F;
+		m_MotionVertor = Texture2D::Create(specTaaTex);
+		specTaaTex.Format = ImageFormat::DEPTH24STENCIL8;
+		m_CurrentDepth = Texture2D::Create(specTaaTex);
 	}
+
+	const glm::vec2 Halton_2_3[8] =
+	{
+		glm::vec2(0.0f, -1.0f / 3.0f),
+		glm::vec2(-1.0f / 2.0f, 1.0f / 3.0f),
+		glm::vec2(1.0f / 2.0f, -7.0f / 9.0f),
+		glm::vec2(-3.0f / 4.0f, -1.0f / 9.0f),
+		glm::vec2(1.0f / 4.0f, 5.0f / 9.0f),
+		glm::vec2(-1.0f / 4.0f, -5.0f / 9.0f),
+		glm::vec2(3.0f / 4.0f, 1.0f / 9.0f),
+		glm::vec2(-7.0f / 8.0f, 7.0f / 9.0f)
+	};
+
 
 	void SceneRenderer::BeginScene(const SceneRenderCamera& camera)
 	{
-		CameraUB.CameraPosition = glm::vec4(camera.position, 1.0);
-		CameraUB.ViewMatrix = camera.ViewMatrix;
-		CameraUB.ViewProjectionMatrix = camera.camera.GetProjection() * camera.ViewMatrix;
-
-		m_CameraUniformBuffer->SetData(&CameraUB, sizeof(CameraUBData));
+		// Set Main framebuffer
+		m_MainFramebuffer->Bind();
+		RenderCommand::SetViewport(0, 0, m_MainFramebuffer->GetWidth(), m_MainFramebuffer->GetHeight());
+		RenderCommand::Clear();
+		m_MainFramebuffer->ClearAttachment(2, glm::vec2(0.0f));
+		m_MainFramebuffer->ClearAttachment(1, -1);
+		
 		// Save current scene data
 		m_SceneRenderCamera = camera;
+		
+		// Set Camera uniform data
+		CameraUB.CameraPosition = glm::vec4(camera.position, 1.0);
+		CameraUB.ViewMatrix = camera.ViewMatrix;
+		CameraUB.ProjectionMatrix = camera.camera.GetProjection();
+		CameraUB.ViewProjectionMatrix = camera.camera.GetProjection() * camera.ViewMatrix;
+		
+		m_CameraUniformBuffer->SetData(&CameraUB, sizeof(CameraUBData));
+
+		// Set Taa date
+		TaaParamUB.ScreenWidth = 1920.f;
+		TaaParamUB.ScreenHeight = 1080.f;
+		static uint32_t frameIndex = 0;
+		frameIndex = (frameIndex + 1) % 8;
+		TaaParamUB.FrameIndex = frameIndex;
+
+		m_TaaParamBuffer->SetData(&TaaParamUB, sizeof(TaaParamUBData));
 	}
 
 	void SceneRenderer::SubmitLight(SceneLightData& lightData)
@@ -84,21 +168,14 @@ namespace Calibur
 			m_LightMatricesBuffer->SetData(&m_CascadeData[i].ViewProj, sizeof(glm::mat4), i * sizeof(glm::mat4));
 		}
 		
-		m_ActiveFramebuffer->Unbind();
 		m_CSMFramebuffer->Bind();
 		RenderCommand::SetViewport(0, 0, m_CSMTextureArray->GetWidth(), m_CSMTextureArray->GetHeight());
 		RenderCommand::Clear();
 
-		//RenderCommand::SetFaceCulling(true, 1);
-
 		m_Scene->RenderScene2D();
 		m_Scene->RenderScene3D(m_DirCSMShader);
 
-		//RenderCommand::SetFaceCulling(true, 0);
-
 		m_CSMFramebuffer->Unbind();
-		m_ActiveFramebuffer->Bind();
-		RenderCommand::SetViewport(0, 0, m_ActiveFramebuffer->GetWidth(), m_ActiveFramebuffer->GetHeight());
 
 		// Uplaod Shadow data
 		for (size_t i = 0; i < m_CascadeData.size(); i++)
@@ -212,10 +289,49 @@ namespace Calibur
 		}
 	}
 
+	void SceneRenderer::TaaPass()
+	{
+		Ref<Shader> shader = Renderer::GetShaderLibrary()->Get("Taa");
+
+		// Taa pass
+		m_CurrentFrame->CopyDataFromAnotherTexture(m_MainFramebuffer->GetColorAttachmentRendererID(0));
+		m_CurrentDepth->CopyDataFromAnotherTexture(m_MainFramebuffer->GetDepthAttachmentRendererID());
+ 		m_MotionVertor->CopyDataFromAnotherTexture(m_MainFramebuffer->GetColorAttachmentRendererID(2));
+
+		m_PreviousFrame->Bind(9);
+		m_CurrentFrame->Bind(10);
+		m_MotionVertor->Bind(11);
+		m_CurrentDepth->Bind(12);
+
+		Renderer::Submit(shader, s_RecData->vao);
+		
+		// Render to screen
+		m_ActiveFramebuffer->Bind();
+		RenderCommand::Clear();
+		RenderCommand::SetViewport(0, 0, m_ActiveFramebuffer->GetWidth(), m_ActiveFramebuffer->GetHeight());
+
+		Renderer::Submit(shader, s_RecData->vao);
+	}
+
 	void SceneRenderer::EndScene()
 	{
 		// Clear Light ub data
 		DirectionalLightUB.Count = 0;
 		PointLightUB.Count = 0;
+
+		// Recoder previous data
+		TaaParamUB.PreView = CameraUB.ViewMatrix;
+		TaaParamUB.PreProjection = CameraUB.ProjectionMatrix;
+
+		m_PreviousFrame->CopyDataFromAnotherTexture(m_MainFramebuffer->GetColorAttachmentRendererID(0));
+
+		// Record previous transform
+		auto& view = m_Scene->Reg().view<TransformComponent>();
+		for (auto& entity : view)
+		{
+			Entity e = { entity, m_Scene.get() };
+			auto& tc = e.GetComponent<TransformComponent>();
+			tc.PreTransform = tc.GetTransform();
+		}
 	}
 }

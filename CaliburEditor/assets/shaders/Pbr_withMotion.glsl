@@ -4,6 +4,7 @@
 #version 450 core
 
 #include "Buffer.glsl"
+#include "TaaCommon.glsl"
 
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
@@ -19,6 +20,9 @@ struct VertexOutput
 	vec3 tangent;
 	vec3 bitangent;
 	mat3 tbn;
+
+	vec4 newPos;
+	vec4 oldPos;
 };
 
 layout (location = 0) out VertexOutput Output;
@@ -36,7 +40,19 @@ void main()
 	vec3 N = normalize(vec3(u_Transform * vec4(a_Normal,    0.0)));
 	Output.tbn = mat3(T, B, N);
 
-	gl_Position = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+	// Calculate jitter
+	float deltaWidth = 1.0 / u_ScreenWidth;
+	float deltaHeight = 1.0 / u_ScreenHeight;
+	vec2 jitter = vec2(Halton_2_3[u_JitterIndex].x * deltaWidth, Halton_2_3[u_JitterIndex].y * deltaHeight);
+	mat4 jitterMat = mat4(1.0);
+	jitterMat[2][0] += jitter.x * 1.f;
+	jitterMat[2][1] += jitter.y * 1.f;
+
+	gl_Position = jitterMat * u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+
+	// Calculate new and old pos
+	Output.newPos = u_ViewProjection * u_Transform * vec4(a_Position, 1.0);
+	Output.oldPos = u_PreProjection * u_PreView * u_PreTransform * vec4(a_Position, 1.0);
 }
 
 #type fragment
@@ -48,6 +64,7 @@ void main()
 
 layout(location = 0) out vec4 FragColor;
 layout(location = 1) out int ID;
+layout(location = 2) out vec4 VelocityVec;
 
 layout(std140, binding = 2) uniform MaterialUniform
 {
@@ -66,6 +83,9 @@ struct VertexOutput
 	vec3 tangent;
 	vec3 bitangent;
 	mat3 tbn;
+
+	vec4 newPos;
+	vec4 oldPos;
 };
 
 layout (location = 0) in VertexOutput Input;
@@ -227,4 +247,11 @@ void main()
 
 	FragColor = vec4(Lo, 1.0);
 	ID = -1;
+
+
+	// Calculate Velocity 
+	vec2 newPos = ((Input.newPos.xy / Input.newPos.w) * 0.5 + 0.5);
+	vec2 oldPos = ((Input.oldPos.xy / Input.oldPos.w) * 0.5 + 0.5);
+
+	VelocityVec = vec4(newPos - oldPos, 0.0, 1.0);
 }

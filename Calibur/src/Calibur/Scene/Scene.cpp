@@ -93,6 +93,7 @@ namespace Calibur
 		Entity entity = { m_Registry.create(), this };
 		entity.AddComponent<TransformComponent>();
 		entity.AddComponent<IDComponent>(uuid);
+		auto& relationship = entity.AddComponent<RelationshipComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 
@@ -162,6 +163,7 @@ namespace Calibur
 				};
 			}
 		}
+		renderer->SubmitLight(lightData);
 
 		// Render Scene Init
 		renderer->SetScene(shared_from_this());
@@ -172,7 +174,7 @@ namespace Calibur
 				camera.GetPosition(),
 				camera.GetFov(), camera.GetNearClip(), camera.GetFarClip(), camera.GetAspectRatio()
 			});
-		renderer->SubmitLight(lightData);
+
 		// Skybox
 		Renderer::BeginScene();
 		{
@@ -186,19 +188,22 @@ namespace Calibur
 			s_Skybox.shader->Unbind();
 			RenderCommand::SetDepthTest(true);
 		}
-		Renderer::EndScene();
 
 		// Set Environment map
 		m_SceneEnv->GetIrradianceMap()->Bind(6);
 		m_SceneEnv->GetPreFilterMap()->Bind(5);
 
 		RenderCommand::SetFaceCulling(false);
-
 		// Render 2D
 		RenderScene2D();
 		
 		// Render 3D
 		RenderScene3D();
+
+		Renderer::EndScene();
+
+		// Taa pass
+		renderer->TaaPass();
 
 		renderer->EndScene();
 	}
@@ -321,12 +326,12 @@ namespace Calibur
 		{
 			Entity entity(entityID, this);
 
-			//if (entity.HasParent()) continue;
+			if (entity.HasParent()) continue;
 
 			auto& transform = entity.GetComponent<TransformComponent>();
 
-			//TraverseRenderScene3D(entity, glm::mat4(1.0f), shader);
-			if (!entity.HasComponent<MeshComponent>())
+			TraverseRenderScene3D(entity, glm::mat4(1.0f), glm::mat4(1.0f), shader);
+			/*if (!entity.HasComponent<MeshComponent>())
 			{
 				continue;
 			}
@@ -355,16 +360,16 @@ namespace Calibur
 					material->GetShader()->Unbind();
 				else
 					shader->Unbind();
-			}
+			}*/
 		}
 
 		Renderer::EndScene();
 	}
 
-	void Scene::TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, Ref<Shader> shader)
+	void Scene::TraverseRenderScene3D(Entity entity, glm::mat4& parentTransform, glm::mat4& preParentTransform, Ref<Shader> shader)
 	{
 		glm::mat4 transform = parentTransform * entity.GetComponent<TransformComponent>().GetTransform();
-
+		glm::mat4 preTransform = preParentTransform * entity.GetComponent<TransformComponent>().PreTransform;
 		if (entity.HasComponent<MeshComponent>())
 		{
 			// Render
@@ -377,6 +382,7 @@ namespace Calibur
 				auto& material = mesh.mesh->GetMaterials()[submeshs.MaterialIndex];
 
 				m_Renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
+				m_Renderer->GetTransformUB()->SetData(&preParentTransform, sizeof(glm::mat4), sizeof(glm::mat4));
 				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
 
 				if (shader == nullptr)
@@ -396,14 +402,13 @@ namespace Calibur
 					material->GetShader()->Unbind();
 				else
 					shader->Unbind();
-
 			}
 		}
 
 		auto& children = entity.Children();
 		for (auto& childID : children)
 		{
-			TraverseRenderScene3D(m_EntityMap[childID], transform, shader);
+			TraverseRenderScene3D(m_EntityMap[childID], transform, preTransform, shader);
 		}
 	}
 
@@ -467,6 +472,11 @@ namespace Calibur
 		{
 			TravserCreateEntity(mesh, entity, children[i]);
 		}
+	}
+
+	Entity Scene::GetEntity(UUID uuid)
+	{
+		return m_EntityMap[uuid];
 	}
 
 	glm::mat4 Scene::GetWorldSpaceTransformMatrix(Entity entity)
