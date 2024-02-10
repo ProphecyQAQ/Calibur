@@ -90,7 +90,7 @@ struct VertexOutput
 
 layout (location = 0) in VertexOutput Input;
 
-float test = 0.0;
+uint Index = 0;
 
 float shadowCalculate(vec3 lightDir)
 {
@@ -106,7 +106,9 @@ float shadowCalculate(vec3 lightDir)
 		{
 			layer = i + 1;
 		}
-	}	
+	}
+
+	Index = layer;
 
 	// Calculate shadow
 	vec4 viewLightPos =  u_lightSpaceMatrices[layer] * vec4(Input.worldPosition, 1.0);
@@ -115,13 +117,13 @@ float shadowCalculate(vec3 lightDir)
 	projCoord = projCoord * 0.5 + 0.5;
 	float currentDepth = projCoord.z;
 	
-	if (currentDepth > 1.0) return 0.0;
+	if (currentDepth > 1.0 || currentDepth < -1.0) return 0.0;
 
 	vec3 normal = normalize(Input.worldNormal);
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
+	float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.005);
+	//bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
 	
-	//float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).x;
+	//float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).r;
 	//return step(depth + bias, currentDepth);
 	float shadow = PCF_DirectionalCascadeShadow(u_DirCSM, layer, projCoord, bias);
 	return shadow;
@@ -165,8 +167,8 @@ void main()
 
 	vec3 diffuseColor = textureLod(u_DiffuseTexture, Input.texCoord, lod).rgb;
 	m_Params.Albedo = diffuseColor * Albedo.rgb;
-	float metallic = textureLod(u_SpecTexture, Input.texCoord, 0.0).r * Metallic;
-	float roughness = max(textureLod(u_RoughnessTexture, Input.texCoord, 0.0).r * Roughness, 0.05);
+	float metallic = textureLod(u_SpecTexture, Input.texCoord, lod).r * Metallic;
+	float roughness = max(textureLod(u_RoughnessTexture, Input.texCoord, lod).r * Roughness, 0.05);
 
 	// Base fresnel
 	vec3 F0 = vec3(0.04);
@@ -245,8 +247,23 @@ void main()
     // gamma correct
     //Lo = pow(Lo, vec3(1.0/2.2));
 
-	FragColor = vec4(Lo, 1.0);
 	ID = -1;
+	FragColor = vec4(Lo, 1.0);
+
+	//switch (Index) {
+	//	case 0:
+	//	FragColor *= vec4(1.0f, 0.25f, 0.25f, 1.0f);
+	//	break;
+	//	case 1:
+	//	FragColor *= vec4(0.25f, 1.0f, 0.25f, 1.0f);
+	//	break;
+	//	case 2:
+	//	FragColor *= vec4(0.25f, 0.25f, 1.0f, 1.0f);
+	//	break;
+	//	default :
+	//	FragColor *= vec4(1.0f, 1.0f, 0.25f, 1.0f);
+	//	break;
+	//}
 
 
 	// Calculate Velocity 

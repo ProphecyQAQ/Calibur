@@ -63,7 +63,7 @@ namespace Calibur
 		Ref<Framebuffer> m_CSMFramebuffer;
 		Ref<Texture2DArray> m_CSMTextureArray;
 		Ref<Shader> m_DirCSMShader;
-		uint32_t m_DirCSMCount = 5;
+		uint32_t m_DirCSMCount = 4;
 		std::vector<CascadeData> m_CascadeData;
 		std::vector<float> m_CascadeSplits;
 

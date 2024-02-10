@@ -19,6 +19,7 @@ namespace Calibur
 				case ImageFormat::RG16F:
 					return GL_RG;
 				case ImageFormat::DEPTH24STENCIL8:
+				case ImageFormat::DEPTH32FSTENCIL8:
 					return GL_DEPTH_STENCIL;
 				case ImageFormat::DEPTH32F:
 					return GL_DEPTH_COMPONENT;
@@ -42,6 +43,8 @@ namespace Calibur
 					return GL_RG16F;
 				case ImageFormat::DEPTH24STENCIL8:
 					return GL_DEPTH24_STENCIL8;
+				case ImageFormat::DEPTH32FSTENCIL8:
+					return GL_DEPTH32F_STENCIL8;
 				case ImageFormat::DEPTH32F:
 					return GL_DEPTH_COMPONENT32F;
 			}
@@ -60,6 +63,7 @@ namespace Calibur
 				case ImageFormat::RGB16F:
 				case ImageFormat::RG16F:
 				case ImageFormat::DEPTH24STENCIL8:
+				case ImageFormat::DEPTH32FSTENCIL8:
 				case ImageFormat::DEPTH32F:
 					return GL_FLOAT;
 			}

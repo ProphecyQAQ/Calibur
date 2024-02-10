@@ -152,5 +152,6 @@ void main()
 	preColor = UnToneMap(YCoCgR2RGB(preColor));
 
 	FragColor = vec4(0.9 * preColor + 0.1 * curColor, 1.0);
+
 	ID = -1;
 }

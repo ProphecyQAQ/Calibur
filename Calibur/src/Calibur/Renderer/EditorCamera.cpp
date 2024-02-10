@@ -83,7 +83,41 @@ namespace Calibur
 		const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 		glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 
-		if (Input::IsKeyPressed(Key::LeftAlt))
+		if (Input::IsMouseButtonPressed(Mouse::ButtonRight) && !Input::IsKeyPressed(Key::LeftAlt))
+		{
+			m_CameraMode = CameraMode::FLYCAM;
+
+			const float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
+
+			const float speed = GetCameraSpeed();
+
+			if (Input::IsKeyPressed(Key::W))
+				m_PositionDelta += ts.GetMilliseconds() * speed * m_Direction;
+			if (Input::IsKeyPressed(Key::S))
+				m_PositionDelta -= ts.GetMilliseconds() * speed * m_Direction;
+			if (Input::IsKeyPressed(Key::A))
+				m_PositionDelta -= ts.GetMilliseconds() * speed * m_RightDirection;
+			if (Input::IsKeyPressed(Key::D))
+				m_PositionDelta += ts.GetMilliseconds() * speed * m_RightDirection;
+			if (Input::IsKeyPressed(Key::Q))
+				m_PositionDelta -= ts.GetMilliseconds() * speed * glm::vec3{0.f, yawSign, 0.f};
+			if (Input::IsKeyPressed(Key::E))
+				m_PositionDelta += ts.GetMilliseconds() * speed * glm::vec3{0.f, yawSign, 0.f};
+
+			float maxRate{ 0.12f };
+			m_YawDelta += glm::clamp(yawSign * delta.x * RotationSpeed(), -maxRate, maxRate);
+			m_PitchDelta += glm::clamp(delta.y * RotationSpeed(), -maxRate, maxRate);
+
+			m_RightDirection = glm::cross(m_Direction, glm::vec3{ 0.f, yawSign, 0.f });
+
+			m_Direction = glm::rotate(glm::normalize(glm::cross(glm::angleAxis(-m_PitchDelta, m_RightDirection),
+				glm::angleAxis(-m_YawDelta, glm::vec3{ 0.f, yawSign, 0.f }))), m_Direction);
+
+			const float distance = glm::distance(m_FocalPoint, m_Position);
+			m_FocalPoint = m_Position + GetForwardDirection() * distance;
+			m_Distance = distance;
+		}
+		else if (Input::IsKeyPressed(Key::LeftAlt))
 		{
 			m_CameraMode = CameraMode::ARCBALL;
 
@@ -168,6 +202,17 @@ namespace Calibur
 	glm::vec3 EditorCamera::GetForwardDirection() const
 	{
 		return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
+	}
+
+	float EditorCamera::GetCameraSpeed() const
+	{
+		float speed = m_NormalSpeed;
+		if (Input::IsKeyPressed(Key::LeftControl))
+			speed /= 2 - glm::log(m_NormalSpeed);
+		if (Input::IsKeyPressed(Key::LeftShift))
+			speed *= 2 - glm::log(m_NormalSpeed);
+
+		return glm::clamp(speed, MIN_SPEED, MAX_SPEED);
 	}
 
 	glm::vec3 EditorCamera::CalculatePosition() const

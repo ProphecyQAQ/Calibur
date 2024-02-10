@@ -27,8 +27,8 @@ namespace Calibur
 		aiProcess_OptimizeMeshes |          // Batch draws where possible
 		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
 		aiProcess_GlobalScale |             // e.g. convert cm to m for fbx import (and other formats where cm is native)
-		aiProcess_ValidateDataStructure;    // Validation
-		//aiProcess_PreTransformVertices;
+		aiProcess_ValidateDataStructure |    // Validation
+		aiProcess_PreTransformVertices;
 
 
 	Mesh::Mesh(std::string filepath, bool isVerticalFlip)

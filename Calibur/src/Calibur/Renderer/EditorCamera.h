@@ -45,6 +45,7 @@ namespace Calibur
 		glm::vec3 GetUpDirection() const;
 		glm::vec3 GetRightDirection() const;
 		glm::vec3 GetForwardDirection() const;
+		float GetCameraSpeed() const;
 		const glm::vec3& GetPosition() const { return m_Position; }
 		glm::quat GetOrientation() const;
 		float GetFov() { return m_FOV; };
@@ -85,6 +86,7 @@ namespace Calibur
 		float m_Pitch = 0.0f, m_Yaw = 0.0f;
 		float m_PitchDelta{}, m_YawDelta{};
 		glm::vec3 m_PositionDelta{};
+		glm::vec3 m_RightDirection{};
 		
 		float m_ViewportWidth = 1920, m_ViewportHeight = 1080;
 

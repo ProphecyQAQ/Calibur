@@ -35,7 +35,7 @@ namespace Calibur
 		m_SceneRenderer = CreateRef<SceneRenderer>(m_ActiveScene);
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH24STENCIL8};
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH32FSTENCIL8};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		fbSpec.Samples = 1;
@@ -43,7 +43,7 @@ namespace Calibur
 		
 		m_CameraController.SetZoomLevel(4.f);
 
-		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 0.001f, 1000.f);
+		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 1.f, 1000.f);
 		#if 0
 		auto square = m_ActiveScene->CreateEntity("Green square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4(0.f, 1.f, 1.f, 1.f));
@@ -109,6 +109,7 @@ namespace Calibur
 		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", true);
 		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", false);
 		m_ActiveScene->LoadModel("assets/LocalModel/Sponza/sponza.obj", false);
+		//m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", false);
 		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
 		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
 		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
@@ -376,10 +377,10 @@ namespace Calibur
 		UI_ToolBar();
 
 		ImGui::End();
-
-		ImGui::Begin("Motion Vector");
-		ImGui::Image(reinterpret_cast<void*>(m_SceneRenderer->m_MainFramebuffer->GetDepthAttachmentRendererID()), ImVec2{256, 256}, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
-		//ImGui::Image(reinterpret_cast<void*>(m_SceneRenderer->m_MainFramebuffer->GetColorAttachmentRendererID(2)), ImVec2{256, 256}, ImVec2{ 0, 1 }, ImVec2{ 1, 0 });
+		
+		ImGui::Begin("Some Data");
+		glm::vec3 EditorCameraPosition = m_EditorCamera.GetPosition();
+		ImGui::DragFloat3("Camera Position", (float*)&EditorCameraPosition);
 		ImGui::End();
 
 		m_SceneHierarchyPanel.OnImGuiRender();

@@ -179,6 +179,7 @@ namespace Calibur
 		Renderer::BeginScene();
 		{
 			RenderCommand::SetDepthTest(false);
+			RenderCommand::SetFaceCulling(false);
 			s_Skybox.shader->Bind();
 			//s_Skybox.texture->Bind(1);
 			m_SceneEnv->GetSkybox()->Bind(1);
@@ -190,10 +191,10 @@ namespace Calibur
 		}
 
 		// Set Environment map
-		m_SceneEnv->GetIrradianceMap()->Bind(6);
 		m_SceneEnv->GetPreFilterMap()->Bind(5);
+		m_SceneEnv->GetIrradianceMap()->Bind(6);
 
-		RenderCommand::SetFaceCulling(false);
+		RenderCommand::SetFaceCulling(true, 0);
 		// Render 2D
 		RenderScene2D();
 		

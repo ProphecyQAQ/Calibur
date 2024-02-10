@@ -50,7 +50,7 @@ namespace Calibur
 		s_PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLightUBData), 4);
 
 		FramebufferSpecification fbSpec;
-		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH24STENCIL8};
+		fbSpec.Attachments = {FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RED_INTEGER, FramebufferTextureFormat::RG16F,FramebufferTextureFormat::DEPTH32FSTENCIL8};
 		fbSpec.Width = 1920;
 		fbSpec.Height = 1080;
 		fbSpec.Samples = 1;
@@ -62,7 +62,7 @@ namespace Calibur
 		specTex.Filter = TextureFilter::Nearest;
 		specTex.Height = 2048;
 		specTex.Width = 2048;
-		specTex.ArraySize = 5;
+		specTex.ArraySize = 4;
 		specTex.Wrap = TextureWrap::ClampToBorder;
 		m_CSMTextureArray = Texture2DArray::Create(specTex);
 
@@ -86,22 +86,9 @@ namespace Calibur
 		m_CurrentFrame = Texture2D::Create(specTaaTex);
 		specTaaTex.Format = ImageFormat::RG16F;
 		m_MotionVertor = Texture2D::Create(specTaaTex);
-		specTaaTex.Format = ImageFormat::DEPTH24STENCIL8;
+		specTaaTex.Format = ImageFormat::DEPTH32FSTENCIL8;
 		m_CurrentDepth = Texture2D::Create(specTaaTex);
 	}
-
-	const glm::vec2 Halton_2_3[8] =
-	{
-		glm::vec2(0.0f, -1.0f / 3.0f),
-		glm::vec2(-1.0f / 2.0f, 1.0f / 3.0f),
-		glm::vec2(1.0f / 2.0f, -7.0f / 9.0f),
-		glm::vec2(-3.0f / 4.0f, -1.0f / 9.0f),
-		glm::vec2(1.0f / 4.0f, 5.0f / 9.0f),
-		glm::vec2(-1.0f / 4.0f, -5.0f / 9.0f),
-		glm::vec2(3.0f / 4.0f, 1.0f / 9.0f),
-		glm::vec2(-7.0f / 8.0f, 7.0f / 9.0f)
-	};
-
 
 	void SceneRenderer::BeginScene(const SceneRenderCamera& camera)
 	{
@@ -171,6 +158,7 @@ namespace Calibur
 		m_CSMFramebuffer->Bind();
 		RenderCommand::SetViewport(0, 0, m_CSMTextureArray->GetWidth(), m_CSMTextureArray->GetHeight());
 		RenderCommand::Clear();
+		RenderCommand::SetFaceCulling(false);
 
 		m_Scene->RenderScene2D();
 		m_Scene->RenderScene3D(m_DirCSMShader);
@@ -191,6 +179,7 @@ namespace Calibur
 		glm::mat4 viewProj = m_SceneRenderCamera.camera.GetProjection() * viewMatrix;
 
 		const glm::vec4 origin = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		float cascadeSplitLambda = 0.95f;
 
 		std:: vector<float> cascadeSplits(m_DirCSMCount);
 
@@ -209,7 +198,7 @@ namespace Calibur
 			float p = (i + 1) / static_cast<float>(m_DirCSMCount);
 			float log = minZ * std::pow(ratio, p);
 			float uniform = minZ + range * p;
-			float d = 0.92 * (log - uniform) + uniform;
+			float d = cascadeSplitLambda * (log - uniform) + uniform;
 			cascadeSplits[i] = (d - nearPlane) / clipRange;
 		}
 
@@ -267,8 +256,8 @@ namespace Calibur
 			
 			glm::vec3 lightDir = -lightDirection;	
 			glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter, glm::vec3(0.0f, 1.0f, 0.0f));
-			glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, -50.0f, maxExtents.z - minExtents.z + 50.0f);
-
+			glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y, -200.0f, maxExtents.z - minExtents.z + 200.f);
+			
 			glm::mat4 shadowMatrix = lightOrthoMatrix * lightViewMatrix;
 			float ShadowMapWidth = (float)m_CSMTextureArray->GetWidth();
 
@@ -295,8 +284,8 @@ namespace Calibur
 
 		// Taa pass
 		m_CurrentFrame->CopyDataFromAnotherTexture(m_MainFramebuffer->GetColorAttachmentRendererID(0));
-		m_CurrentDepth->CopyDataFromAnotherTexture(m_MainFramebuffer->GetDepthAttachmentRendererID());
  		m_MotionVertor->CopyDataFromAnotherTexture(m_MainFramebuffer->GetColorAttachmentRendererID(2));
+		m_CurrentDepth->CopyDataFromAnotherTexture(m_MainFramebuffer->GetDepthAttachmentRendererID());
 
 		m_PreviousFrame->Bind(9);
 		m_CurrentFrame->Bind(10);

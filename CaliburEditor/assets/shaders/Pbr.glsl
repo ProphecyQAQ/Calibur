@@ -145,8 +145,8 @@ void main()
 
 	vec3 diffuseColor = textureLod(u_DiffuseTexture, Input.texCoord, lod).rgb;
 	m_Params.Albedo = diffuseColor * Albedo.rgb;
-	float metallic = textureLod(u_SpecTexture, Input.texCoord, 0.0).r * Metallic;
-	float roughness = max(textureLod(u_RoughnessTexture, Input.texCoord, 0.0).r * Roughness, 0.05);
+	float metallic = textureLod(u_SpecTexture, Input.texCoord, lod).r * Metallic;
+	float roughness = max(textureLod(u_RoughnessTexture, Input.texCoord, lod).r * Roughness, 0.05);
 
 	// Base fresnel
 	vec3 F0 = vec3(0.04);
