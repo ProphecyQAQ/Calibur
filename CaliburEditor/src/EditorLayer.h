@@ -60,6 +60,8 @@ namespace Calibur
 
 		int m_GizmoType = -1;
 
+		float m_FramePerSecond = 0;
+
 		//Panels;
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContextBrowserPanel;

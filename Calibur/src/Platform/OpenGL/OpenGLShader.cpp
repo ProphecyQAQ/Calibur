@@ -21,6 +21,10 @@ namespace Calibur {
 				return GL_FRAGMENT_SHADER;
 			if (type == "geometry")
 				return GL_GEOMETRY_SHADER;
+			if (type == "tessCtrl")
+				return GL_TESS_CONTROL_SHADER;
+			if (type == "tessEval")
+				return GL_TESS_EVALUATION_SHADER;
 
 			HZ_CORE_ASSERT(false, "Unkonow shader type!");
 			return 0;
@@ -45,6 +49,8 @@ namespace Calibur {
 				case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 				case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
 				case GL_GEOMETRY_SHADER: return shaderc_glsl_geometry_shader;
+				case GL_TESS_CONTROL_SHADER: return shaderc_glsl_tess_control_shader;
+				case GL_TESS_EVALUATION_SHADER: return shaderc_glsl_tess_evaluation_shader;
 			}
 			HZ_CORE_ASSERT(false);
 			return (shaderc_shader_kind)0;
@@ -57,6 +63,8 @@ namespace Calibur {
 				case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 				case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
 				case GL_GEOMETRY_SHADER: return "GL_GEOMETRY_SHADER";
+				case GL_TESS_CONTROL_SHADER: return "GL_TESS_CONTROL_SHADER";
+				case GL_TESS_EVALUATION_SHADER: return "GL_TESS_EVALUATION_SHADER";
 			}
 			HZ_CORE_ASSERT(false);
 			return nullptr;
@@ -66,9 +74,11 @@ namespace Calibur {
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER:   return ".cached_opengl.vert";
-			case GL_FRAGMENT_SHADER: return ".cached_opengl.frag";
-			case GL_GEOMETRY_SHADER: return ".cached_opengl.geom";
+				case GL_VERTEX_SHADER:   return ".cached_opengl.vert";
+				case GL_FRAGMENT_SHADER: return ".cached_opengl.frag";
+				case GL_GEOMETRY_SHADER: return ".cached_opengl.geom";
+				case GL_TESS_CONTROL_SHADER: return ".cached_opengl.tesc";
+				case GL_TESS_EVALUATION_SHADER: return ".cached_opengl.tese";
 			}
 			
 			HZ_CORE_ASSERT(false);
@@ -79,9 +89,11 @@ namespace Calibur {
 		{
 			switch (stage)
 			{
-			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
-			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
-			case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geom";
+				case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
+				case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+				case GL_GEOMETRY_SHADER:  return ".cached_vulkan.geom";
+				case GL_TESS_CONTROL_SHADER: return ".cached_vulkan.tesc";
+				case GL_TESS_EVALUATION_SHADER: return ".cached_vulkan.tese";
 			}
 			HZ_CORE_ASSERT(false);
 			return "";

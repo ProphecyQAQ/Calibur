@@ -28,6 +28,7 @@ namespace Calibur
 		virtual void SetFaceCulling(bool flag, int type = 0) = 0;
 		
 		virtual void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex) = 0;
+		virtual void DrawPatches(const Ref<VertexArray>& vertexArray, uint32_t size) = 0;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) = 0;
 
 		static API GetAPI() { return s_API; }

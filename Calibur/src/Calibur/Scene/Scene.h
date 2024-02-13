@@ -7,6 +7,7 @@
 #include "Calibur/Renderer/Shader.h"
 #include "Calibur/Renderer/UniformBuffer.h"
 #include "Calibur/Renderer/SceneEnvironment.h"
+#include "Calibur/Renderer/Terrain.h"
 
 #include <glm/glm.hpp>
 
@@ -86,6 +87,8 @@ namespace Calibur
 		
 		Ref<UniformBuffer> m_MaterialUniform;
 		Ref<SceneRenderer> m_Renderer;
+
+		Ref<Terrain> m_Terrain;
 
 		std::unordered_map<UUID, Entity> m_EntityMap;
 

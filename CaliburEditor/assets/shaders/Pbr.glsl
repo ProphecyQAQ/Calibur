@@ -98,7 +98,7 @@ float shadowCalculate(vec3 lightDir)
 	if (currentDepth > 1.0) return 0.0;
 
 	vec3 normal = normalize(Input.worldNormal);
-	float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.005);
 	bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
 	
 	//float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).x;

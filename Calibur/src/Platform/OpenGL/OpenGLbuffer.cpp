@@ -7,6 +7,7 @@ namespace Calibur
 {
 	//Vertex buffer
 	OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size)
+		: m_Size(size)
 	{
 		HZ_PROFILE_FUNCTION();
 
@@ -15,7 +16,8 @@ namespace Calibur
 		glBufferData(GL_ARRAY_BUFFER, size, nullptr, GL_DYNAMIC_DRAW);
 	}
 
-	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size) 
+	OpenGLVertexBuffer::OpenGLVertexBuffer(float* vertices, uint32_t size)
+		: m_Size(size)
 	{
 		HZ_PROFILE_FUNCTION();
 

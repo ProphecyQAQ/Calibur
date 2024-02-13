@@ -59,6 +59,10 @@ namespace Calibur
 		m_MaterialUniform = UniformBuffer::Create(sizeof(MaterialUniforms), 2);
 
 		m_SceneEnv = CreateRef<SceneEnvironment>("assets/sIbl/hallstatt4_hd.hdr", true);
+
+		TextureSpecification spec;
+		Ref<Texture2D> texture = Texture2D::Create(spec, "assets/textures/heightmap.png");
+		m_Terrain = CreateRef<Terrain>(texture);
 	}
 
 	Scene::~Scene()
@@ -106,15 +110,15 @@ namespace Calibur
 	void Scene::DestroyEntity(Entity entity)
 	{
 		UUID id = entity.GetUUID();
-		
+
 		// Remove Children
 		for (auto child : entity.Children())
 		{
-			DestroyEntity(m_EntityMap[id]);
+			DestroyEntity(m_EntityMap[child]);
 		}
 
+		m_Registry.destroy((entt::entity)entity);
 		m_EntityMap.erase(id);
-		m_Registry.destroy(entity);
 	}
 
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera)
@@ -187,6 +191,7 @@ namespace Calibur
 			//m_SceneEnv->GetPreFilterMap()->Bind(1);
 			RenderCommand::DrawIndexed(s_Skybox.vao);
 			s_Skybox.shader->Unbind();
+			s_Skybox.vao->Unbind();
 			RenderCommand::SetDepthTest(true);
 		}
 
@@ -194,7 +199,13 @@ namespace Calibur
 		m_SceneEnv->GetPreFilterMap()->Bind(5);
 		m_SceneEnv->GetIrradianceMap()->Bind(6);
 
+		RenderCommand::SetFaceCulling(false);
+		static glm::mat4 transform = glm::mat4(1.0f);
+		renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
+		m_Terrain->Render();
+
 		RenderCommand::SetFaceCulling(true, 0);
+
 		// Render 2D
 		RenderScene2D();
 		

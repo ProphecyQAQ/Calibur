@@ -42,6 +42,11 @@ namespace Calibur
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
 		}
 
+		static void DrawPatches(const Ref<VertexArray>& vertexArray, uint32_t size)
+		{
+			s_RendererAPI->DrawPatches(vertexArray, size);
+		}
+
 		static void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 		{
 			s_RendererAPI->RenderMesh(mesh, submeshIndex);

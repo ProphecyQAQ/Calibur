@@ -17,6 +17,7 @@ namespace Calibur
 		virtual void SetFaceCulling(bool flag, int type) override;
 
 		virtual void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex) override;
+		virtual void DrawPatches(const Ref<VertexArray>& vertexArray, uint32_t size) override;
 		virtual void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0) override;
 	};
 }

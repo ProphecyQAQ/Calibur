@@ -45,6 +45,8 @@ namespace Calibur
 
 		glDepthFunc(GL_LEQUAL);
 
+		glPatchParameteri(GL_PATCH_VERTICES, 4);
+
 		//glPolygonMode(GL_FRONT, GL_LINE);
 	}
 
@@ -88,6 +90,13 @@ namespace Calibur
 		auto& submesh = mesh->GetSubMeshes()[submeshIndex];
 		mesh->GetVertexArray()->Bind();
 		glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void*)(submesh.BaseIndex * sizeof(uint32_t)), submesh.BaseVertex);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	void OpenGLRenderer::DrawPatches(const Ref<VertexArray>& vertexArray, uint32_t size)
+	{
+		vertexArray->Bind();
+		glDrawArrays(GL_PATCHES, 0, size);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
