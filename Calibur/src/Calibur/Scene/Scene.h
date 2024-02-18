@@ -71,11 +71,14 @@ namespace Calibur
 	
 		Entity GetPrimaryCameraEntity();
 
-		void LoadModel(const std::string& filepath, bool isVerticalFilp = false);
-		void TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t subMeshId);
+		std::tuple<Entity, Ref<Mesh>> LoadModel(const std::string& filepath, const std::string& shaderName = "Pbr_withMotion", bool isVerticalFilp = false);
+		Entity TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t subMeshId);
 		Entity GetEntity(UUID uuid);
 
 		glm::mat4 GetWorldSpaceTransformMatrix(Entity entity);
+
+		bool* IsRenderTerrain() { return &m_IsRenderTerrain; }
+		bool* IsRenderSkybox() { return &m_IsRenderSkybox; }
 
 		Ref<SceneEnvironment> m_SceneEnv;
 	private:
@@ -91,6 +94,10 @@ namespace Calibur
 		Ref<Terrain> m_Terrain;
 
 		std::unordered_map<UUID, Entity> m_EntityMap;
+
+		// Some control check
+		bool m_IsRenderTerrain = false;
+		bool m_IsRenderSkybox = true;
 
 		friend class Entity;
 		friend class SceneSerializer;

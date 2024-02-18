@@ -45,6 +45,7 @@ namespace Calibur
 		void SetFramebuffer(Ref<Framebuffer>& fbo) { m_ActiveFramebuffer = fbo; }
 
 		Ref<UniformBuffer>& GetTransformUB() { return m_TransformBuffer; }
+		Ref<UniformBuffer>& GetBoneMatricesUB() { return m_FinalBoneMatricesBuffer; }
 	private:
 		// Framebuffer will show the final result
 		Ref<Framebuffer> m_ActiveFramebuffer;
@@ -58,6 +59,7 @@ namespace Calibur
 		Ref<UniformBuffer> m_TransformBuffer;
 		Ref<UniformBuffer> m_LightMatricesBuffer;
 		Ref<UniformBuffer> m_TaaParamBuffer;
+		Ref<UniformBuffer> m_FinalBoneMatricesBuffer;
 
 		// Dir CSM data
 		Ref<Framebuffer> m_CSMFramebuffer;

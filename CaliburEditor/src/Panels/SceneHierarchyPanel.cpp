@@ -379,7 +379,7 @@ namespace Calibur
 					{
 						const wchar_t* path = (const wchar_t*)payload->Data;
 						std::string filePath = (std::filesystem::path(g_AssetPath) / path).string();
-						Ref<Mesh> newMesh = CreateRef<Mesh>(filePath, false);
+						Ref<Mesh> newMesh = CreateRef<Mesh>(filePath, component.mesh->GetShaderName(), false);
 						if (newMesh->IsLoaded())
 							component.mesh = newMesh;
 					}

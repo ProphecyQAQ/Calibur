@@ -6,14 +6,14 @@ namespace Calibur
 {
 	namespace Utils
 	{
-		glm::mat4 ConvertAiMat4ToGlm(const aiMatrix4x4& aiMat) {
-			// glm::mat4 is column-major, while aiMatrix4x4 is row-major
-			return glm::mat4(
-				aiMat.a1, aiMat.a2, aiMat.a3, aiMat.a4,
-				aiMat.b1, aiMat.b2, aiMat.b3, aiMat.b4,
-				aiMat.c1, aiMat.c2, aiMat.c3, aiMat.c4,
-				aiMat.d1, aiMat.d2, aiMat.d3, aiMat.d4
-			);
+		glm::mat4 ConvertAiMat4ToGlm(const aiMatrix4x4& matrix) {
+			glm::mat4 result;
+			//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
+			result[0][0] = matrix.a1; result[1][0] = matrix.a2; result[2][0] = matrix.a3; result[3][0] = matrix.a4;
+			result[0][1] = matrix.b1; result[1][1] = matrix.b2; result[2][1] = matrix.b3; result[3][1] = matrix.b4;
+			result[0][2] = matrix.c1; result[1][2] = matrix.c2; result[2][2] = matrix.c3; result[3][2] = matrix.c4;
+			result[0][3] = matrix.d1; result[1][3] = matrix.d2; result[2][3] = matrix.d3; result[3][3] = matrix.d4;
+			return result;
 		}
 	}
 
@@ -24,15 +24,14 @@ namespace Calibur
 		//aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_GenUVCoords |             // Convert UVs if required 
 		//aiProcess_OptimizeGraph |          
-		aiProcess_OptimizeMeshes |          // Batch draws where possible
-		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
+		//aiProcess_OptimizeMeshes |          // Batch draws where possible
+		//aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
 		aiProcess_GlobalScale |             // e.g. convert cm to m for fbx import (and other formats where cm is native)
-		aiProcess_ValidateDataStructure |    // Validation
-		aiProcess_PreTransformVertices;
+		aiProcess_ValidateDataStructure;    // Validation
 
 
-	Mesh::Mesh(std::string filepath, bool isVerticalFlip)
-		: m_FilePath(filepath), m_IsVerticalFlip(isVerticalFlip)
+	Mesh::Mesh(std::string filepath, const std::string& shaderName, bool isVerticalFlip)
+		: m_FilePath(filepath), m_IsVerticalFlip(isVerticalFlip), m_ShaderName(shaderName)
 	{	
 		Assimp::Importer importer;
 		const aiScene *scene = importer.ReadFile(filepath,  s_MeshImportFlags);
@@ -95,6 +94,39 @@ namespace Calibur
 					Index index = { face.mIndices[0], face.mIndices[1], face.mIndices[2] };
 					m_Indices.push_back(index);
 				}
+				
+				// Bone 
+				for (size_t boneIndex = 0; boneIndex < mesh->mNumBones; boneIndex++)
+				{
+					aiBone* bone = mesh->mBones[boneIndex];
+					int boneID = -1;
+					std::string boneName = bone->mName.C_Str();
+					if (m_BoneInfoMap.find(boneName) == m_BoneInfoMap.end())
+					{
+						BoneInfo info;
+						info.BoneIndex = m_BoneCount;
+						info.OffsetMatrix = Utils::ConvertAiMat4ToGlm(bone->mOffsetMatrix);
+
+						m_BoneInfoMap[boneName] = info;
+						boneID = m_BoneCount;
+						m_BoneCount++;
+					}
+					else
+					{
+						boneID = m_BoneInfoMap[boneName].BoneIndex;
+					}
+
+					HZ_CORE_ASSERT(boneID != -1, "Bone Id should not be -1");
+
+					auto weights = bone->mWeights;
+					for (size_t weightID = 0; weightID < bone->mNumWeights; weightID++)
+					{
+						uint32_t vertexID = weights[weightID].mVertexId;
+						float weight = weights[weightID].mWeight;
+
+						SetVertexBoneData(m_Vertices[vertexID], boneID, weight);
+					}
+				}
 			}
 		}
 
@@ -111,7 +143,9 @@ namespace Calibur
 			{ ShaderDataType::Float3, "a_Normal" },
 			{ ShaderDataType::Float2, "a_TexCoords" },
 			{ ShaderDataType::Float3, "a_Tangent" },
-			{ ShaderDataType::Float3, "a_Bitangent" }
+			{ ShaderDataType::Float3, "a_Bitangent" },
+			{ ShaderDataType::Int4,   "a_BoneIDs" },
+			{ ShaderDataType::Float4, "a_BoneWeights"},
 		};
 		m_VertexBuffer->SetLayout(layout);
 
@@ -132,7 +166,7 @@ namespace Calibur
 				auto aiMaterial = scene->mMaterials[i];
 				auto aiMateriaName = aiMaterial->GetName();
 
-				Ref<Material> material = Material::Create(Renderer::GetShaderLibrary()->Get("Pbr_withMotion"), aiMateriaName.C_Str());
+				Ref<Material> material = Material::Create(Renderer::GetShaderLibrary()->Get(m_ShaderName), aiMateriaName.C_Str());
 				m_Materials[i] = material;
 				
 				///////////// Material Properties //////////////
@@ -245,4 +279,17 @@ namespace Calibur
 			TraverseNodes(aNode->mChildren[i], (uint32_t)childIndex, transform);
 		}
 	}
+
+	void Mesh::SetVertexBoneData(Vertex& vertex, int boneID, float weight)
+    {
+        for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
+        {
+            if (vertex.m_BoneIDs[i] < 0)
+            {
+                vertex.m_Weights[i] = weight;
+                vertex.m_BoneIDs[i] = boneID;
+                break;
+            }
+        }
+    }
 }

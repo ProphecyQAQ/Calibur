@@ -6,6 +6,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 #include "Calibur/Core/UUID.h"
+#include "Calibur/Animation/Animator.h"
 #include "Calibur/Math/Math.h"
 #include "Calibur/Scene/SceneCamera.h"
 #include "Calibur/Renderer/Mesh.h"
@@ -69,6 +70,18 @@ namespace Calibur
 		}
 	};
 
+	struct AnimationComponent
+	{
+		Ref<Animator> animator;
+		AnimationComponent() = default;
+		AnimationComponent(const AnimationComponent&) = default;
+		AnimationComponent(const std::string& filepath, Ref<Mesh> mesh)
+		{
+			Ref<Animation> animation = CreateRef<Animation>(filepath, mesh);
+			animator = CreateRef<Animator>(animation);
+		}
+	};
+
 	struct SpriteRendererComponent
 	{
 		glm::vec4 Color{ 1.0f, 1.0f, 1.0f, 1.0f };
@@ -114,8 +127,8 @@ namespace Calibur
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent&) = default;
-		MeshComponent(const std::string& filepath, bool isVerticalFlip)
-			: mesh(std::make_shared<Mesh>(filepath, isVerticalFlip)) {}
+		MeshComponent(const std::string& filepath, const std::string& shaderName, bool isVerticalFlip)
+			: mesh(CreateRef<Mesh>(filepath, shaderName, isVerticalFlip)) {}
 		MeshComponent(Ref<Mesh> mesh)
 			: mesh(mesh) {}
 	};

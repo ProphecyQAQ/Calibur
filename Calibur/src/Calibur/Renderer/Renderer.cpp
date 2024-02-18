@@ -37,6 +37,7 @@ namespace Calibur
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Pbr_withMotion.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Taa.glsl");
 		Renderer::GetShaderLibrary()->Load("./assets/shaders/Terrain.glsl");
+		Renderer::GetShaderLibrary()->Load("./assets/shaders/PbrAnim_withMotion.glsl");
 	}
 
 	void Renderer::Shutdown()

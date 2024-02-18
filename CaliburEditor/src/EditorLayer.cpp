@@ -107,17 +107,14 @@ namespace Calibur
 		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
 		//m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
 		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", true);
-		//m_ActiveScene->LoadModel("assets/LocalModel/CrytekSponza/sponza.obj", true);
+		//m_ActiveScene->LoadModel("assets/LocalModel/CrytekSponza/sponza.obj", "Pbr_withMotion", true);
 		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", false);
 		//m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", false);
-		/*auto& entity = m_ActiveScene->CreateEntity("teapot");
-		entity.AddComponent<MeshComponent>("assets/Model/teapot/teapot.obj", false);
-		entity.GetComponent<TransformComponent>().Rotation = glm::vec3(glm::radians(-90.0), 0.0, 0.0);
-		entity.GetComponent<TransformComponent>().Scale = glm::vec3(0.1, 0.1, 0.1);
-
-		auto& entity1 = m_ActiveScene->CreateEntity("plane");
-		entity1.AddComponent<MeshComponent>("assets/Model/common/plane.obj", false);
-		entity1.GetComponent<TransformComponent>().Scale = glm::vec3(10.0, 10.0, 10.0);*/
+		//std::string path = "assets/LocalModel/vampire/dancing_vampire.dae";
+		std::string path = "assets/LocalModel/Anim/model2/scene.gltf";
+		auto modelMessage = m_ActiveScene->LoadModel(path, "PbrAnim_withMotion", true);
+		auto entity = std::get<0>(modelMessage);
+		entity.AddComponent<AnimationComponent>(path, std::get<1>(modelMessage));
 	}
 
 	void EditorLayer::OnDetach()
@@ -384,6 +381,13 @@ namespace Calibur
 		glm::vec3 EditorCameraPosition = m_EditorCamera.GetPosition();
 		ImGui::DragFloat3("Camera Position", (float*)&EditorCameraPosition); 
 		ImGui::DragFloat("FPS", &m_FramePerSecond);
+		ImGui::End();
+
+		ImGui::Begin("Scene Panel");
+		
+		ImGui::Checkbox("Render Terrain", m_ActiveScene->IsRenderTerrain());
+		ImGui::Checkbox("Render Skybox", m_ActiveScene->IsRenderSkybox());
+
 		ImGui::End();
 
 		m_SceneHierarchyPanel.OnImGuiRender();

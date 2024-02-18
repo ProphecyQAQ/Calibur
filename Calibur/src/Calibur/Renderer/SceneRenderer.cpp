@@ -45,6 +45,7 @@ namespace Calibur
 		m_CameraUniformBuffer = UniformBuffer::Create(sizeof(CameraUBData), 0);
 		m_TransformBuffer = UniformBuffer::Create(2 * sizeof(glm::mat4), 1);
 		m_TaaParamBuffer = UniformBuffer::Create(sizeof(TaaParamUBData), 6);
+		m_FinalBoneMatricesBuffer = UniformBuffer::Create(sizeof(glm::mat4) * 100, 7);
 
 		s_DirectionalLightUniformBuffer = UniformBuffer::Create(sizeof(DirectionalLightUBData), 3);
 		s_PointLightUniformBuffer = UniformBuffer::Create(sizeof(PointLightUBData), 4);

@@ -42,7 +42,7 @@ namespace Calibur
 		6,5,7, 7,5,4,  // bottom
 		1,2,0, 0,2,3,  // top
 	};
-
+	
 	Scene::Scene()
 	{
 		s_Skybox.shader = Renderer::GetShaderLibrary()->Get("Skybox");
@@ -126,6 +126,18 @@ namespace Calibur
 		// Record SceneRenderer
 		m_Renderer = renderer;
 
+		// Updata Logic
+		// Animation
+		{
+			auto view = m_Registry.view<AnimationComponent>();
+			for (auto& entity : view)
+			{
+				Entity ent = { entity, this };
+				auto animationComponent = ent.GetComponent<AnimationComponent>();
+				animationComponent.animator->UpdateAnimation(ts.GetSeconds());
+			}
+		}
+
 		// Light
 		SceneLightData lightData;
 		{
@@ -181,6 +193,7 @@ namespace Calibur
 
 		// Skybox
 		Renderer::BeginScene();
+		if (m_IsRenderSkybox) 
 		{
 			RenderCommand::SetDepthTest(false);
 			RenderCommand::SetFaceCulling(false);
@@ -202,7 +215,7 @@ namespace Calibur
 		RenderCommand::SetFaceCulling(false);
 		static glm::mat4 transform = glm::mat4(1.0f);
 		renderer->GetTransformUB()->SetData(&transform, sizeof(glm::mat4));
-		m_Terrain->Render();
+		if (m_IsRenderTerrain) m_Terrain->Render();
 
 		RenderCommand::SetFaceCulling(true, 0);
 
@@ -339,42 +352,16 @@ namespace Calibur
 			Entity entity(entityID, this);
 
 			if (entity.HasParent()) continue;
+			if (entity.HasComponent<AnimationComponent>())
+			{
+				auto& finalBoneMatrices = entity.GetComponent<AnimationComponent>().animator->GetFinalBoneMatrices();
+				m_Renderer->GetBoneMatricesUB()->SetData(finalBoneMatrices.data(), finalBoneMatrices.size() * sizeof(glm::mat4));
+			}
 
 			auto& transform = entity.GetComponent<TransformComponent>();
 
 			TraverseRenderScene3D(entity, glm::mat4(1.0f), glm::mat4(1.0f), shader);
-			/*if (!entity.HasComponent<MeshComponent>())
-			{
-				continue;
-			}
-			auto& mesh = entity.GetComponent<MeshComponent>();
-			auto& submeshs = mesh.mesh->GetSubMeshes();
-			m_Renderer->GetTransformUB()->SetData(&transform.GetTransform(), sizeof(glm::mat4));
-			for (size_t id = 0; id < submeshs.size(); id++)
-			{
-				auto& material = mesh.mesh->GetMaterials()[submeshs[id].MaterialIndex];
-				m_MaterialUniform->SetData((void*) & material->GetMaterialUniforms(), sizeof(MaterialUniforms));
-
-				if (shader == nullptr)
-					material->GetShader()->Bind();
-				else
-					shader->Bind();
-
-				material->GetDiffuseMap()->Bind(0);
-				if (material->GetMaterialUniforms().useNormalMap == 1)
-					material->GetNormalMap()->Bind(1);
-				material->GetSpecMap()->Bind(2);
-				material->GetRoughnessMap()->Bind(3);
-
-				Renderer::RenderMesh(mesh.mesh, id);
-
-				if (shader == nullptr)
-					material->GetShader()->Unbind();
-				else
-					shader->Unbind();
-			}*/
 		}
-
 		Renderer::EndScene();
 	}
 
@@ -451,17 +438,17 @@ namespace Calibur
 		return {};
 	}
 
-	void Scene::LoadModel(const std::string& filepath, bool isVerticalFilp)
+	std::tuple<Entity, Ref<Mesh>> Scene::LoadModel(const std::string& filepath, const std::string& shaderName, bool isVerticalFilp)
 	{
-		Ref<Mesh> mesh = CreateRef<Mesh>(filepath, isVerticalFilp);
+		Ref<Mesh> mesh = CreateRef<Mesh>(filepath, shaderName, isVerticalFilp);
 		size_t slashId = filepath.find_last_of('/');
 		size_t dotId = filepath.find_last_of('.');
 
 		std::string name = filepath.substr(slashId + 1, dotId - slashId - 1);
-		TravserCreateEntity(mesh, {}, 0);
+		return { TravserCreateEntity(mesh, {}, 0), mesh };
  	}
 
-	void Scene::TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t meshNodeId)
+	Entity Scene::TravserCreateEntity(Ref<Mesh> mesh, Entity parent, uint32_t meshNodeId)
 	{
 		auto& meshNode = mesh->GetMeshNodes()[meshNodeId];
 		auto& subMeshs = meshNode.SubMeshes;
@@ -484,6 +471,8 @@ namespace Calibur
 		{
 			TravserCreateEntity(mesh, entity, children[i]);
 		}
+
+		return entity;
 	}
 
 	Entity Scene::GetEntity(UUID uuid)
@@ -535,6 +524,11 @@ namespace Calibur
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component)
+	{
+	}
+
+	template<>
+	void Scene::OnComponentAdded<AnimationComponent>(Entity entity, AnimationComponent& component)
 	{
 	}
 
