@@ -99,7 +99,7 @@ vec2 SamplePoisson(int index)
 
 float PCF_DirectionalCascadeShadow(sampler2DArray shadowMap, uint cascade, vec3 shadowCoords, float bias)
 {
-	int numSamples = 64;
+	int numSamples = 9;
 	vec2 texelSize = 1.0 / textureSize(u_DirCSM, 0).xy;
 
 	float shadow = 0.0f;

@@ -123,6 +123,8 @@ namespace Calibur
 
 	void Scene::OnUpdateEditor(Ref<SceneRenderer> renderer, TimeStep ts, EditorCamera& camera)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		// Record SceneRenderer
 		m_Renderer = renderer;
 
@@ -207,10 +209,6 @@ namespace Calibur
 			s_Skybox.vao->Unbind();
 			RenderCommand::SetDepthTest(true);
 		}
-
-		// Set Environment map
-		m_SceneEnv->GetPreFilterMap()->Bind(5);
-		m_SceneEnv->GetIrradianceMap()->Bind(6);
 
 		RenderCommand::SetFaceCulling(false);
 		static glm::mat4 transform = glm::mat4(1.0f);
@@ -344,6 +342,8 @@ namespace Calibur
 
 	void Scene::RenderScene3D(Ref<Shader> shader)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		Renderer::BeginScene();
 			
 		auto view = m_Registry.view<TransformComponent, RelationshipComponent>();
@@ -396,11 +396,6 @@ namespace Calibur
 				material->GetRoughnessMap()->Bind(3);
 
 				Renderer::RenderMesh(mesh.mesh, submeshIndex);
-
-				if (shader == nullptr)
-					material->GetShader()->Unbind();
-				else
-					shader->Unbind();
 			}
 		}
 

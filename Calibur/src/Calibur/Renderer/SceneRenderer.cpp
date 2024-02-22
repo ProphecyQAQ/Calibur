@@ -148,6 +148,8 @@ namespace Calibur
 	// Now only support one light
 	void SceneRenderer::GenerateShadowMap(const SceneLightData& lightData)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		if (lightData.DirectionalLightCount == 0) return;		
 
 		// Upload light viewProj matrix
@@ -159,7 +161,7 @@ namespace Calibur
 		m_CSMFramebuffer->Bind();
 		RenderCommand::SetViewport(0, 0, m_CSMTextureArray->GetWidth(), m_CSMTextureArray->GetHeight());
 		RenderCommand::Clear();
-		RenderCommand::SetFaceCulling(false);
+		RenderCommand::SetFaceCulling(true, 1);
 
 		m_Scene->RenderScene2D();
 		m_Scene->RenderScene3D(m_DirCSMShader);
@@ -176,6 +178,8 @@ namespace Calibur
 
 	void SceneRenderer::CalculateCascades(const glm::vec3& lightDirection)
 	{
+		HZ_PROFILE_FUNCTION();
+
 		glm::mat4 viewMatrix = m_SceneRenderCamera.ViewMatrix;
 		glm::mat4 viewProj = m_SceneRenderCamera.camera.GetProjection() * viewMatrix;
 
@@ -281,6 +285,8 @@ namespace Calibur
 
 	void SceneRenderer::TaaPass()
 	{
+		HZ_PROFILE_FUNCTION();
+
 		Ref<Shader> shader = Renderer::GetShaderLibrary()->Get("Taa");
 
 		// Taa pass

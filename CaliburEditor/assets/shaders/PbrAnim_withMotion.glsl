@@ -58,6 +58,7 @@ void main()
 
 	Output.worldPosition = worldPosition.xyz;
 	Output.worldNormal = transpose(inverse(mat3(u_Transform * boneTransform))) * a_Normal;
+	Output.worldNormal = normalize(Output.worldNormal);
 	Output.texCoord = a_TexCoord;
 	Output.tangent = a_Tangent;
 	Output.bitangent = a_Bitangent;
@@ -147,7 +148,7 @@ float shadowCalculate(vec3 lightDir)
 	if (currentDepth > 1.0 || currentDepth < -1.0) return 0.0;
 
 	vec3 normal = normalize(Input.worldNormal);
-	float bias = max(0.005 * (1.0 - dot(normal, lightDir)), 0.005);
+	float bias = max(0.002 * (1.0 - dot(normal, lightDir)), 0.002);
 	//bias *= 1 / (-u_CascadePlaneDistances[layer] * 0.5f);
 	
 	//float depth = texture(u_DirCSM, vec3(projCoord.xy, layer)).r;

@@ -114,6 +114,10 @@ namespace Calibur
 		{
 			DrawBrdfLut();
 		}
+
+		// Set Environment map
+		GetPreFilterMap()->Bind(5);
+		GetIrradianceMap()->Bind(6);
 	}
 
 	void SceneEnvironment::DrawEquirectangularToCubemap(Ref<Texture2D> equirectangularMap)

@@ -21,12 +21,13 @@ namespace Calibur
 		aiProcess_CalcTangentSpace |        // Create binormals/tangents just in case
 		aiProcess_Triangulate |             // Make sure we're triangles
 		aiProcess_GenNormals |              // Make sure we have legit normals
-		//aiProcess_SortByPType |             // Split meshes by primitive type
+		aiProcess_SortByPType |             // Split meshes by primitive type
 		aiProcess_GenUVCoords |             // Convert UVs if required 
 		//aiProcess_OptimizeGraph |          
-		//aiProcess_OptimizeMeshes |          // Batch draws where possible
-		//aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
+		aiProcess_OptimizeMeshes |          // Batch draws where possible
+		aiProcess_JoinIdenticalVertices |   // Join identical vertices/ optimize indexing
 		aiProcess_GlobalScale |             // e.g. convert cm to m for fbx import (and other formats where cm is native)
+		aiProcess_LimitBoneWeights |        // If more than N (=4) bone weights, discard least influencing bones and renormalise sum to 1
 		aiProcess_ValidateDataStructure;    // Validation
 
 

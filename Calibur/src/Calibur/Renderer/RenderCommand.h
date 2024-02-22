@@ -40,19 +40,33 @@ namespace Calibur
 		static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount = 0)
 		{
 			s_RendererAPI->DrawIndexed(vertexArray, indexCount);
+			s_DrawCallsCount++;
 		}
 
 		static void DrawPatches(const Ref<VertexArray>& vertexArray, uint32_t size)
 		{
 			s_RendererAPI->DrawPatches(vertexArray, size);
+			s_DrawCallsCount++;
 		}
 
 		static void RenderMesh(Ref<Mesh> mesh, uint32_t submeshIndex)
 		{
 			s_RendererAPI->RenderMesh(mesh, submeshIndex);
+			s_DrawCallsCount++;
+		}
+
+		static int GetDrawCallsCount()
+		{
+			return s_DrawCallsCount;
+		}
+
+		static void ClearDrawCallsCount()
+		{
+			s_DrawCallsCount = 0;
 		}
 
 	private:
 		static Scope<RendererAPI> s_RendererAPI;
+		static int s_DrawCallsCount;
 	};
 }

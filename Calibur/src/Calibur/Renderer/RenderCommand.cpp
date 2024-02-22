@@ -4,4 +4,5 @@
 namespace Calibur
 {
 	Scope<RendererAPI> RenderCommand::s_RendererAPI = RendererAPI::Create();
+	int RenderCommand::s_DrawCallsCount = 0;
 }

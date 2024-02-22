@@ -43,7 +43,7 @@ namespace Calibur
 		
 		m_CameraController.SetZoomLevel(4.f);
 
-		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 1.f, 5000.f);
+		m_EditorCamera = EditorCamera(45.f, 16.f / 9.f, 0.1f, 2000.f);
 		#if 0
 		auto square = m_ActiveScene->CreateEntity("Green square");
 		square.AddComponent<SpriteRendererComponent>(glm::vec4(0.f, 1.f, 1.f, 1.f));
@@ -106,15 +106,17 @@ namespace Calibur
 		/*auto& entity = m_ActiveScene->CreateEntity("nanosuit");
 		entity.AddComponent<MeshComponent>("assets/Model/nanosuit/nanosuit.obj", false);*/
 		//m_ActiveScene->LoadModel("assets/Model/nanosuit/nanosuit.obj", true);
-		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", true);
-		//m_ActiveScene->LoadModel("assets/LocalModel/CrytekSponza/sponza.obj", "Pbr_withMotion", true);
-		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", false);
-		//m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", false);
+		//m_ActiveScene->LoadModel("assets/LocalModel/Cerberus/Cerberus_LP.FBX", "Pbr_withMotion", true);
+		m_ActiveScene->LoadModel("assets/LocalModel/CrytekSponza/sponza.obj", "Pbr_withMotion", true);
+		//m_ActiveScene->LoadModel("assets/Model/CornelBox/cornell-box.obj", "Pbr", false);
+		//m_ActiveScene->LoadModel("assets/Model/teapot1/teapot.obj", "Pbr_withMotion", false);
 		//std::string path = "assets/LocalModel/vampire/dancing_vampire.dae";
-		std::string path = "assets/LocalModel/Anim/model2/scene.gltf";
-		auto modelMessage = m_ActiveScene->LoadModel(path, "PbrAnim_withMotion", true);
-		auto entity = std::get<0>(modelMessage);
-		entity.AddComponent<AnimationComponent>(path, std::get<1>(modelMessage));
+		//auto plane = m_ActiveScene->LoadModel("assets/Model/common/plane.obj");
+		//std::get<0>(plane).GetComponent<TransformComponent>().Scale = glm::vec3(100.f, 1.f, 100.f);
+		//std::string path = "assets/LocalModel/Anim/model2/scene.gltf";
+		//auto modelMessage = m_ActiveScene->LoadModel(path, "PbrAnim_withMotion", true);
+		//auto entity = std::get<0>(modelMessage);
+		//entity.AddComponent<AnimationComponent>(path, std::get<1>(modelMessage));
 	}
 
 	void EditorLayer::OnDetach()
@@ -127,6 +129,7 @@ namespace Calibur
 		HZ_PROFILE_FUNCTION();
 
 		m_FramePerSecond = 1000.f / ts.GetMilliseconds();
+		RenderCommand::ClearDrawCallsCount();
 
 		//Resize
 		if (FramebufferSpecification spec = m_Framebuffer->GetSpecificaition();
@@ -280,7 +283,7 @@ namespace Calibur
 
 		auto& stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
-		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
+		ImGui::Text("Draw Calls: %d", RenderCommand::GetDrawCallsCount());
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Indices: %d", stats.GetTotalIndexCount());
